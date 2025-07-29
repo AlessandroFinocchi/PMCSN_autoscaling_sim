@@ -34,6 +34,8 @@
  * --------------------------------------------------------------------------
  */
 
+import libs.Rngs;
+
 import java.math.*;
 import java.io.*;
 
@@ -48,7 +50,7 @@ public class Rvgs{
     // Instead, force the Rvgs constructor to have an already-created Rngs
     // object.
 
-    Rngs rngs; 
+    Rngs rngs;
     
 //    public Rvgs(){
 //   	  rngs = new Rngs();

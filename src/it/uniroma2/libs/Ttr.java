@@ -12,6 +12,8 @@
  * ------------------------------------------------------------------------- 
  */
 
+import libs.Rngs;
+
 import java.io.*;
 import java.lang.Math;
 import java.text.*;
