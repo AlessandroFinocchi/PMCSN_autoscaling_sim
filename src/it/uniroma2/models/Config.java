@@ -1,6 +1,6 @@
 package it.uniroma2.models;
 
-import it.uniroma2.App;
+import it.uniroma2.ExampleApp;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +16,7 @@ public class Config {
     public static final double SERVICES_CV;
 
     static {
-        try(InputStream in = App.class
+        try(InputStream in = ExampleApp.class
                 .getClassLoader()
                 .getResourceAsStream(CONFIG_FILE)){
             Properties props = new Properties();
