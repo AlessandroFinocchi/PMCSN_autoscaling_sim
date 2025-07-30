@@ -159,10 +159,9 @@ public class Rngs {
 	  
           line = ReadThis.readLine();
           x = Long.parseLong(line);
-        } catch (IOException e) {
-        } catch (NumberFormatException nfe) {
+        } catch (IOException | NumberFormatException e) {
         }
-        ok = (0 < x) && (x < MODULUS);
+          ok = (0 < x) && (x < MODULUS);
         if (!ok)
           System.out.println("\nInput out of range ... try again");
       }

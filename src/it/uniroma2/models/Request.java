@@ -1,6 +1,6 @@
 package it.uniroma2.models;
 
-import it.uniroma2.libs.Rng;
+import it.uniroma2.libs.Rngs;
 import lombok.Getter;
 
 public class Request {
@@ -11,7 +11,7 @@ public class Request {
     @Getter private static double START = 0.0;                   /* initial time             */
     private double sarrival = START;              /* sum of arrivals          */
 
-    public Request(Rng r) {
+    public Request(Rngs r) {
         this.arrivalTime = getArrival(r);
         this.serviceTime = getService(r);
     }
@@ -22,20 +22,22 @@ public class Request {
     }
 
 
-    double exponential(double m, Rng r) {
+    double exponential(double m, Rngs r) {
         return (-m * Math.log(1.0 - r.random()));
     }
 
-    double uniform(double a, double b, Rng r) {
+    double uniform(double a, double b, Rngs r) {
         return (a + (b - a) * r.random());
     }
 
-    double getArrival(Rng r) {
+    double getArrival(Rngs r) {
+        r.selectStream(0);
         sarrival += exponential(2.0, r);
         return sarrival;
     }
 
-    double getService(Rng r) {
+    double getService(Rngs r) {
+        r.selectStream(1);
         return (uniform(1.0, 2.0, r));
     }
 }

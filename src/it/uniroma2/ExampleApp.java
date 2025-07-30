@@ -1,6 +1,6 @@
 package it.uniroma2;
 
-import it.uniroma2.libs.Rng;
+import it.uniroma2.libs.Rngs;
 import it.uniroma2.models.Request;
 
 import java.text.DecimalFormat;
@@ -9,7 +9,7 @@ import static it.uniroma2.models.Config.*;
 
 /***
  * Riprendi da:
- * - LIBRO      p.107   paragrafo 3.1.2
+ * - LIBRO      p.117   paragrafo 3.2
  * - APPUNTI    p.28    paragrafo 3.1.3
  */
 
@@ -38,8 +38,8 @@ public class ExampleApp {
         double departure = Request.getSTART();        /* time of departure    */
 
         ExampleSum sum = new ExampleSum();
-        Rng r = new Rng();
-        r.putSeed(SEED);
+        Rngs r = new Rngs();
+        r.plantSeeds(SEED);
 
 
         while (index < Request.getLAST()) {
