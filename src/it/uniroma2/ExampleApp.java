@@ -1,7 +1,11 @@
 package it.uniroma2;
 
 import it.uniroma2.libs.Rngs;
-import it.uniroma2.models.Request;
+import it.uniroma2.models.distr.Distribution;
+import it.uniroma2.models.distr.Exponential;
+import it.uniroma2.models.distr.Uniform;
+import it.uniroma2.models.sys.SystemState;
+import it.uniroma2.models.sys.SystemStatsSum;
 
 import java.text.DecimalFormat;
 
@@ -9,63 +13,70 @@ import static it.uniroma2.models.Config.*;
 
 /***
  * Riprendi da:
- * - LIBRO      p.117   paragrafo 3.2
- * - APPUNTI    p.28    paragrafo 3.1.3
+ * - LIBRO      p.182   paragrafo inizio
+ * - APPUNTI    p.32    paragrafo inizio
  */
 
-class ExampleSum {                                 /* sum of ...           */
-    double delay;                                  /*   delay times        */
-    double wait;                                   /*   wait times         */
-    double service;                                /*   service times      */
-    double interarrival;                           /*   interarrival times */
-
-    ExampleSum() {
-        this.delay = 0.0;
-        this.wait = 0.0;
-        this.service = 0.0;
-        this.interarrival = 0.0;
-    }
-}
 
 public class ExampleApp {
 
-    public static void main( String[] args )
-    {
-        long   index     = 0;                         /* job index            */
-        double arrival   = Request.getSTART();        /* time of arrival      */
-        double delay;                                 /* delay in queue       */
-        double wait;                                  /* delay + service      */
-        double departure = Request.getSTART();        /* time of departure    */
+    public static void main(String[] args) {
 
-        ExampleSum sum = new ExampleSum();
+        long index  = 0;                  /* used to count departed jobs         */
+        long number = 0;                  /* number in the node                  */
+        double sarrival = START;
+
         Rngs r = new Rngs();
         r.plantSeeds(SEED);
 
+        Distribution arrivalVA  = new Exponential(r, 0, ARRIVALS_LAMBDA);
+        Distribution servicesVA = new Uniform(r, 1, SERVICES_MIN, SERVICES_MAX);
 
-        while (index < Request.getLAST()) {
-            index++;
-            Request request = new Request(r);
-            if (arrival < departure)
-                delay      = departure - arrival;         /* delay in queue    */
-            else
-                delay      = 0.0;                         /* no delay          */
-            wait         = delay + request.getServiceTime();
-            departure    = arrival + wait;              /* time of departure */
-            sum.delay   += delay;
-            sum.wait    += wait;
-            sum.service += request.getServiceTime();
+        sarrival += arrivalVA.gen();
+
+        SystemStatsSum sum = new SystemStatsSum();
+        SystemState s = new SystemState(
+                sarrival,
+                INFINITY,
+                START
+        );
+
+        while (s.getArrival() < STOP || number > 0) {
+            s.setNext(Math.min(s.getArrival(), s.getCompletion()));
+            if (number > 0) {
+                sum.node    += (s.getNext() - s.getCurrent()) * number;
+                sum.queue   += (s.getNext() - s.getCurrent()) * (number - 1);
+                sum.service += (s.getNext() - s.getCurrent());
+            }
+            s.setCurrent(s.getNext());
+
+            if (s.getCurrent() == s.getArrival()) {
+                number++;
+                sarrival += arrivalVA.gen();
+                s.setArrival(sarrival);
+                if (s.getArrival() > STOP) {
+                    s.setLast(s.getCurrent());
+                    s.setArrival(INFINITY);
+                }
+                if (number == 1)
+                    s.setCompletion(s.getCurrent() + servicesVA.gen());
+            }
+            else {
+                index++;
+                number--;
+                s.setCompletion(number > 0 ? s.getCurrent() + servicesVA.gen() : INFINITY);
+            }
         }
-        sum.interarrival = arrival - Request.getSTART();
-
         DecimalFormat f = new DecimalFormat("###0.00");
+
         System.out.println("\nfor " + index + " jobs");
-        System.out.println("   average interarrival time =   " + f.format(sum.interarrival / index));
-        System.out.println("   average wait ............ =   " + f.format(sum.wait / index));
-        System.out.println("   average delay ........... =   " + f.format(sum.delay / index));
+        System.out.println("   average interarrival time =   " + f.format(s.getLast() / index));
+        System.out.println("   average wait ............ =   " + f.format(sum.node / index));
+        System.out.println("   average delay ........... =   " + f.format(sum.queue / index));
         System.out.println("   average service time .... =   " + f.format(sum.service / index));
-        System.out.println("   average # in the node ... =   " + f.format(sum.wait / departure));
-        System.out.println("   average # in the queue .. =   " + f.format(sum.delay / departure));
-        System.out.println("   utilization ............. =   " + f.format(sum.service / departure));
+        System.out.println("   average # in the node ... =   " + f.format(sum.node / s.getCurrent()));
+        System.out.println("   average # in the queue .. =   " + f.format(sum.queue / s.getCurrent()));
+        System.out.println("   utilization ............. =   " + f.format(sum.service / s.getCurrent()));
 
     }
 

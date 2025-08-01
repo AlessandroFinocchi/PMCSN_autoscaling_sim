@@ -10,10 +10,14 @@ public class Config {
     private static final String CONFIG_FILE = "config.properties";
 
     public static final int SEED;
-    public static final double ARRIVALS_AVG;
-    public static final double ARRIVALS_CV;
-    public static final double SERVICES_AVG;
-    public static final double SERVICES_CV;
+
+    public static final double ARRIVALS_LAMBDA;
+    public static final double SERVICES_MIN;
+    public static final double SERVICES_MAX;
+
+    public static final double START;
+    public static final double STOP;
+    public static final double INFINITY;
 
     static {
         try(InputStream in = ExampleApp.class
@@ -22,12 +26,14 @@ public class Config {
             Properties props = new Properties();
             props.load(in);
 
-            SEED = Integer.parseInt(props.getProperty("random.seed"));
-            ARRIVALS_AVG = Double.parseDouble(props.getProperty("distribution.arrivals.avg"));
-            ARRIVALS_CV = Double.parseDouble(props.getProperty("distribution.arrivals.cv"));
-            SERVICES_AVG = Double.parseDouble(props.getProperty("distribution.services.avg"));
-            SERVICES_CV = Double.parseDouble(props.getProperty("distribution.services.cv"));
-
+            SEED            = Integer.parseInt(props.getProperty("random.seed"));
+            ARRIVALS_LAMBDA = Double.parseDouble(props.getProperty("distribution.arrivals.lambda"));
+            SERVICES_MIN    = Double.parseDouble(props.getProperty("distribution.services.min"));
+            SERVICES_MAX    = Double.parseDouble(props.getProperty("distribution.services.max"));
+            START           = Double.parseDouble(props.getProperty("system.start"));
+            STOP            = Double.parseDouble(props.getProperty("system.stop"));
+//            INFINITY        = Double.POSITIVE_INFINITY;
+            INFINITY = 100.0 * STOP;
         } catch (IOException e) {
             throw new ExceptionInInitializerError(
                     "Impossible loading " + CONFIG_FILE + ": " + e.getMessage());
