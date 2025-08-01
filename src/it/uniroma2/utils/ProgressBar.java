@@ -14,14 +14,14 @@ public class ProgressBar {
 
     public void update(double current) {
         try { Thread.sleep(1); } catch (InterruptedException ignored) {}
-        if (current > this.nextUpdate) {
+        if (current >= this.nextUpdate) {
             this.nextUpdate += len/10000;
             double percent =(current * 100) / this.len;
             long currentTime = System.nanoTime();
             long diffTime = currentTime - initialTime;
-            long remainingTime = (long) (diffTime * 100 / percent);
+            long remainingTime = (long) (diffTime * 100 / percent) - diffTime;
             System.out.print(String.format(
-                    "\rProgress: %5f%% (%f%f) | Elapsed %s | Remaining %s",
+                    "\rProgress: %.2f%% (%.2f/%.2f) | Elapsed %s | Remaining %s",
                     percent, current, this.len,
                     formatTime(diffTime),
                     formatTime(remainingTime)
@@ -30,8 +30,8 @@ public class ProgressBar {
         }
     }
 
-    private String formatTime(long millis) {
-        long seconds = millis / 1000000;
+    private String formatTime(long nanos) {
+        long seconds = (long) (nanos / 1e9);
         long minutes = seconds / 60;
         long hours = minutes / 60;
         return String.format("%02d:%02d:%02d",
