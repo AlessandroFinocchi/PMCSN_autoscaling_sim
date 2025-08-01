@@ -14,6 +14,6 @@ public class Uniform extends Distribution {
 
     @Override
     public double newTime() {
-        return (this.min + (this.max - this.min) * this.r.random());
+        return this.min + (this.max - this.min) * this.r.random();
     }
 }

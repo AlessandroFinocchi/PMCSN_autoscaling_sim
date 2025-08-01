@@ -6,6 +6,7 @@ import it.uniroma2.models.distr.Exponential;
 import it.uniroma2.models.distr.Uniform;
 import it.uniroma2.models.sys.SystemState;
 import it.uniroma2.models.sys.SystemStatsSum;
+import it.uniroma2.utils.ProgressBar;
 
 import java.text.DecimalFormat;
 
@@ -29,7 +30,7 @@ public class ExampleApp {
         Rngs r = new Rngs();
         r.plantSeeds(SEED);
 
-        Distribution arrivalVA  = new Exponential(r, 0, ARRIVALS_LAMBDA);
+        Distribution arrivalVA  = new Exponential(r, 0, ARRIVALS_MU);
         Distribution servicesVA = new Uniform(r, 1, SERVICES_MIN, SERVICES_MAX);
 
         sarrival += arrivalVA.gen();
@@ -41,7 +42,10 @@ public class ExampleApp {
                 START
         );
 
+        ProgressBar bar = new ProgressBar(STOP);
+
         while (s.getArrival() < STOP || number > 0) {
+            bar.update(s.getCurrent());
             s.setNext(Math.min(s.getArrival(), s.getCompletion()));
             if (number > 0) {
                 sum.node    += (s.getNext() - s.getCurrent()) * number;

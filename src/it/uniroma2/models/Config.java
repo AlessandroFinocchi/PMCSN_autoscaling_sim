@@ -11,7 +11,7 @@ public class Config {
 
     public static final int SEED;
 
-    public static final double ARRIVALS_LAMBDA;
+    public static final double ARRIVALS_MU;
     public static final double SERVICES_MIN;
     public static final double SERVICES_MAX;
 
@@ -27,13 +27,13 @@ public class Config {
             props.load(in);
 
             SEED            = Integer.parseInt(props.getProperty("random.seed"));
-            ARRIVALS_LAMBDA = Double.parseDouble(props.getProperty("distribution.arrivals.lambda"));
+            ARRIVALS_MU = Double.parseDouble(props.getProperty("distribution.arrivals.mu"));
             SERVICES_MIN    = Double.parseDouble(props.getProperty("distribution.services.min"));
             SERVICES_MAX    = Double.parseDouble(props.getProperty("distribution.services.max"));
             START           = Double.parseDouble(props.getProperty("system.start"));
             STOP            = Double.parseDouble(props.getProperty("system.stop"));
-//            INFINITY        = Double.POSITIVE_INFINITY;
-            INFINITY = 100.0 * STOP;
+            INFINITY        = Double.POSITIVE_INFINITY;
+//            INFINITY = 100.0 * STOP;
         } catch (IOException e) {
             throw new ExceptionInInitializerError(
                     "Impossible loading " + CONFIG_FILE + ": " + e.getMessage());
