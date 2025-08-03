@@ -12,10 +12,9 @@ import java.text.DecimalFormat;
 
 import static it.uniroma2.models.Config.*;
 
-/***
+/**
  * Riprendi da:
- * - LIBRO      p.182   paragrafo inizio
- * - APPUNTI    p.32    paragrafo inizio
+ * - LIBRO      p.208   paragrafo inizio
  */
 
 

@@ -13,7 +13,7 @@ public class ProgressBar {
     }
 
     public void update(double current) {
-        try { Thread.sleep(1); } catch (InterruptedException ignored) {}
+//        try { Thread.sleep(1); } catch (InterruptedException ignored) {}
         if (current >= this.nextUpdate) {
             this.nextUpdate += len/10000;
             double percent =(current * 100) / this.len;
