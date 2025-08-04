@@ -14,14 +14,14 @@ public class Job {
         this.remainingLife = executionLife;
     }
 
-    public void decreaseRemainingLife(double executedTime) throws JobCompletionException {
+    public void decreaseRemainingLife(double executedTime) {
         this.remainingLife -= executedTime;
 
         if (remainingLife < -QUANTUM_THR) {
             System.out.println("Remaining life: " + remainingLife);
             throw new RuntimeException("Remaining time cannot be negative");
         }
-        else if (remainingLife < QUANTUM_THR) throw new JobCompletionException();
+//        else if (remainingLife < QUANTUM_THR) throw new JobCompletionException();
 
     }
 }

@@ -1,10 +1,7 @@
 package it.uniroma2.models.events;
 
-import it.uniroma2.exceptions.JobCompletionException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.SystemState;
-
-import java.util.Iterator;
 
 import static it.uniroma2.models.Config.INFINITY;
 import static it.uniroma2.models.Config.STOP;
@@ -12,7 +9,7 @@ import static it.uniroma2.models.Config.STOP;
 public class EventProcessor implements EventVisitor {
 
     @Override
-    public void visit(SystemState s, ArrivalEvent event) throws JobCompletionException {
+    public void visit(SystemState s, ArrivalEvent event)  {
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();
@@ -22,6 +19,7 @@ public class EventProcessor implements EventVisitor {
         for(Job job: s.getJobs()) {
             job.decreaseRemainingLife(quantum);
         }
+        s.removeMinRemainingLifeJob();
 
         /* Add the next job to the list */
         double nextServiceLife = s.getServicesVA().gen();
@@ -52,15 +50,10 @@ public class EventProcessor implements EventVisitor {
 
         /* Compute the advancement of each job */
         double quantum = (s.getCapacity() / s.getJobs().size()) * (endTs - startTs);
-        Iterator<Job> iterator = s.getJobs().iterator();
-        while(iterator.hasNext()) {
-            Job job = iterator.next();
-            try {
-                job.decreaseRemainingLife(quantum);
-            } catch (JobCompletionException e) {
-                iterator.remove();
-            }
+        for (Job job : s.getJobs()) {
+            job.decreaseRemainingLife(quantum);
         }
+        s.removeMinRemainingLifeJob();
 
         /* Generate next completion */
         double nextCompletionTs;

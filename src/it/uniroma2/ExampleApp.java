@@ -12,7 +12,7 @@ import static it.uniroma2.models.Config.*;
 
 public class ExampleApp {
 
-    public static void main(String[] args) throws JobCompletionException {
+    public static void main(String[] args)  {
         Rngs r = new Rngs();
         r.plantSeeds(SEED);
 

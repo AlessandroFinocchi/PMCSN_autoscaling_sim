@@ -9,7 +9,7 @@ public class CompletionEvent extends Event {
     }
 
     @Override
-    public void process(SystemState s, EventVisitor visitor) throws JobCompletionException {
+    public void process(SystemState s, EventVisitor visitor) {
         visitor.visit(s, this);
     }
 }

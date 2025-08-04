@@ -38,6 +38,10 @@ public class SystemState {
         this.calendar.addEvent(event);
     }
 
+    public void removeMinRemainingLifeJob() {
+        jobs.stream().min(Comparator.comparing(Job::getRemainingLife)).ifPresent(this::removeJob);
+    }
+
     public double minRemainingLife() {
         if (jobs.isEmpty()) return INFINITY;
         return jobs.stream().min(Comparator.comparing(Job::getRemainingLife)).get().getRemainingLife();

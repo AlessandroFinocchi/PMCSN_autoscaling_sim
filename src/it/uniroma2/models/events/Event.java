@@ -13,6 +13,6 @@ public abstract class Event {
         this.eventType = eventType;
     }
 
-    public abstract void process(SystemState s, EventVisitor visitor) throws JobCompletionException;
+    public abstract void process(SystemState s, EventVisitor visitor);
 
 }
