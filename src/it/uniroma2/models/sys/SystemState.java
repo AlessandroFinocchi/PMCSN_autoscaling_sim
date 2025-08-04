@@ -18,8 +18,8 @@ public class SystemState {
     @Getter @Setter private double current;                 /* current time                        */
     private EventCalendar calendar;
     @Getter private List<Job> jobs;
-    @Getter private Distribution arrivalVA;
-    @Getter private Distribution servicesVA;
+    @Getter private final Distribution arrivalVA;
+    @Getter private final Distribution servicesVA;
 
     public SystemState(EventCalendar calendar, Distribution arrivalVA, Distribution servicesVA) {
         this.capacity = WEBSERVER_CAPACITY;

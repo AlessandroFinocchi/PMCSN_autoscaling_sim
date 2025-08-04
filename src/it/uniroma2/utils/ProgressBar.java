@@ -3,19 +3,18 @@ package it.uniroma2.utils;
 
 public class ProgressBar {
     private final double len;
-    private double nextUpdate;
+    private double counter;
     private final long initialTime;
 
     public ProgressBar(double len) {
         this.len = len;
-        this.nextUpdate = len/10000;
+        this.counter = 0;
         this.initialTime = System.nanoTime();
     }
 
     public void update(double current) {
 //        try { Thread.sleep(1); } catch (InterruptedException ignored) {}
-        if (current >= this.nextUpdate) {
-            this.nextUpdate += len/10000;
+        if (counter++ % 1000 == 0) {
             double percent =(current * 100) / this.len;
             long currentTime = System.nanoTime();
             long diffTime = currentTime - initialTime;

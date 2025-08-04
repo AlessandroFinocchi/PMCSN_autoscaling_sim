@@ -36,12 +36,15 @@ public class ExampleApp {
 
         /* Setup state of the system */
         SystemState s = new SystemState(calendar, arrivalVA, servicesVA);
-
+        //21070.448522268824
         ProgressBar bar = new ProgressBar(STOP);
         while (s.getCurrent() < STOP || s.jobActiveExist()) {
             /* Compute the next event time */
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());
+            if(s.getCurrent() > 21070) {
+                System.out.println("mannaggetta");
+            }
 
             nextEvent.process(s, visitor);
         }
