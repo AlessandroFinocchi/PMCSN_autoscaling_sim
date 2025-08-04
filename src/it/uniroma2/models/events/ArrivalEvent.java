@@ -1,15 +1,15 @@
 package it.uniroma2.models.events;
 
-import it.uniroma2.models.distr.Distribution;
+import it.uniroma2.exceptions.JobCompletionException;
 import it.uniroma2.models.sys.SystemState;
 
 public class ArrivalEvent extends Event {
     public ArrivalEvent(double timestamp) {
-        super(timestamp);
+        super(timestamp, EventType.ARRIVAL);
     }
 
     @Override
-    public void process(SystemState s, EventVisitor visitor) {
+    public void process(SystemState s, EventVisitor visitor) throws JobCompletionException {
         visitor.visit(s, this);
     }
 

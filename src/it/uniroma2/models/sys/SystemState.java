@@ -1,21 +1,49 @@
 package it.uniroma2.models.sys;
 
+import it.uniroma2.models.Job;
+import it.uniroma2.models.distr.Distribution;
+import it.uniroma2.models.events.Event;
+import it.uniroma2.models.events.EventCalendar;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * System clock abstraction
- */
-public class SystemState {
-    @Getter @Setter private double arrival;                 /* next arrival time                   */
-    @Getter @Setter private double completion;              /* next completion time                */
-    @Getter @Setter private double current;                 /* current time                        */
-    @Getter @Setter private double next;                    /* next (most imminent) event time     */
-    @Getter @Setter private double last;                    /* last arrival time                   */
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
-    public SystemState(double arrival, double completion, double current) {
-        this.arrival = arrival;
-        this.completion = completion;
-        this.current = current;
+import static it.uniroma2.models.Config.*;
+
+public class SystemState {
+    @Getter private final double capacity;
+    @Getter @Setter private double current;                 /* current time                        */
+    private EventCalendar calendar;
+    @Getter private List<Job> jobs;
+    @Getter private Distribution arrivalVA;
+    @Getter private Distribution servicesVA;
+
+    public SystemState(EventCalendar calendar, Distribution arrivalVA, Distribution servicesVA) {
+        this.capacity = WEBSERVER_CAPACITY;
+        this.current = START;
+        this.calendar = calendar;
+        this.jobs = new ArrayList<>();
+        this.arrivalVA = arrivalVA;
+        this.servicesVA = servicesVA;
+    }
+
+    public boolean jobActiveExist() {
+        return !this.jobs.isEmpty();
+    }
+
+    public void addEvent(Event event) {
+        this.calendar.addEvent(event);
+    }
+
+    public double minRemainingLife() {
+        if (jobs.isEmpty()) return INFINITY;
+        return jobs.stream().min(Comparator.comparing(Job::getRemainingLife)).get().getRemainingLife();
+    }
+
+    public void removeJob(Job job) {
+        jobs.remove(job);
     }
 }

@@ -3,26 +3,23 @@ package it.uniroma2.models.events;
 import java.util.*;
 
 public class EventCalendar {
-    private final PriorityQueue<Event> events;
-
-    public EventCalendar() {
-        this.events = new PriorityQueue<>(
-                (e1, e2) -> Double.compare(e1.getTimestamp(), e2.getTimestamp())
-        );
-    }
+    private final Map<EventType, Event> events = new HashMap<>();
 
     /**
-     * Adds event in the list, keeping it in order
+     * Adds event in the map
      * @param e The event to add
      */
     public void addEvent(Event e) {
-        events.add(e);
+        events.put(e.getEventType(), e);
     }
 
     /**
-     * Get event with minimum timestamp and removes it
+     * Get event with minimum timestamp
      */
     public Event nextEvent() {
-        return events.poll();
+        return events.values()
+                .stream()
+                .min(Comparator.comparing(Event::getTimestamp))
+                .orElse(null);
     }
 }
