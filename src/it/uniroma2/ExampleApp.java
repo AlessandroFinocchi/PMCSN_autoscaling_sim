@@ -53,10 +53,8 @@ public class ExampleApp {
         System.out.println("\nfor " + stats.getCompletedJobs() + " jobs");
         System.out.println("   average interarrival time =   " + f.format(s.getCurrent() / stats.getCompletedJobs()));
         System.out.println("   average response time ... =   " + f.format(stats.getNodeSum() / stats.getCompletedJobs()));
-        System.out.println("   average waiting time .... =   " + f.format(stats.getQueueSum() / stats.getCompletedJobs()));
         System.out.println("   average service time .... =   " + f.format(stats.getServiceSum() / stats.getCompletedJobs()));
         System.out.println("   average # in the node ... =   " + f.format(stats.getNodeSum() / s.getCurrent()));
-        System.out.println("   average # in the queue .. =   " + f.format(stats.getQueueSum() / s.getCurrent()));
         System.out.println("   utilization ............. =   " + f.format(stats.getServiceSum() / s.getCurrent()));
     }
 

@@ -15,6 +15,9 @@ public class EventProcessor implements EventVisitor {
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();
 
+        /* Update stats */
+        stats.updateSystemStats(startTs, endTs, s.getJobs().size(), 0);
+
         /* Compute the advancement of each job */
         double quantum = (s.getCapacity() / s.getJobs().size()) * (endTs - startTs);
         for(Job job: s.getJobs()) {
@@ -40,10 +43,6 @@ public class EventProcessor implements EventVisitor {
 
         /* Update the current system clock */
         s.setCurrent(endTs);
-
-        /* Update stats */
-        stats.updateSystemStats(startTs, endTs, s.getJobs().size() - 1, 0);
-
     }
 
     @Override
@@ -51,6 +50,9 @@ public class EventProcessor implements EventVisitor {
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();
+
+        /* Update stats */
+        stats.updateSystemStats(startTs, endTs, s.getJobs().size(), 1);
 
         /* Compute the advancement of each job */
         double quantum = (s.getCapacity() / s.getJobs().size()) * (endTs - startTs);
@@ -71,8 +73,5 @@ public class EventProcessor implements EventVisitor {
 
         /* Update the current system clock */
         s.setCurrent(endTs);
-
-        /* Update stats */
-        stats.updateSystemStats(startTs, endTs, s.getJobs().size() + 1, 1);
     }
 }
