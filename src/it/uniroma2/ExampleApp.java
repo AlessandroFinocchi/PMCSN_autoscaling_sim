@@ -1,6 +1,5 @@
 package it.uniroma2;
 
-import it.uniroma2.exceptions.JobCompletionException;
 import it.uniroma2.libs.Rngs;
 import it.uniroma2.models.distr.Distribution;
 import it.uniroma2.models.distr.Exponential;
@@ -42,9 +41,6 @@ public class ExampleApp {
             /* Compute the next event time */
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());
-            if(s.getCurrent() > 21070) {
-                System.out.println("mannaggetta");
-            }
 
             nextEvent.process(s, visitor);
         }

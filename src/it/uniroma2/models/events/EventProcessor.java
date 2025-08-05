@@ -19,7 +19,6 @@ public class EventProcessor implements EventVisitor {
         for(Job job: s.getJobs()) {
             job.decreaseRemainingLife(quantum);
         }
-        s.removeMinRemainingLifeJob();
 
         /* Add the next job to the list */
         double nextServiceLife = s.getServicesVA().gen();
@@ -50,10 +49,10 @@ public class EventProcessor implements EventVisitor {
 
         /* Compute the advancement of each job */
         double quantum = (s.getCapacity() / s.getJobs().size()) * (endTs - startTs);
+        s.removeMinRemainingLifeJob();
         for (Job job : s.getJobs()) {
             job.decreaseRemainingLife(quantum);
         }
-        s.removeMinRemainingLifeJob();
 
         /* Generate next completion */
         double nextCompletionTs;
