@@ -21,9 +21,9 @@ import java.text.*;
 
 
 class Ssq3Area {                
-  double node;                    /* time integrated number in the node  */
-  double queue;                   /* time integrated number in the queue */
-  double service;                 /* time integrated number in service   */
+  double node;                    /* mean population in system  ibtg(l(s))*/
+  double queue;                   /* mean population in queue   intg(q(s))*/
+  double service;                 /* mean population in service intg(x(s))*/
 
   void initAreaParas() {
     node = 0.0;

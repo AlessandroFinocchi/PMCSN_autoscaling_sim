@@ -5,7 +5,10 @@ import it.uniroma2.models.distr.Distribution;
 import it.uniroma2.models.distr.Exponential;
 import it.uniroma2.models.events.*;
 import it.uniroma2.models.sys.SystemState;
+import it.uniroma2.models.sys.SystemStats;
 import it.uniroma2.utils.ProgressBar;
+
+import java.text.DecimalFormat;
 
 import static it.uniroma2.models.Config.*;
 
@@ -20,8 +23,6 @@ public class ExampleApp {
         Distribution arrivalVA  = new Exponential(r, 0, ARRIVALS_MU);
         Distribution servicesVA = new Exponential(r, 1, SERVICES_Z);
 
-        long completedJobs  = 0;                  /* used to count departed jobs         */
-
         /* Compute first arrival time */
         double nextArrival = arrivalVA.gen();
         double nextCompletion = INFINITY;
@@ -35,27 +36,28 @@ public class ExampleApp {
 
         /* Setup state of the system */
         SystemState s = new SystemState(calendar, arrivalVA, servicesVA);
-        //21070.448522268824
+        SystemStats stats = new SystemStats();
+
         ProgressBar bar = new ProgressBar(STOP);
         while (s.getCurrent() < STOP || s.jobActiveExist()) {
             /* Compute the next event time */
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());
 
-            nextEvent.process(s, visitor);
+            nextEvent.process(s, stats, visitor);
         }
 
-//        /* Print results */
-//        DecimalFormat f = new DecimalFormat("###0.00");
-//
-//        System.out.println("\nfor " + completedJobs + " jobs");
-//        System.out.println("   average interarrival time =   " + f.format(s.getLast() / completedJobs));
-//        System.out.println("   average wait ............ =   " + f.format(sum.node / completedJobs));
-//        System.out.println("   average delay ........... =   " + f.format(sum.queue / completedJobs));
-//        System.out.println("   average service time .... =   " + f.format(sum.service / completedJobs));
-//        System.out.println("   average # in the node ... =   " + f.format(sum.node / s.getCurrent()));
-//        System.out.println("   average # in the queue .. =   " + f.format(sum.queue / s.getCurrent()));
-//        System.out.println("   utilization ............. =   " + f.format(sum.service / s.getCurrent()));
+        /* Print results */
+        DecimalFormat f = new DecimalFormat("###0.00000000");
+
+        System.out.println("\nfor " + stats.getCompletedJobs() + " jobs");
+        System.out.println("   average interarrival time =   " + f.format(s.getCurrent() / stats.getCompletedJobs()));
+        System.out.println("   average response time ... =   " + f.format(stats.getNodeSum() / stats.getCompletedJobs()));
+        System.out.println("   average waiting time .... =   " + f.format(stats.getQueueSum() / stats.getCompletedJobs()));
+        System.out.println("   average service time .... =   " + f.format(stats.getServiceSum() / stats.getCompletedJobs()));
+        System.out.println("   average # in the node ... =   " + f.format(stats.getNodeSum() / s.getCurrent()));
+        System.out.println("   average # in the queue .. =   " + f.format(stats.getQueueSum() / s.getCurrent()));
+        System.out.println("   utilization ............. =   " + f.format(stats.getServiceSum() / s.getCurrent()));
     }
 
 }

@@ -2,6 +2,7 @@ package it.uniroma2.models.events;
 
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.SystemState;
+import it.uniroma2.models.sys.SystemStats;
 
 import static it.uniroma2.models.Config.INFINITY;
 import static it.uniroma2.models.Config.STOP;
@@ -9,7 +10,7 @@ import static it.uniroma2.models.Config.STOP;
 public class EventProcessor implements EventVisitor {
 
     @Override
-    public void visit(SystemState s, ArrivalEvent event)  {
+    public void visit(SystemState s, SystemStats stats, ArrivalEvent event)  {
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();
@@ -39,10 +40,14 @@ public class EventProcessor implements EventVisitor {
 
         /* Update the current system clock */
         s.setCurrent(endTs);
+
+        /* Update stats */
+        stats.updateSystemStats(startTs, endTs, s.getJobs().size() - 1, 0);
+
     }
 
     @Override
-    public void visit(SystemState s, CompletionEvent event) {
+    public void visit(SystemState s, SystemStats stats, CompletionEvent event) {
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();
@@ -66,5 +71,8 @@ public class EventProcessor implements EventVisitor {
 
         /* Update the current system clock */
         s.setCurrent(endTs);
+
+        /* Update stats */
+        stats.updateSystemStats(startTs, endTs, s.getJobs().size() + 1, 1);
     }
 }
