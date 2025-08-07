@@ -1,8 +1,8 @@
 package it.uniroma2.models.events;
 
+import it.uniroma2.controllers.ServerInfrastructure;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.SystemState;
-import it.uniroma2.models.sys.SystemStats;
 
 import static it.uniroma2.models.Config.INFINITY;
 import static it.uniroma2.models.Config.STOP;
@@ -10,27 +10,22 @@ import static it.uniroma2.models.Config.STOP;
 public class EventProcessor implements EventVisitor {
 
     @Override
-    public void visit(SystemState s, SystemStats stats, ArrivalEvent event)  {
+    public void visit(SystemState s, ArrivalEvent event)  {
+        ServerInfrastructure servers = s.getServers();
+        
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();
 
-        /* Update stats */
-        stats.updateSystemStats(startTs, endTs, s.getJobs().size(), 0);
-
-        /* Compute the advancement of each job */
-        double quantum = (s.getCapacity() / s.getJobs().size()) * (endTs - startTs);
-        for(Job job: s.getJobs()) {
-            job.decreaseRemainingLife(quantum);
-        }
+        servers.computeJobsAdvancement(startTs, endTs, 0);
 
         /* Add the next job to the list */
         double nextServiceLife = s.getServicesVA().gen();
         Job newJob = new Job(endTs, nextServiceLife);
-        s.getJobs().add(newJob);
+        servers.assignJob(newJob);
 
         /* Generate next completion */
-        double nextCompletionTs = endTs + s.minRemainingLife() / (s.getCapacity() / s.getJobs().size());
+        double nextCompletionTs = servers.computeNextCompletionTs(endTs);
         Event nextCompletion = new CompletionEvent(nextCompletionTs);
         s.addEvent(nextCompletion);
 
@@ -46,25 +41,19 @@ public class EventProcessor implements EventVisitor {
     }
 
     @Override
-    public void visit(SystemState s, SystemStats stats, CompletionEvent event) {
+    public void visit(SystemState s, CompletionEvent event) {
+        ServerInfrastructure servers = s.getServers();
+
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();
 
-        /* Update stats */
-        stats.updateSystemStats(startTs, endTs, s.getJobs().size(), 1);
-
-        /* Compute the advancement of each job */
-        double quantum = (s.getCapacity() / s.getJobs().size()) * (endTs - startTs);
-        s.removeMinRemainingLifeJob();
-        for (Job job : s.getJobs()) {
-            job.decreaseRemainingLife(quantum);
-        }
+        servers.computeJobsAdvancement(startTs, endTs, 0);
 
         /* Generate next completion */
         double nextCompletionTs;
-        if(s.jobActiveExist())
-            nextCompletionTs = endTs + s.minRemainingLife() / (s.getCapacity() / s.getJobs().size());
+        if(servers.activeJobExists())
+            nextCompletionTs = servers.computeNextCompletionTs(endTs);
         else
             nextCompletionTs = INFINITY;
 
