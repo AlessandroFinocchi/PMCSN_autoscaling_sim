@@ -1,5 +1,6 @@
 package it.uniroma2.controllers;
 
+import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 
 public class WebServer extends AbstractServer {
@@ -15,7 +16,7 @@ public class WebServer extends AbstractServer {
      * @param completed weather a job is completing or not
      */
     @Override
-    public void computeJobsAdvancement(double startTs, double endTs, int completed) {
+    public void computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
         /*  At this point the job has already been removed, so if this is the server
         *   where completion happened, it must be taken into consideration */
         int jobAdvanced = jobs.size() + completed;

@@ -1,6 +1,7 @@
 package it.uniroma2.models.events;
 
 import it.uniroma2.controllers.ServerInfrastructure;
+import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.SystemState;
 
@@ -10,7 +11,7 @@ import static it.uniroma2.models.Config.STOP;
 public class EventProcessor implements EventVisitor {
 
     @Override
-    public void visit(SystemState s, ArrivalEvent event)  {
+    public void visit(SystemState s, ArrivalEvent event) throws IllegalLifeException {
         ServerInfrastructure servers = s.getServers();
         
         /* Get the current clock and the one of this arrival */
@@ -25,7 +26,7 @@ public class EventProcessor implements EventVisitor {
         Job newJob = new Job(endTs, nextServiceLife);
         servers.assignJob(newJob);
 
-        /* Generate next completion */
+        /* Generate next completion 0.08246927943190602*/
         double nextCompletionTs = servers.computeNextCompletionTs(endTs);
         Event nextCompletion = new CompletionEvent(nextCompletionTs);
         s.addEvent(nextCompletion);
@@ -42,7 +43,7 @@ public class EventProcessor implements EventVisitor {
     }
 
     @Override
-    public void visit(SystemState s, CompletionEvent event) {
+    public void visit(SystemState s, CompletionEvent event) throws IllegalLifeException {
         ServerInfrastructure servers = s.getServers();
 
         /* Get the current clock and the one of this arrival */

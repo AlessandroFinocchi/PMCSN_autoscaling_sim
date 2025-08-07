@@ -1,5 +1,6 @@
 package it.uniroma2.models.events;
 
+import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.sys.SystemState;
 
 
@@ -9,7 +10,7 @@ public class CompletionEvent extends Event {
     }
 
     @Override
-    public void process(SystemState s, EventVisitor visitor) {
+    public void process(SystemState s, EventVisitor visitor) throws IllegalLifeException {
         visitor.visit(s, this);
     }
 }

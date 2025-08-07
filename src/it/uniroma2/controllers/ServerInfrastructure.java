@@ -1,5 +1,6 @@
 package it.uniroma2.controllers;
 
+import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 
 import java.text.DecimalFormat;
@@ -10,12 +11,13 @@ import static it.uniroma2.models.Config.INFINITY;
 import static it.uniroma2.models.Config.WEBSERVER_CAPACITY;
 
 public class ServerInfrastructure {
-    private int lastAssignedServer;
+    private int nextAssigningServer;
     private List<WebServer> webServers;
 
     public ServerInfrastructure() {
-        this.lastAssignedServer = 0;
+        this.nextAssigningServer = 0;
         this.webServers = new ArrayList<>();
+        this.webServers.add(new WebServer(WEBSERVER_CAPACITY));
         this.webServers.add(new WebServer(WEBSERVER_CAPACITY));
     }
 
@@ -25,7 +27,7 @@ public class ServerInfrastructure {
      * @param endTs the computation interval end
      * @param completed if the advancement is a completion or not
      */
-    public void computeJobsAdvancement(double startTs, double endTs, int completed) {
+    public void computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
         int completionServerIndex = completed == 1 ?
                 removeMinRemainingLifeJob() : -1;
 
@@ -33,6 +35,7 @@ public class ServerInfrastructure {
         for(int currIndex = 0; currIndex < webServers.size(); currIndex++) {
             WebServer server = webServers.get(currIndex);
             server.computeJobsAdvancement(startTs, endTs, currIndex == completionServerIndex ? 1 : 0);
+
         }
     }
 
@@ -42,17 +45,20 @@ public class ServerInfrastructure {
      */
     public int removeMinRemainingLifeJob() {
         IServer minServer = webServers.get(0);
-        Job minJob = new Job(0, INFINITY);
+        double lifeRemaining, minRemainingLife = INFINITY;
 
         for(IServer server: webServers) {
             Job j = server.getMinRemainingLifeJob();
-            if(j != null && j.getRemainingLife() < minJob.getRemainingLife()) {
-                minServer = server;
-                minJob = j;
+            if(j != null) {
+                lifeRemaining = j.getRemainingLife() * server.size(); //todo: check computation
+                if(lifeRemaining < minRemainingLife) {
+                    minRemainingLife = lifeRemaining;
+                    minServer = server;
+                }
             }
         }
 
-        minServer.removeJob(minJob);
+        minServer.removeJob(minServer.getMinRemainingLifeJob());
         return webServers.indexOf(minServer);
     }
 
@@ -61,8 +67,8 @@ public class ServerInfrastructure {
      * @param job the job to assign
      */
     public void assignJob(Job job) {
-        webServers.get(lastAssignedServer).addJob(job);
-        lastAssignedServer = (lastAssignedServer + 1) % webServers.size();
+        webServers.get(nextAssigningServer).addJob(job);
+        nextAssigningServer = (nextAssigningServer + 1) % webServers.size();
     }
 
     /**
@@ -82,18 +88,16 @@ public class ServerInfrastructure {
      * @return the completion time
      */
     public double computeNextCompletionTs(double endTs) {
-        double currLife, minRemainingLife = INFINITY;
-        AbstractServer minServer = webServers.get(0);
+        double currRemainingLife, minRemainingLife = INFINITY;
 
-        for(AbstractServer server: webServers) {
-            currLife = server.getMinRemainingLife();
-            if(currLife < minRemainingLife) {
-                minRemainingLife = currLife;
-                minServer = server;
+        for(AbstractServer server: webServers.stream().filter(webServer -> webServer.size() != 0).toList()) {
+            currRemainingLife = server.getMinRemainingLife() * server.size() / server.capacity;
+            if(currRemainingLife < minRemainingLife) { //todo: check computation
+                minRemainingLife = currRemainingLife;
             }
         }
 
-        return endTs + minRemainingLife / (minServer.getCapacity() / minServer.size());
+        return endTs + minRemainingLife;
     }
 
     public void printStats(double currentTs) {

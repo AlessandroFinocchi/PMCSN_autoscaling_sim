@@ -1,20 +1,18 @@
 package it.uniroma2;
 
+import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.libs.Rngs;
 import it.uniroma2.models.distr.Distribution;
 import it.uniroma2.models.distr.Exponential;
 import it.uniroma2.models.events.*;
 import it.uniroma2.models.sys.SystemState;
-import it.uniroma2.models.sys.SystemStats;
 import it.uniroma2.utils.ProgressBar;
-
-import java.text.DecimalFormat;
 
 import static it.uniroma2.models.Config.*;
 
 public class ExampleApp {
 
-    public static void main(String[] args)  {
+    public static void main(String[] args) throws IllegalLifeException {
         Rngs r = new Rngs();
         r.plantSeeds(SEED);
 
@@ -25,9 +23,8 @@ public class ExampleApp {
 
         /* Compute first arrival time */
         double nextArrival = arrivalVA.gen();
-        double nextCompletion = INFINITY;
         Event firstArrival = new ArrivalEvent(nextArrival);
-        Event firstCompletion = new CompletionEvent(nextCompletion);
+        Event firstCompletion = new CompletionEvent(INFINITY);
 
         /* Setup event schedule */
         EventCalendar calendar = new EventCalendar();
@@ -43,7 +40,12 @@ public class ExampleApp {
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());
 
-            nextEvent.process(s, visitor);
+//            nextEvent.process(s, visitor);
+            try { nextEvent.process(s, visitor); }
+            catch (IllegalLifeException e) {
+                System.out.println(s.getCurrent());
+                return;
+            }
         }
 
         s.printStats();
