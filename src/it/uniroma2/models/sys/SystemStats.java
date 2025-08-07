@@ -19,7 +19,7 @@ public class SystemStats {
     public void updateSystemStats(double startTs, double endTs, double jobNum, int completed) {
         assert startTs >= 0 && endTs >= startTs && jobNum >= 0;
         if(jobNum > 0) {
-            this.nodeSum       += (endTs - startTs) * jobNum;
+            this.nodeSum       += (endTs - startTs) * jobNum; //todo: maybe jobNum + completed
             this.serviceSum    += (endTs - startTs);
             this.completedJobs += completed;
         }

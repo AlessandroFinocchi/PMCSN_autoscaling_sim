@@ -17,6 +17,7 @@ public class EventProcessor implements EventVisitor {
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();
 
+        /* Advance job execution */
         servers.computeJobsAdvancement(startTs, endTs, 0);
 
         /* Add the next job to the list */
@@ -48,15 +49,11 @@ public class EventProcessor implements EventVisitor {
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();
 
-        servers.computeJobsAdvancement(startTs, endTs, 0);
+        /* Advance job execution */
+        servers.computeJobsAdvancement(startTs, endTs, 1);
 
         /* Generate next completion */
-        double nextCompletionTs;
-        if(servers.activeJobExists())
-            nextCompletionTs = servers.computeNextCompletionTs(endTs);
-        else
-            nextCompletionTs = INFINITY;
-
+        double nextCompletionTs = servers.activeJobExists() ? servers.computeNextCompletionTs(endTs) : INFINITY;
         Event nextCompletion = new CompletionEvent(nextCompletionTs);
         s.addEvent(nextCompletion);
 

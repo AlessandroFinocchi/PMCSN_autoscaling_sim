@@ -7,6 +7,8 @@ import it.uniroma2.models.events.EventCalendar;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.text.DecimalFormat;
+
 import static it.uniroma2.models.Config.*;
 
 public class SystemState {
@@ -32,5 +34,9 @@ public class SystemState {
 
     public boolean activeJobExists() {
         return servers.activeJobExists();
+    }
+
+    public void printStats() {
+        servers.printStats(this.getCurrent());
     }
 }
