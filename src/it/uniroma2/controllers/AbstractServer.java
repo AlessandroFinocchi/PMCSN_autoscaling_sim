@@ -14,9 +14,10 @@ public abstract class AbstractServer implements IServer {
 
     public AbstractServer(double capacity) {
         this.capacity = capacity;
-        this.jobs = new  JobList();
+        this.jobs = new JobList();
         stats = new SystemStats();
     }
+
     @Override
     public void addJob(Job job) {
         jobs.add(job);
@@ -55,5 +56,9 @@ public abstract class AbstractServer implements IServer {
         System.out.println("   average service time .... =   " + f.format(stats.getServiceSum() / stats.getCompletedJobs()));
         System.out.println("   average # in the node ... =   " + f.format(stats.getNodeSum() / currentTs));
         System.out.println("   utilization ............. =   " + f.format(stats.getServiceSum() / currentTs));
+    }
+
+    public double getResponseTime() {
+        return stats.getNodeSum() / stats.getCompletedJobs();
     }
 }

@@ -18,6 +18,8 @@ public class Config {
     public static final double START;
     public static final double STOP;
     public static final double INFINITY;
+    public static final double RESPONSE_TIME_OUT_THRESHOLD;
+    public static final double RESPONSE_TIME_IN_THRESHOLD;
 
     static {
         try(InputStream in = ExampleApp.class
@@ -33,6 +35,9 @@ public class Config {
             START           = Double.parseDouble(props.getProperty("system.start"));
             STOP            = Double.parseDouble(props.getProperty("system.stop"));
             INFINITY        = Double.POSITIVE_INFINITY;
+            RESPONSE_TIME_OUT_THRESHOLD  = Double.parseDouble(props.getProperty("webserver.response_time.out_thr"));
+            RESPONSE_TIME_IN_THRESHOLD  = Double.parseDouble(props.getProperty("webserver.response_time.in_thr"));
+
         } catch (IOException e) {
             throw new ExceptionInInitializerError(
                     "Impossible loading " + CONFIG_FILE + ": " + e.getMessage());

@@ -46,4 +46,8 @@ public class JobList {
         if (jobs.isEmpty()) return INFINITY;
         return jobs.stream().min(Comparator.comparing(Job::getRemainingLife)).get().getRemainingLife();
     }
+
+    public double getSumRemainingLife(){
+        return jobs.stream().mapToDouble(Job::getRemainingLife).sum();
+    }
 }

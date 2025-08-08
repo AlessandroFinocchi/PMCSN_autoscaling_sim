@@ -4,8 +4,7 @@ import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static it.uniroma2.models.Config.INFINITY;
 import static it.uniroma2.models.Config.WEBSERVER_CAPACITY;
@@ -26,10 +25,10 @@ public class ServerInfrastructure {
      * @param startTs the computation interval start
      * @param endTs the computation interval end
      * @param completed if the advancement is a completion or not
+     * @return the medium response time of the webservers
      */
-    public void computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
-        int completionServerIndex = completed == 1 ?
-                removeMinRemainingLifeJob() : -1;
+    public double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
+        int completionServerIndex = completed == 1 ? removeMinRemainingLifeJob() : -1;
 
         /* Compute the advancement of each job in each Server */
         for(int currIndex = 0; currIndex < webServers.size(); currIndex++) {
@@ -37,6 +36,17 @@ public class ServerInfrastructure {
             server.computeJobsAdvancement(startTs, endTs, currIndex == completionServerIndex ? 1 : 0);
 
         }
+
+        /* Compute the (weighted) mean response time */ //todo: ha senso pesare così?
+        double meanResponseTime = 0.0f;
+        double totalCapacity = 0.0f;
+        if(completed == 1) {
+            for(WebServer server : webServers) {
+                meanResponseTime += server.getResponseTime() * server.getCapacity();
+                totalCapacity += server.getCapacity();
+            }
+        }
+        return meanResponseTime / totalCapacity;
     }
 
     /**
@@ -67,6 +77,15 @@ public class ServerInfrastructure {
      * @param job the job to assign
      */
     public void assignJob(Job job) {
+        for(int currIndex, i = 0; i < webServers.size(); i++) {
+            currIndex = (nextAssigningServer + i) % webServers.size();
+            WebServer server = webServers.get(currIndex);
+            if (!server.isToBeRemoved()) {
+                server.addJob(job);
+                nextAssigningServer = (currIndex + 1) % webServers.size();
+                return;
+            }
+        }
         webServers.get(nextAssigningServer).addJob(job);
         nextAssigningServer = (nextAssigningServer + 1) % webServers.size();
     }

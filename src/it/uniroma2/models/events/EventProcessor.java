@@ -5,8 +5,7 @@ import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.SystemState;
 
-import static it.uniroma2.models.Config.INFINITY;
-import static it.uniroma2.models.Config.STOP;
+import static it.uniroma2.models.Config.*;
 
 public class EventProcessor implements EventVisitor {
 
@@ -51,7 +50,14 @@ public class EventProcessor implements EventVisitor {
         double endTs = event.getTimestamp();
 
         /* Advance job execution */
-        servers.computeJobsAdvancement(startTs, endTs, 1);
+        double meanResponseTime = servers.computeJobsAdvancement(startTs, endTs, 1);
+
+        /* Check scaling */
+        if(meanResponseTime > RESPONSE_TIME_OUT_THRESHOLD)
+            s.addEvent(new ScalingOutEvent(endTs));
+        else if(meanResponseTime < RESPONSE_TIME_IN_THRESHOLD)
+            s.addEvent(new ScalingInEvent(endTs));
+
 
         /* Generate next completion */
         double nextCompletionTs = servers.activeJobExists() ? servers.computeNextCompletionTs(endTs) : INFINITY;
@@ -60,5 +66,17 @@ public class EventProcessor implements EventVisitor {
 
         /* Update the current system clock */
         s.setCurrent(endTs);
+    }
+
+    @Override
+    public void visit(SystemState s, ScalingOutEvent event) {
+        ServerInfrastructure servers = s.getServers();
+        servers.scaleOut();
+    }
+
+    @Override
+    public void visit(SystemState s, ScalingInEvent event) {
+        ServerInfrastructure servers = s.getServers();
+        servers.scaleIn();
     }
 }

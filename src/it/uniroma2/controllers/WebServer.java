@@ -2,11 +2,14 @@ package it.uniroma2.controllers;
 
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
+import lombok.Getter;
+import lombok.Setter;
 
 public class WebServer extends AbstractServer {
 
     public WebServer(double capacity) {
         super(capacity);
+        this.toBeRemoved = false;
     }
 
     /**
@@ -28,5 +31,9 @@ public class WebServer extends AbstractServer {
         for(Job job: this.jobs.getJobs()) {
             job.decreaseRemainingLife(quantum);
         }
+    }
+    
+    public double getRemainingServerLife() {
+        return jobs.getSumRemainingLife();
     }
 }

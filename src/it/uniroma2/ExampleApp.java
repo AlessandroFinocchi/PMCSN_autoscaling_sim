@@ -40,12 +40,7 @@ public class ExampleApp {
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());
 
-//            nextEvent.process(s, visitor);
-            try { nextEvent.process(s, visitor); }
-            catch (IllegalLifeException e) {
-                System.out.println(s.getCurrent());
-                return;
-            }
+            nextEvent.process(s, visitor);
         }
 
         s.printStats();
