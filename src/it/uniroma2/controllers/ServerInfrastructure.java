@@ -34,7 +34,6 @@ public class ServerInfrastructure {
         for(int currIndex = 0; currIndex < webServers.size(); currIndex++) {
             WebServer server = webServers.get(currIndex);
             server.computeJobsAdvancement(startTs, endTs, currIndex == completionServerIndex ? 1 : 0);
-
         }
 
         /* Compute the (weighted) mean response time */ //todo: ha senso pesare così?
@@ -125,6 +124,26 @@ public class ServerInfrastructure {
 
         for(IServer server: webServers) {
             server.printStats(f,  currentTs);
+        }
+    }
+
+    public void scaleOut() {
+        var removingWebServer = webServers.stream()
+                .filter(WebServer::isToBeRemoved)
+                .max(Comparator.comparing(WebServer::getCapacity))
+                .orElse(null);
+
+        if(removingWebServer != null) removingWebServer.setToBeRemoved(false);
+        else webServers.add(new WebServer(WEBSERVER_CAPACITY));
+    }
+
+    public void scaleIn() {
+        if (webServers.size() > 1) {
+            WebServer minServer = webServers.stream()
+                            .min(Comparator.comparingDouble(WebServer::getRemainingServerLife))
+                            .get();
+
+            if (!minServer.isToBeRemoved()) minServer.setToBeRemoved(true);
         }
     }
 }

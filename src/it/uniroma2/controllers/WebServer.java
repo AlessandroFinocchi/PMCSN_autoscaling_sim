@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class WebServer extends AbstractServer {
+    @Getter @Setter private boolean toBeRemoved;
 
     public WebServer(double capacity) {
         super(capacity);
