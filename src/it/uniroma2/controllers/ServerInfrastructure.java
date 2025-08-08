@@ -50,7 +50,7 @@ public class ServerInfrastructure {
         for(IServer server: webServers) {
             Job j = server.getMinRemainingLifeJob();
             if(j != null) {
-                lifeRemaining = j.getRemainingLife() * server.size(); //todo: check computation
+                lifeRemaining = j.getRemainingLife() * server.size();
                 if(lifeRemaining < minRemainingLife) {
                     minRemainingLife = lifeRemaining;
                     minServer = server;
@@ -92,7 +92,7 @@ public class ServerInfrastructure {
 
         for(AbstractServer server: webServers.stream().filter(webServer -> webServer.size() != 0).toList()) {
             currRemainingLife = server.getMinRemainingLife() * server.size() / server.capacity;
-            if(currRemainingLife < minRemainingLife) { //todo: check computation
+            if(currRemainingLife < minRemainingLife) {
                 minRemainingLife = currRemainingLife;
             }
         }
