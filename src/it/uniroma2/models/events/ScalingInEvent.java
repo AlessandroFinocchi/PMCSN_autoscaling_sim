@@ -5,7 +5,7 @@ import it.uniroma2.models.sys.SystemState;
 
 public class ScalingInEvent extends Event {
     public ScalingInEvent(double timestamp) {
-        super(timestamp, EventType.ARRIVAL);
+        super(timestamp, EventType.SCALING_IN);
     }
 
     @Override

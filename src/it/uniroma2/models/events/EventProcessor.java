@@ -71,12 +71,18 @@ public class EventProcessor implements EventVisitor {
     @Override
     public void visit(SystemState s, ScalingOutEvent event) {
         ServerInfrastructure servers = s.getServers();
+        double endTs = event.getTimestamp();
         servers.scaleOut();
+        s.addEvent(new ScalingOutEvent(INFINITY));
+        s.setCurrent(endTs);
     }
 
     @Override
     public void visit(SystemState s, ScalingInEvent event) {
         ServerInfrastructure servers = s.getServers();
+        double endTs = event.getTimestamp();
         servers.scaleIn();
+        s.addEvent(new ScalingInEvent(INFINITY));
+        s.setCurrent(endTs);
     }
 }

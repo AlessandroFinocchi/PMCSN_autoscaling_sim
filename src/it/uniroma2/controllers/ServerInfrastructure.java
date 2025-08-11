@@ -17,7 +17,7 @@ public class ServerInfrastructure {
         this.nextAssigningServer = 0;
         this.webServers = new ArrayList<>();
         this.webServers.add(new WebServer(WEBSERVER_CAPACITY));
-        this.webServers.add(new WebServer(WEBSERVER_CAPACITY));
+        // this.webServers.add(new WebServer(WEBSERVER_CAPACITY));
     }
 
     /**
