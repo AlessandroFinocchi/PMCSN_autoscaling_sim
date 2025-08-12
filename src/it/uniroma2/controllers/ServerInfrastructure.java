@@ -6,8 +6,7 @@ import it.uniroma2.models.Job;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import static it.uniroma2.models.Config.INFINITY;
-import static it.uniroma2.models.Config.WEBSERVER_CAPACITY;
+import static it.uniroma2.models.Config.*;
 
 public class ServerInfrastructure {
     private int nextAssigningServer;
@@ -16,8 +15,10 @@ public class ServerInfrastructure {
     public ServerInfrastructure() {
         this.nextAssigningServer = 0;
         this.webServers = new ArrayList<>();
-        this.webServers.add(new WebServer(WEBSERVER_CAPACITY));
-        // this.webServers.add(new WebServer(WEBSERVER_CAPACITY));
+        for (int i = 0; i < MAX_NUM_SERVERS; i ++) {
+            var isActive = i < START_NUM_SERVERS;
+            this.webServers.add(new WebServer(WEBSERVER_CAPACITY, isActive));
+        }
     }
 
     /**
@@ -39,8 +40,9 @@ public class ServerInfrastructure {
         /* Compute the (weighted) mean response time */ //todo: ha senso pesare così?
         double meanResponseTime = 0.0f;
         double totalCapacity = 0.0f;
+        var activeServer = webServers.stream().filter(WebServer::isActive).toList();
         if(completed == 1) {
-            for(WebServer server : webServers) {
+            for(WebServer server : activeServer) {
                 meanResponseTime += server.getResponseTime() * server.getCapacity();
                 totalCapacity += server.getCapacity();
             }
@@ -79,7 +81,7 @@ public class ServerInfrastructure {
         for(int currIndex, i = 0; i < webServers.size(); i++) {
             currIndex = (nextAssigningServer + i) % webServers.size();
             WebServer server = webServers.get(currIndex);
-            if (!server.isToBeRemoved()) {
+            if (!server.isToBeRemoved() && server.isActive()) {
                 server.addJob(job);
                 nextAssigningServer = (currIndex + 1) % webServers.size();
                 return;
@@ -102,7 +104,7 @@ public class ServerInfrastructure {
 
     /**
      * Computes when the next completion will happen
-     * @param endTs the starting point from which computing the completion timee
+     * @param endTs the starting point from which computing the completion time
      * @return the completion time
      */
     public double computeNextCompletionTs(double endTs) {
@@ -128,22 +130,39 @@ public class ServerInfrastructure {
     }
 
     public void scaleOut() {
+        // Search if there is a server still active but to be removed
         var removingWebServer = webServers.stream()
                 .filter(WebServer::isToBeRemoved)
+                .filter(WebServer::isActive)
                 .max(Comparator.comparing(WebServer::getCapacity))
                 .orElse(null);
 
-        if(removingWebServer != null) removingWebServer.setToBeRemoved(false);
-        else webServers.add(new WebServer(WEBSERVER_CAPACITY));
+        if(removingWebServer != null) {
+            removingWebServer.setToBeRemoved(false);
+        } else {
+            // If there aren't server still active but to be removed power on a server
+            webServers.stream()
+                    .filter(ws -> !ws.isActive())
+                    .max(Comparator.comparing(WebServer::getCapacity))
+                    .ifPresent(unactiveWebServer -> {
+                        unactiveWebServer.setActive(true);
+                        unactiveWebServer.setToBeRemoved(false);
+                    });
+        }
     }
 
     public void scaleIn() {
-        if (webServers.size() > 1) {
-            WebServer minServer = webServers.stream()
-                            .min(Comparator.comparingDouble(WebServer::getRemainingServerLife))
-                            .get();
+        WebServer minServer = webServers.stream()
+                        .filter(WebServer::isActive)
+                        .min(Comparator.comparingDouble(WebServer::getRemainingServerLife))
+                        .get();
 
-            if (!minServer.isToBeRemoved()) minServer.setToBeRemoved(true);
+        if (!minServer.isToBeRemoved()) {
+            if (minServer.activeJobExists()) {
+                minServer.setToBeRemoved(true);
+            } else {
+                minServer.setActive(false);
+            }
         }
     }
 }
