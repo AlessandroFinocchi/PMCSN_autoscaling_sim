@@ -11,6 +11,7 @@ import static it.uniroma2.models.Config.*;
 public class ServerInfrastructure {
     private int nextAssigningServer;
     private List<WebServer> webServers;
+    private double movingExpMeanResponseTime;
 
     public ServerInfrastructure() {
         this.nextAssigningServer = 0;
@@ -29,7 +30,13 @@ public class ServerInfrastructure {
      * @return the medium response time of the webservers
      */
     public double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
-        int completionServerIndex = completed == 1 ? removeMinRemainingLifeJob() : -1;
+        int completionServerIndex = completed == 1 ? getCompletingServerIndex() : -1;
+        Job removedJob = null;
+        if(completionServerIndex != -1) {
+            WebServer minServer = webServers.get(completionServerIndex);
+            removedJob = minServer.getMinRemainingLifeJob();
+            minServer.removeJob(removedJob);
+        }
 
         /* Compute the advancement of each job in each Server */
         for(int currIndex = 0; currIndex < webServers.size(); currIndex++) {
@@ -37,24 +44,21 @@ public class ServerInfrastructure {
             server.computeJobsAdvancement(startTs, endTs, currIndex == completionServerIndex ? 1 : 0);
         }
 
-        /* Compute the (weighted) mean response time */ //todo: ha senso pesare così?
-        double meanResponseTime = 0.0f;
-        double totalCapacity = 0.0f;
-        var activeServer = webServers.stream().filter(WebServer::isActive).toList();
-        if(completed == 1) {
-            for(WebServer server : activeServer) {
-                meanResponseTime += server.getResponseTime() * server.getCapacity();
-                totalCapacity += server.getCapacity();
-            }
+        /* Compute the moving exponential average of the response time */
+        if(completionServerIndex != -1) {
+            assert removedJob != null;
+            double lastResponseTime = endTs - removedJob.getArrivalTime();
+            this.updateMovingExpResponseTime(lastResponseTime);
         }
-        return meanResponseTime / totalCapacity;
+
+        return this.movingExpMeanResponseTime;
     }
 
     /**
      * Removes the job in the server farm with minimum life
      * @return the index of the server with the job removed
      */
-    public int removeMinRemainingLifeJob() {
+    public int getCompletingServerIndex() {
         IServer minServer = webServers.get(0);
         double lifeRemaining, minRemainingLife = INFINITY;
 
@@ -69,7 +73,6 @@ public class ServerInfrastructure {
             }
         }
 
-        minServer.removeJob(minServer.getMinRemainingLifeJob());
         return webServers.indexOf(minServer);
     }
 
@@ -164,5 +167,10 @@ public class ServerInfrastructure {
                 minServer.setActive(false);
             }
         }
+    }
+
+    public void updateMovingExpResponseTime(double lastResponseTime) {
+        this.movingExpMeanResponseTime = this.movingExpMeanResponseTime * ALPHA +
+                lastResponseTime * (1 - ALPHA);
     }
 }

@@ -22,6 +22,7 @@ public class Config {
     public static final double RESPONSE_TIME_IN_THRESHOLD;
     public static final int MAX_NUM_SERVERS;
     public static final int START_NUM_SERVERS;
+    public static final double ALPHA;
 
     static {
         try(InputStream in = ExampleApp.class
@@ -41,6 +42,7 @@ public class Config {
             RESPONSE_TIME_IN_THRESHOLD  = Double.parseDouble(props.getProperty("webserver.response_time.in_thr"));
             MAX_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.max_num_server"));
             START_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.start_num_server"));
+            ALPHA = Double.parseDouble(props.getProperty("stats.alpha"));
 
         } catch (IOException e) {
             throw new ExceptionInInitializerError(

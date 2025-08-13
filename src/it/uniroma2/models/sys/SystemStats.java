@@ -6,9 +6,9 @@ import lombok.Getter;
  * Used for computing statistics
  */
 public class SystemStats {
-    @Getter private double nodeSum;                    /* mean population in system  intg(l(s)) */
-    @Getter private double serviceSum;                 /* mean population in service intg(x(s)) */
-    @Getter private int    completedJobs;              /* number of completed jobs              */
+    @Getter private double nodeSum;                    /* mean population in system  intg(l(s))                 */
+    @Getter private double serviceSum;                 /* mean population in service intg(x(s))                 */
+    @Getter private int    completedJobs;              /* number of completed jobs                              */
 
     public SystemStats(){
         this.nodeSum       = 0.0;
