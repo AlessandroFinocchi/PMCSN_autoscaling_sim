@@ -83,17 +83,25 @@ public class ServerInfrastructure {
      * @param job the job to assign
      */
     public void assignJob(Job job) {
-        for(int currIndex, i = 0; i < webServers.size(); i++) {
-            currIndex = (nextAssigningServer + i) % webServers.size();
-            WebServer server = webServers.get(currIndex);
-            if (server.getServerState() == ServerState.ACTIVE) {
-                server.addJob(job);
-                nextAssigningServer = (currIndex + 1) % webServers.size();
-                return;
-            }
-        }
+        WebServer leastUsedServer = webServers
+                .stream()
+                .filter(server -> server.getServerState() == ServerState.ACTIVE)
+                .min(Comparator.comparingDouble(WebServer::size))
+                .stream().toList().get(0);
 
-        throw new RuntimeException("No active server found");
+        leastUsedServer.addJob(job);
+
+//        for(int currIndex, i = 0; i < webServers.size(); i++) {
+//            currIndex = (nextAssigningServer + i) % webServers.size();
+//            WebServer server = webServers.get(currIndex);
+//            if (server.getServerState() == ServerState.ACTIVE) {
+//                server.addJob(job);
+//                nextAssigningServer = (currIndex + 1) % webServers.size();
+//                return;
+//            }
+//        }
+//
+//        throw new RuntimeException("No active server found");
     }
 
     /**
@@ -140,14 +148,16 @@ public class ServerInfrastructure {
         // Search if there is a server still active but to be removed
         targetWebServer = webServers.stream()
                 .filter(ws -> ws.getServerState() == ServerState.TO_BE_REMOVED)
-                .max(Comparator.comparing(WebServer::getCapacity))
+//                .max(Comparator.comparing(WebServer::getCapacity))
+                .min(Comparator.comparingDouble(w -> webServers.indexOf(w)))
                 .orElse(null);
 
         // If no servers are active but to be removed, look for a removed one
         if (targetWebServer == null) {
             targetWebServer = webServers.stream()
                     .filter(ws -> ws.getServerState() == ServerState.REMOVED)
-                    .max(Comparator.comparing(WebServer::getCapacity))
+//                    .max(Comparator.comparing(WebServer::getCapacity))
+                    .min(Comparator.comparingDouble(w -> webServers.indexOf(w)))
                     .orElse(null);
         }
 
@@ -160,7 +170,8 @@ public class ServerInfrastructure {
         // Search if there is a server still active
         targetWebServer = webServers.stream()
                 .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
-                .min(Comparator.comparingDouble(WebServer::getRemainingServerLife))
+//                .min(Comparator.comparingDouble(WebServer::getRemainingServerLife))
+                .max(Comparator.comparingDouble(w -> webServers.indexOf(w)))
                 .orElse(null);
 
         return targetWebServer;
