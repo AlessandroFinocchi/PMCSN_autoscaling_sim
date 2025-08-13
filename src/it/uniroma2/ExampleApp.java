@@ -6,7 +6,10 @@ import it.uniroma2.models.distr.Distribution;
 import it.uniroma2.models.distr.Exponential;
 import it.uniroma2.models.events.*;
 import it.uniroma2.models.sys.SystemState;
+import it.uniroma2.utils.DataCSVWriter;
 import it.uniroma2.utils.ProgressBar;
+
+import java.io.IOException;
 
 import static it.uniroma2.models.Config.*;
 
@@ -44,6 +47,13 @@ public class ExampleApp {
         }
 
         s.printStats();
+
+        try {
+            DataCSVWriter.flushAll();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

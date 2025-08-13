@@ -12,7 +12,7 @@ public class EventProcessor implements EventVisitor {
     @Override
     public void visit(SystemState s, ArrivalEvent event) throws IllegalLifeException {
         ServerInfrastructure servers = s.getServers();
-        
+
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();
@@ -31,7 +31,7 @@ public class EventProcessor implements EventVisitor {
         s.addEvent(nextCompletion);
 
         /* Generate next arrival if simulation is not finished*/
-        if(endTs < STOP) {
+        if (endTs < STOP) {
             double nextArrivalTs = endTs + s.getArrivalVA().gen();
             Event nextArrival = new ArrivalEvent(nextArrivalTs);
             s.addEvent(nextArrival);
@@ -50,12 +50,12 @@ public class EventProcessor implements EventVisitor {
         double endTs = event.getTimestamp();
 
         /* Advance job execution */
-        double meanResponseTime = servers.computeJobsAdvancement(startTs, endTs, 1);
+        double movingMeanResponseTime = servers.computeJobsAdvancement(startTs, endTs, 1);
 
         /* Check scaling */
-        if(meanResponseTime > RESPONSE_TIME_OUT_THRESHOLD && servers.numServerActive() < MAX_NUM_SERVERS)
+        if (movingMeanResponseTime > RESPONSE_TIME_OUT_THRESHOLD && servers.numServerActive() < MAX_NUM_SERVERS)
             s.addEvent(new ScalingOutEvent(endTs));
-        else if(meanResponseTime < RESPONSE_TIME_IN_THRESHOLD && servers.numServerActive() > 1)
+        else if (movingMeanResponseTime < RESPONSE_TIME_IN_THRESHOLD && servers.numServerActive() > 1)
             s.addEvent(new ScalingInEvent(endTs));
 
 
@@ -72,7 +72,7 @@ public class EventProcessor implements EventVisitor {
     public void visit(SystemState s, ScalingOutEvent event) {
         ServerInfrastructure servers = s.getServers();
         double endTs = event.getTimestamp();
-        servers.scaleOut();
+        servers.scaleOut(endTs);
         s.addEvent(new ScalingOutEvent(INFINITY));
         s.setCurrent(endTs);
     }
@@ -81,7 +81,7 @@ public class EventProcessor implements EventVisitor {
     public void visit(SystemState s, ScalingInEvent event) {
         ServerInfrastructure servers = s.getServers();
         double endTs = event.getTimestamp();
-        servers.scaleIn();
+        servers.scaleIn(endTs);
         s.addEvent(new ScalingInEvent(INFINITY));
         s.setCurrent(endTs);
     }
