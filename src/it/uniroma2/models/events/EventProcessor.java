@@ -53,9 +53,9 @@ public class EventProcessor implements EventVisitor {
         double meanResponseTime = servers.computeJobsAdvancement(startTs, endTs, 1);
 
         /* Check scaling */
-        if(meanResponseTime > RESPONSE_TIME_OUT_THRESHOLD)
+        if(meanResponseTime > RESPONSE_TIME_OUT_THRESHOLD && servers.numServerActive() < MAX_NUM_SERVERS)
             s.addEvent(new ScalingOutEvent(endTs));
-        else if(meanResponseTime < RESPONSE_TIME_IN_THRESHOLD)
+        else if(meanResponseTime < RESPONSE_TIME_IN_THRESHOLD && servers.numServerActive() > 1)
             s.addEvent(new ScalingInEvent(endTs));
 
 

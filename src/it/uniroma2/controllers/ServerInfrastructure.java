@@ -17,8 +17,8 @@ public class ServerInfrastructure {
         this.nextAssigningServer = 0;
         this.webServers = new ArrayList<>();
         for (int i = 0; i < MAX_NUM_SERVERS; i ++) {
-            var isActive = i < START_NUM_SERVERS;
-            this.webServers.add(new WebServer(WEBSERVER_CAPACITY, isActive));
+            var serverState = i < START_NUM_SERVERS ? ServerState.ACTIVE : ServerState.REMOVED;
+            this.webServers.add(new WebServer(WEBSERVER_CAPACITY, serverState));
         }
     }
 
@@ -36,6 +36,8 @@ public class ServerInfrastructure {
             WebServer minServer = webServers.get(completionServerIndex);
             removedJob = minServer.getMinRemainingLifeJob();
             minServer.removeJob(removedJob);
+            if (!minServer.activeJobExists() && minServer.getServerState() == ServerState.TO_BE_REMOVED)
+                minServer.setServerState(ServerState.REMOVED);
         }
 
         /* Compute the advancement of each job in each Server */
@@ -84,14 +86,14 @@ public class ServerInfrastructure {
         for(int currIndex, i = 0; i < webServers.size(); i++) {
             currIndex = (nextAssigningServer + i) % webServers.size();
             WebServer server = webServers.get(currIndex);
-            if (!server.isToBeRemoved() && server.isActive()) {
+            if (server.getServerState() == ServerState.ACTIVE) {
                 server.addJob(job);
                 nextAssigningServer = (currIndex + 1) % webServers.size();
                 return;
             }
         }
-        webServers.get(nextAssigningServer).addJob(job);
-        nextAssigningServer = (nextAssigningServer + 1) % webServers.size();
+
+        throw new RuntimeException("No active server found");
     }
 
     /**
@@ -132,45 +134,68 @@ public class ServerInfrastructure {
         }
     }
 
-    public void scaleOut() {
+    public WebServer findScaleOutTarget() {
+        WebServer targetWebServer;
+
         // Search if there is a server still active but to be removed
-        var removingWebServer = webServers.stream()
-                .filter(WebServer::isToBeRemoved)
-                .filter(WebServer::isActive)
+        targetWebServer = webServers.stream()
+                .filter(ws -> ws.getServerState() == ServerState.TO_BE_REMOVED)
                 .max(Comparator.comparing(WebServer::getCapacity))
                 .orElse(null);
 
-        if(removingWebServer != null) {
-            removingWebServer.setToBeRemoved(false);
-        } else {
-            // If there aren't server still active but to be removed power on a server
-            webServers.stream()
-                    .filter(ws -> !ws.isActive())
+        // If no servers are active but to be removed, look for a removed one
+        if (targetWebServer == null) {
+            targetWebServer = webServers.stream()
+                    .filter(ws -> ws.getServerState() == ServerState.REMOVED)
                     .max(Comparator.comparing(WebServer::getCapacity))
-                    .ifPresent(unactiveWebServer -> {
-                        unactiveWebServer.setActive(true);
-                        unactiveWebServer.setToBeRemoved(false);
-                    });
+                    .orElse(null);
         }
+
+        return targetWebServer;
+    }
+
+    public WebServer findScaleInTarget() {
+        WebServer targetWebServer;
+
+        // Search if there is a server still active
+        targetWebServer = webServers.stream()
+                .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
+                .min(Comparator.comparingDouble(WebServer::getRemainingServerLife))
+                .orElse(null);
+
+        return targetWebServer;
+    }
+
+    public void scaleOut() {
+        WebServer targetWebServer =  findScaleOutTarget();
+
+        /* If found server, make it active */
+        if (targetWebServer != null) targetWebServer.setServerState(ServerState.ACTIVE);
+
+        /* If no server is found, all servers are active */
+        else System.out.println("All servers are active");
     }
 
     public void scaleIn() {
-        WebServer minServer = webServers.stream()
-                        .filter(WebServer::isActive)
-                        .min(Comparator.comparingDouble(WebServer::getRemainingServerLife))
-                        .get();
+        WebServer minServer = findScaleInTarget();
 
-        if (!minServer.isToBeRemoved()) {
-            if (minServer.activeJobExists()) {
-                minServer.setToBeRemoved(true);
-            } else {
-                minServer.setActive(false);
-            }
-        }
+        /* If found server, make it to be removed */
+        if (minServer != null) minServer.setServerState(ServerState.TO_BE_REMOVED);
+
+        /* If no server is found, all servers are active */
+        else  System.out.println("No active servers found!");
     }
 
     public void updateMovingExpResponseTime(double lastResponseTime) {
         this.movingExpMeanResponseTime = this.movingExpMeanResponseTime * ALPHA +
                 lastResponseTime * (1 - ALPHA);
+    }
+
+    public int numServerActive() {
+        return webServers
+                .stream()
+                .filter(w -> w.getServerState() == ServerState.ACTIVE)
+                .toList()
+                .size();
     }
 }

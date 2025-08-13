@@ -6,13 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class WebServer extends AbstractServer {
-    @Getter @Setter private boolean toBeRemoved;
-    @Getter @Setter private boolean active;
+    @Getter @Setter private ServerState serverState;
 
-    public WebServer(double capacity, boolean isActive) {
+    public WebServer(double capacity, ServerState serverState) {
         super(capacity);
-        this.toBeRemoved = false;
-        this.active = isActive;
+        this.serverState = serverState;
     }
 
     /**

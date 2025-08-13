@@ -7,8 +7,6 @@ import lombok.Getter;
 
 import java.text.DecimalFormat;
 
-import static it.uniroma2.models.Config.ALPHA;
-
 public abstract class AbstractServer implements IServer {
     @Getter protected double capacity;
     protected JobList jobs;
