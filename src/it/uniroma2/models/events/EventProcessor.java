@@ -1,6 +1,7 @@
 package it.uniroma2.models.events;
 
 import it.uniroma2.controllers.ServerInfrastructure;
+import it.uniroma2.controllers.ServerState;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.SystemState;
@@ -53,9 +54,9 @@ public class EventProcessor implements EventVisitor {
         double movingMeanResponseTime = servers.computeJobsAdvancement(startTs, endTs, 1);
 
         /* Check scaling */
-        if (movingMeanResponseTime > RESPONSE_TIME_OUT_THRESHOLD && servers.numServerActive() < MAX_NUM_SERVERS)
+        if (movingMeanResponseTime > RESPONSE_TIME_OUT_THRESHOLD && servers.getNumServersByState(ServerState.ACTIVE) < MAX_NUM_SERVERS)
             s.addEvent(new ScalingOutEvent(endTs));
-        else if (movingMeanResponseTime < RESPONSE_TIME_IN_THRESHOLD && servers.numServerActive() > 1)
+        else if (movingMeanResponseTime < RESPONSE_TIME_IN_THRESHOLD && servers.getNumServersByState(ServerState.ACTIVE) > 1)
             s.addEvent(new ScalingInEvent(endTs));
 
 

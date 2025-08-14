@@ -6,44 +6,59 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import static it.uniroma2.utils.DataField.*;
+
 public class DataCSVWriter {
 
-    public static DataCSVList MOVING_R0 = new DataCSVList("moving-R_0", "timestamp", "moving-R_0");
-    public static DataCSVList R0 = new DataCSVList("R_0", "timestamp", "R_0");
-    public static DataCSVList SERVERS = new DataCSVList("servers", "timestamp", "active", "to-be-removed", "removed", "event");
+    // Data table for completion and scaling events
+    public static DataTimeTable SCALING_DATA = new DataTimeTable();
 
-    public static void flushList(DataCSVList list) throws IOException {
-        String dirPath = "out";
-        String filePath = dirPath + "/" + list.getName() + ".csv";
+    private static String OUT_DIR_PATH = "data_out";
 
-        File directory = new File(dirPath);
+    /**
+     * Flushes a DataTimeTable to a file in .csv format.
+     * @param timeTable The DataTimeTable containing the data.
+     * @param fileName The name of the file in the OUT_DIR_PATH.
+     * @param fields The lists of the fields that will be flushed on file.
+     * @throws IOException
+     */
+    public static void flushList(DataTimeTable timeTable, String fileName, DataField... fields) throws IOException {
+        String filePath = OUT_DIR_PATH + "/" + fileName + ".csv";
+
+        // Create the directory if not exists
+        File directory = new File(OUT_DIR_PATH);
         if (!directory.exists() && !directory.mkdirs()) {
             throw new IOException("Failed to create output directory");
         }
 
+        // Check if the file is writable
         File file = new File(filePath);
         if (file.exists() && !file.canWrite()) {
             throw new IOException("File exists but is not writable: " + filePath);
         }
 
+        // Write on file
         try (CSVWriter writer = new CSVWriter(new FileWriter(filePath),
                                               CSVWriter.DEFAULT_SEPARATOR,
                                               CSVWriter.NO_QUOTE_CHARACTER,
                                               CSVWriter.DEFAULT_ESCAPE_CHARACTER,
                                               CSVWriter.DEFAULT_LINE_END)) {
-            writer.writeNext(list.getHeader());
 
-            if (list.getData() != null) {
-                for (String[] row : list.getData()) {
-                    writer.writeNext(row);
-                }
+            // Write headers
+            String[] strFields = new String[fields.length];
+            for (int i = 0; i < fields.length; i++) {
+                strFields[i] = fields[i].name();
+            }
+            writer.writeNext(strFields);
+
+            // Write data
+            for (String[] row : timeTable.getDataFromHeaders(fields)) {
+                writer.writeNext(row);
             }
         }
     }
 
     public static void flushAll() throws IOException {
-        flushList(MOVING_R0);
-        flushList(R0);
-        flushList(SERVERS);
+        flushList(SCALING_DATA, "scaling", TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, ACTIVE, TO_BE_REMOVED, REMOVED);
     }
 }

@@ -2,7 +2,6 @@ package it.uniroma2.controllers;
 
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
-import it.uniroma2.utils.DataCSVWriter;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -10,6 +9,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import static it.uniroma2.models.Config.*;
+import static it.uniroma2.utils.DataCSVWriter.SCALING_DATA;
+import static it.uniroma2.utils.DataField.*;
 
 public class ServerInfrastructure {
     private int nextAssigningServer;
@@ -25,22 +26,24 @@ public class ServerInfrastructure {
         }
     }
 
-    public String[] getServerStatusInfo(double endTs, ServerState state) {
-        String[] status = new String[ServerState.values().length + 2];
-        int active = 0, toBeRemoved = 0, removed = 0;
-        for (WebServer webServer : webServers) {
-            switch (webServer.getServerState()) {
-                case ACTIVE -> active++;
-                case TO_BE_REMOVED -> toBeRemoved++;
-                case REMOVED -> removed++;
-            }
-        }
-        status[0] = String.valueOf(endTs);
-        status[1] = String.valueOf(active);
-        status[2] = String.valueOf(toBeRemoved);
-        status[3] = String.valueOf(removed);
-        status[4] = String.valueOf(state);
-        return status;
+
+    /**
+     * Returns the number of Web Servers in a given state
+     * @param state the state of the web servers
+     * @return the number of web servers in the state 'state'
+     */
+    public int getNumServersByState(ServerState state) {
+        return (int) webServers.stream().filter(server -> server.getServerState() == state).count();
+    }
+
+
+    /**
+     * Utils method to quickly add all possible states to the scaling Data Table
+     */
+    private void addStateToScalingData(double endTs) {
+        SCALING_DATA.addField(endTs, ACTIVE, getNumServersByState(ServerState.ACTIVE));
+        SCALING_DATA.addField(endTs, TO_BE_REMOVED, getNumServersByState(ServerState.TO_BE_REMOVED));
+        SCALING_DATA.addField(endTs, REMOVED, getNumServersByState(ServerState.REMOVED));
     }
 
     /**
@@ -59,9 +62,8 @@ public class ServerInfrastructure {
             minServer.removeJob(removedJob);
             if (!minServer.activeJobExists() && minServer.getServerState() == ServerState.TO_BE_REMOVED) {
                 minServer.setServerState(ServerState.REMOVED);
-                DataCSVWriter.SERVERS.addArrayData(getServerStatusInfo(endTs, ServerState.REMOVED));
+                SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
             }
-
         }
 
         /* Compute the advancement of each job in each Server */
@@ -74,9 +76,11 @@ public class ServerInfrastructure {
         if (completionServerIndex != -1) {
             assert removedJob != null;
             double lastResponseTime = endTs - removedJob.getArrivalTime();
-            DataCSVWriter.R0.addData(endTs, lastResponseTime);
             this.updateMovingExpResponseTime(lastResponseTime);
-            DataCSVWriter.MOVING_R0.addData(endTs, this.movingExpMeanResponseTime);
+            
+            addStateToScalingData(endTs);
+            SCALING_DATA.addField(endTs, R_0, lastResponseTime);
+            SCALING_DATA.addField(endTs, MOVING_R_O, this.movingExpMeanResponseTime);
         }
 
         return this.movingExpMeanResponseTime;
@@ -207,36 +211,34 @@ public class ServerInfrastructure {
         WebServer targetWebServer = findScaleOutTarget();
 
         /* If found server, make it active */
-        if (targetWebServer != null) targetWebServer.setServerState(ServerState.ACTIVE);
+        if (targetWebServer != null) {
+            targetWebServer.setServerState(ServerState.ACTIVE);
+            
+            SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.ACTIVE);
+            addStateToScalingData(endTs);
+        }
 
-            /* If no server is found, all servers are active */
+        /* If no server is found, all servers are active */
         else System.out.println("All servers are active");
-
-        DataCSVWriter.SERVERS.addArrayData(getServerStatusInfo(endTs, ServerState.ACTIVE));
     }
 
     public void scaleIn(double endTs) {
         WebServer minServer = findScaleInTarget();
 
         /* If found server, make it to be removed */
-        if (minServer != null) minServer.setServerState(ServerState.TO_BE_REMOVED);
+        if (minServer != null) {
+            minServer.setServerState(ServerState.TO_BE_REMOVED);
+            
+            SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_REMOVED);
+            addStateToScalingData(endTs);
+        }
 
-            /* If no server is found, all servers are active */
+        /* If no server is found, all servers are active */
         else System.out.println("No active servers found!");
-
-        DataCSVWriter.SERVERS.addArrayData(getServerStatusInfo(endTs, ServerState.TO_BE_REMOVED));
     }
 
     public void updateMovingExpResponseTime(double lastResponseTime) {
         this.movingExpMeanResponseTime = this.movingExpMeanResponseTime * ALPHA +
                 lastResponseTime * (1 - ALPHA);
-    }
-
-    public int numServerActive() {
-        return webServers
-                .stream()
-                .filter(w -> w.getServerState() == ServerState.ACTIVE)
-                .toList()
-                .size();
     }
 }
