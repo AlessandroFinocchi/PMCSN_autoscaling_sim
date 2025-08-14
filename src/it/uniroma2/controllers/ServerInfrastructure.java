@@ -4,9 +4,13 @@ import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static it.uniroma2.models.Config.*;
+import static it.uniroma2.utils.DataCSVWriter.SCALING_DATA;
+import static it.uniroma2.utils.DataField.*;
 
 public class ServerInfrastructure {
     private int nextAssigningServer;
@@ -16,10 +20,30 @@ public class ServerInfrastructure {
     public ServerInfrastructure() {
         this.nextAssigningServer = 0;
         this.webServers = new ArrayList<>();
-        for (int i = 0; i < MAX_NUM_SERVERS; i ++) {
+        for (int i = 0; i < MAX_NUM_SERVERS; i++) {
             var serverState = i < START_NUM_SERVERS ? ServerState.ACTIVE : ServerState.REMOVED;
             this.webServers.add(new WebServer(WEBSERVER_CAPACITY, serverState));
         }
+    }
+
+
+    /**
+     * Returns the number of Web Servers in a given state
+     * @param state the state of the web servers
+     * @return the number of web servers in the state 'state'
+     */
+    public int getNumServersByState(ServerState state) {
+        return (int) webServers.stream().filter(server -> server.getServerState() == state).count();
+    }
+
+
+    /**
+     * Utils method to quickly add all possible states to the scaling Data Table
+     */
+    private void addStateToScalingData(double endTs) {
+        SCALING_DATA.addField(endTs, ACTIVE, getNumServersByState(ServerState.ACTIVE));
+        SCALING_DATA.addField(endTs, TO_BE_REMOVED, getNumServersByState(ServerState.TO_BE_REMOVED));
+        SCALING_DATA.addField(endTs, REMOVED, getNumServersByState(ServerState.REMOVED));
     }
 
     /**
@@ -32,25 +56,31 @@ public class ServerInfrastructure {
     public double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
         int completionServerIndex = completed == 1 ? getCompletingServerIndex() : -1;
         Job removedJob = null;
-        if(completionServerIndex != -1) {
+        if (completionServerIndex != -1) {
             WebServer minServer = webServers.get(completionServerIndex);
             removedJob = minServer.getMinRemainingLifeJob();
             minServer.removeJob(removedJob);
-            if (!minServer.activeJobExists() && minServer.getServerState() == ServerState.TO_BE_REMOVED)
+            if (!minServer.activeJobExists() && minServer.getServerState() == ServerState.TO_BE_REMOVED) {
                 minServer.setServerState(ServerState.REMOVED);
+                SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
+            }
         }
 
         /* Compute the advancement of each job in each Server */
-        for(int currIndex = 0; currIndex < webServers.size(); currIndex++) {
+        for (int currIndex = 0; currIndex < webServers.size(); currIndex++) {
             WebServer server = webServers.get(currIndex);
             server.computeJobsAdvancement(startTs, endTs, currIndex == completionServerIndex ? 1 : 0);
         }
 
         /* Compute the moving exponential average of the response time */
-        if(completionServerIndex != -1) {
+        if (completionServerIndex != -1) {
             assert removedJob != null;
             double lastResponseTime = endTs - removedJob.getArrivalTime();
             this.updateMovingExpResponseTime(lastResponseTime);
+            
+            addStateToScalingData(endTs);
+            SCALING_DATA.addField(endTs, R_0, lastResponseTime);
+            SCALING_DATA.addField(endTs, MOVING_R_O, this.movingExpMeanResponseTime);
         }
 
         return this.movingExpMeanResponseTime;
@@ -64,11 +94,11 @@ public class ServerInfrastructure {
         IServer minServer = webServers.get(0);
         double lifeRemaining, minRemainingLife = INFINITY;
 
-        for(IServer server: webServers) {
+        for (IServer server : webServers) {
             Job j = server.getMinRemainingLifeJob();
-            if(j != null) {
+            if (j != null) {
                 lifeRemaining = j.getRemainingLife() * server.size();
-                if(lifeRemaining < minRemainingLife) {
+                if (lifeRemaining < minRemainingLife) {
                     minRemainingLife = lifeRemaining;
                     minServer = server;
                 }
@@ -109,7 +139,7 @@ public class ServerInfrastructure {
      * @return if an active job exists
      */
     public boolean activeJobExists() {
-        for(IServer server: webServers) {
+        for (IServer server : webServers) {
             if (server.activeJobExists()) return true;
         }
         return false;
@@ -123,9 +153,9 @@ public class ServerInfrastructure {
     public double computeNextCompletionTs(double endTs) {
         double currRemainingLife, minRemainingLife = INFINITY;
 
-        for(AbstractServer server: webServers.stream().filter(webServer -> webServer.size() != 0).toList()) {
+        for (AbstractServer server : webServers.stream().filter(webServer -> webServer.size() != 0).toList()) {
             currRemainingLife = server.getMinRemainingLife() * server.size() / server.capacity;
-            if(currRemainingLife < minRemainingLife) {
+            if (currRemainingLife < minRemainingLife) {
                 minRemainingLife = currRemainingLife;
             }
         }
@@ -137,8 +167,8 @@ public class ServerInfrastructure {
         /* Print results */
         DecimalFormat f = new DecimalFormat("###0.00000000");
 
-        for(IServer server: webServers) {
-            server.printStats(f,  currentTs);
+        for (IServer server : webServers) {
+            server.printStats(f, currentTs);
         }
     }
 
@@ -177,36 +207,38 @@ public class ServerInfrastructure {
         return targetWebServer;
     }
 
-    public void scaleOut() {
-        WebServer targetWebServer =  findScaleOutTarget();
+    public void scaleOut(double endTs) {
+        WebServer targetWebServer = findScaleOutTarget();
 
         /* If found server, make it active */
-        if (targetWebServer != null) targetWebServer.setServerState(ServerState.ACTIVE);
+        if (targetWebServer != null) {
+            targetWebServer.setServerState(ServerState.ACTIVE);
+            
+            SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.ACTIVE);
+            addStateToScalingData(endTs);
+        }
 
         /* If no server is found, all servers are active */
         else System.out.println("All servers are active");
     }
 
-    public void scaleIn() {
+    public void scaleIn(double endTs) {
         WebServer minServer = findScaleInTarget();
 
         /* If found server, make it to be removed */
-        if (minServer != null) minServer.setServerState(ServerState.TO_BE_REMOVED);
+        if (minServer != null) {
+            minServer.setServerState(ServerState.TO_BE_REMOVED);
+            
+            SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_REMOVED);
+            addStateToScalingData(endTs);
+        }
 
         /* If no server is found, all servers are active */
-        else  System.out.println("No active servers found!");
+        else System.out.println("No active servers found!");
     }
 
     public void updateMovingExpResponseTime(double lastResponseTime) {
         this.movingExpMeanResponseTime = this.movingExpMeanResponseTime * ALPHA +
                 lastResponseTime * (1 - ALPHA);
-    }
-
-    public int numServerActive() {
-        return webServers
-                .stream()
-                .filter(w -> w.getServerState() == ServerState.ACTIVE)
-                .toList()
-                .size();
     }
 }
