@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static it.uniroma2.models.Config.*;
+import static it.uniroma2.utils.DataCSVWriter.JOBS_DATA;
 import static it.uniroma2.utils.DataCSVWriter.SCALING_DATA;
 import static it.uniroma2.utils.DataField.*;
 
@@ -33,7 +34,7 @@ public class ServerInfrastructure {
      * @return the number of web servers in the state 'state'
      */
     public int getNumServersByState(ServerState state) {
-        return (int) webServers.stream().filter(server -> server.getServerState()  == state).count();
+        return (int) webServers.stream().filter(server -> server.getServerState() == state).count();
     }
 
 
@@ -78,7 +79,7 @@ public class ServerInfrastructure {
             assert removedJob != null;
             double lastResponseTime = endTs - removedJob.getArrivalTime();
             this.updateMovingExpResponseTime(lastResponseTime);
-            
+
             addStateToScalingData(endTs);
             SCALING_DATA.addField(endTs, R_0, lastResponseTime);
             SCALING_DATA.addField(endTs, MOVING_R_O, this.movingExpMeanResponseTime);
@@ -220,7 +221,7 @@ public class ServerInfrastructure {
         if (targetWebServer != null) {
             targetWebServer.setServerState(ServerState.TO_BE_ACTIVE);
             targetWebServer.setActivationTimestamp(endTs + 1); // #TODO: change
-            
+
             SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_ACTIVE);
             addStateToScalingData(endTs);
 
@@ -246,7 +247,7 @@ public class ServerInfrastructure {
         /* If found server, make it to be removed */
         if (minServer != null) {
             minServer.setServerState(ServerState.TO_BE_REMOVED);
-            
+
             SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_REMOVED);
             addStateToScalingData(endTs);
         }
@@ -264,5 +265,15 @@ public class ServerInfrastructure {
     public void updateMovingExpResponseTime(double lastResponseTime) {
         this.movingExpMeanResponseTime = this.movingExpMeanResponseTime * ALPHA +
                 lastResponseTime * (1 - ALPHA);
+    }
+
+    public void logFineJobs(double endTs, String eventType) {
+        int i = 1;
+        for (WebServer server : webServers) {
+            JOBS_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(i), server.size());
+            JOBS_DATA.addFieldWithSuffix(endTs, STATUS_OF_SERVER, String.valueOf(i), server.getServerState().toString());
+            JOBS_DATA.addField(endTs, EVENT_TYPE, eventType);
+            i++;
+        }
     }
 }

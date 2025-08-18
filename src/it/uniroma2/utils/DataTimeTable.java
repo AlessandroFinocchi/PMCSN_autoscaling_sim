@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 public class DataTimeTable {
     @Getter
-    Map<Double, Map<DataField, String>> table;
+    Map<Double, Map<String, String>> table;
 
 
     /**
@@ -27,21 +27,30 @@ public class DataTimeTable {
     public void addField(Double rowKey, DataField columnKey, Object value) {
         if (!table.containsKey(rowKey)) {
             table.put(rowKey, new HashMap<>());
-            table.get(rowKey).put(DataField.TIMESTAMP, String.valueOf(rowKey));
+            table.get(rowKey).put(DataField.TIMESTAMP.toString(), String.valueOf(rowKey));
         }
-        table.get(rowKey).put(columnKey, String.valueOf(value));
+        table.get(rowKey).put(columnKey.toString(), String.valueOf(value));
+    }
+
+    public void addFieldWithSuffix(Double rowKey, DataField columnKey, String suffix, Object value) {
+        if (!table.containsKey(rowKey)) {
+            table.put(rowKey, new HashMap<>());
+            table.get(rowKey).put(DataField.TIMESTAMP.toString(), String.valueOf(rowKey));
+        }
+        String columnKeyString = columnKey.toString() + "_" + suffix;
+        table.get(rowKey).put(columnKeyString, String.valueOf(value));
     }
 
     /**
      * Given a list of DataField produce a table of String used for the CSV export.
      */
-    public String[][] getDataFromHeaders(DataField... fields) {
+    public String[][] getDataFromHeaders(String... fields) {
         String[][] data = new String[table.size()][fields.length];
         int i = 0;
-        for (Map.Entry<Double, Map<DataField, String>> entry : table.entrySet()) {
+        for (Map.Entry<Double, Map<String, String>> entry : table.entrySet()) {
             int j = 0;
-            for (DataField field : fields) {
-                data[i][j] = entry.getValue().get(field);
+            for (String field : fields) {
+                data[i][j] = entry.getValue().get(field.toString());
                 j++;
             }
             i++;

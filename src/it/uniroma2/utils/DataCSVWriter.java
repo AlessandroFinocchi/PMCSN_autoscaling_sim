@@ -12,8 +12,9 @@ public class DataCSVWriter {
 
     // Data table for completion and scaling events
     public static DataTimeTable SCALING_DATA = new DataTimeTable();
+    public static DataTimeTable JOBS_DATA = new DataTimeTable();
 
-    private static String OUT_DIR_PATH = "data_out";
+    private static String OUT_DIR_PATH = "out";
 
     /**
      * Flushes a DataTimeTable to a file in .csv format.
@@ -22,7 +23,7 @@ public class DataCSVWriter {
      * @param fields The lists of the fields that will be flushed on file.
      * @throws IOException
      */
-    public static void flushList(DataTimeTable timeTable, String fileName, DataField... fields) throws IOException {
+    public static void flushList(DataTimeTable timeTable, String fileName, String[] fields) throws IOException {
         String filePath = OUT_DIR_PATH + "/" + fileName + ".csv";
 
         // Create the directory if not exists
@@ -47,7 +48,7 @@ public class DataCSVWriter {
             // Write headers
             String[] strFields = new String[fields.length];
             for (int i = 0; i < fields.length; i++) {
-                strFields[i] = fields[i].name();
+                strFields[i] = fields[i];
             }
             writer.writeNext(strFields);
 
@@ -58,8 +59,26 @@ public class DataCSVWriter {
         }
     }
 
+    public static void flushList(DataTimeTable timeTable, String fileName, DataField[] fields) throws IOException {
+        String[] strFields = new String[fields.length];
+        for (int i = 0; i < fields.length; i++) {
+            strFields[i] = fields[i].toString();
+        }
+        flushList(timeTable, fileName, strFields);
+    }
+
     public static void flushAll() throws IOException {
-        flushList(SCALING_DATA, "scaling", TIMESTAMP, R_0, MOVING_R_O,
-                EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
+        flushList(SCALING_DATA, "scaling", new DataField[]{
+                TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED
+        });
+
+        String[] jobsFields = new String[2 + 5 * 2];
+        jobsFields[0] = "TIMESTAMP";
+        jobsFields[1] = "EVENT_TYPE";
+        for (int i = 0; i < 5; i++) {
+            jobsFields[2 + i * 2] = "STATUS_OF_SERVER_" + (i + 1);
+            jobsFields[2 + i * 2 + 1] = "JOBS_IN_SERVER_" + (i + 1);
+        }
+        flushList(JOBS_DATA, "jobs", jobsFields);
     }
 }

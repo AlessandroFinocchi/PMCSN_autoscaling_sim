@@ -9,4 +9,6 @@ public enum DataField {
     TO_BE_REMOVED,
     REMOVED,
     EVENT_TYPE,
+    JOBS_IN_SERVER,
+    STATUS_OF_SERVER,
 }
