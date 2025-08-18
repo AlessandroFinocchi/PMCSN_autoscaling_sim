@@ -7,6 +7,7 @@ import lombok.Setter;
 
 public class WebServer extends AbstractServer {
     @Getter @Setter private ServerState serverState;
+    @Getter @Setter private Double activationTimestamp;
 
     public WebServer(double capacity, ServerState serverState) {
         super(capacity);

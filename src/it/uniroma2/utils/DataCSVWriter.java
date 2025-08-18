@@ -59,6 +59,7 @@ public class DataCSVWriter {
     }
 
     public static void flushAll() throws IOException {
-        flushList(SCALING_DATA, "scaling", TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, ACTIVE, TO_BE_REMOVED, REMOVED);
+        flushList(SCALING_DATA, "scaling", TIMESTAMP, R_0, MOVING_R_O,
+                EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
     }
 }

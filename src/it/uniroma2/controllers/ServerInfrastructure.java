@@ -33,7 +33,7 @@ public class ServerInfrastructure {
      * @return the number of web servers in the state 'state'
      */
     public int getNumServersByState(ServerState state) {
-        return (int) webServers.stream().filter(server -> server.getServerState() == state).count();
+        return (int) webServers.stream().filter(server -> server.getServerState()  == state).count();
     }
 
 
@@ -41,6 +41,7 @@ public class ServerInfrastructure {
      * Utils method to quickly add all possible states to the scaling Data Table
      */
     private void addStateToScalingData(double endTs) {
+        SCALING_DATA.addField(endTs, TO_BE_ACTIVE, getNumServersByState(ServerState.TO_BE_ACTIVE));
         SCALING_DATA.addField(endTs, ACTIVE, getNumServersByState(ServerState.ACTIVE));
         SCALING_DATA.addField(endTs, TO_BE_REMOVED, getNumServersByState(ServerState.TO_BE_REMOVED));
         SCALING_DATA.addField(endTs, REMOVED, getNumServersByState(ServerState.REMOVED));
@@ -178,7 +179,6 @@ public class ServerInfrastructure {
         // Search if there is a server still active but to be removed
         targetWebServer = webServers.stream()
                 .filter(ws -> ws.getServerState() == ServerState.TO_BE_REMOVED)
-//                .max(Comparator.comparing(WebServer::getCapacity))
                 .min(Comparator.comparingDouble(w -> webServers.indexOf(w)))
                 .orElse(null);
 
@@ -186,7 +186,6 @@ public class ServerInfrastructure {
         if (targetWebServer == null) {
             targetWebServer = webServers.stream()
                     .filter(ws -> ws.getServerState() == ServerState.REMOVED)
-//                    .max(Comparator.comparing(WebServer::getCapacity))
                     .min(Comparator.comparingDouble(w -> webServers.indexOf(w)))
                     .orElse(null);
         }
@@ -199,27 +198,46 @@ public class ServerInfrastructure {
 
         // Search if there is a server still active
         targetWebServer = webServers.stream()
-                .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
-//                .min(Comparator.comparingDouble(WebServer::getRemainingServerLife))
+                .filter(ws -> ws.getServerState() == ServerState.TO_BE_ACTIVE)
                 .max(Comparator.comparingDouble(w -> webServers.indexOf(w)))
                 .orElse(null);
+
+        // If no servers are to be active, look for an active one
+        if (targetWebServer == null) {
+            targetWebServer = webServers.stream()
+                    .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
+                    .max(Comparator.comparingDouble(w -> webServers.indexOf(w)))
+                    .orElse(null);
+        }
 
         return targetWebServer;
     }
 
-    public void scaleOut(double endTs) {
+    public WebServer requestScaleOut(double endTs) {
         WebServer targetWebServer = findScaleOutTarget();
 
         /* If found server, make it active */
         if (targetWebServer != null) {
-            targetWebServer.setServerState(ServerState.ACTIVE);
+            targetWebServer.setServerState(ServerState.TO_BE_ACTIVE);
+            targetWebServer.setActivationTimestamp(endTs + 1); // #TODO: change
             
-            SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.ACTIVE);
+            SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_ACTIVE);
             addStateToScalingData(endTs);
+
+            return targetWebServer;
         }
 
         /* If no server is found, all servers are active */
         else System.out.println("All servers are active");
+
+        return null;
+    }
+
+    public WebServer findNextScaleOut() {
+        return webServers.stream()
+                .filter(ws -> ws.getServerState() == ServerState.TO_BE_ACTIVE)
+                .min(Comparator.comparingDouble(WebServer::getActivationTimestamp))
+                .orElse(null);
     }
 
     public void scaleIn(double endTs) {
@@ -235,6 +253,12 @@ public class ServerInfrastructure {
 
         /* If no server is found, all servers are active */
         else System.out.println("No active servers found!");
+    }
+
+    public void scaleOut(double endTs, WebServer targetWebServer) {
+        targetWebServer.setServerState(ServerState.ACTIVE);
+        SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.ACTIVE);
+        addStateToScalingData(endTs);
     }
 
     public void updateMovingExpResponseTime(double lastResponseTime) {

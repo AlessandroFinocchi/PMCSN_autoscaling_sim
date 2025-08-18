@@ -4,5 +4,6 @@ public enum EventType {
     ARRIVAL,
     COMPLETION,
     SCALING_IN,
+    SCALING_OUT_REQ,
     SCALING_OUT,
 }
