@@ -101,7 +101,7 @@ public class EventProcessor implements EventVisitor {
         double endTs = event.getTimestamp();
 
         /* Advance job execution */
-        servers.computeJobsAdvancement(startTs, endTs, 1);
+        servers.computeJobsAdvancement(startTs, endTs, 0);
 
         /* Set server to be effectively active */
         servers.scaleOut(endTs, event.getTarget());
