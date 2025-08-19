@@ -72,12 +72,13 @@ public class DataCSVWriter {
                 TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED
         });
 
-        String[] jobsFields = new String[2 + 5 * 2];
+        String[] jobsFields = new String[2 + 5 * 2 + 1];
         jobsFields[0] = "TIMESTAMP";
         jobsFields[1] = "EVENT_TYPE";
+        jobsFields[2] = "JOBS_IN_SERVER_0";
         for (int i = 0; i < 5; i++) {
-            jobsFields[2 + i * 2] = "STATUS_OF_SERVER_" + (i + 1);
-            jobsFields[2 + i * 2 + 1] = "JOBS_IN_SERVER_" + (i + 1);
+            jobsFields[3 + i * 2] = "STATUS_OF_SERVER_" + (i + 1);
+            jobsFields[3 + i * 2 + 1] = "JOBS_IN_SERVER_" + (i + 1);
         }
         flushList(JOBS_DATA, "jobs", jobsFields);
     }

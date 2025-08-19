@@ -10,7 +10,7 @@ public interface IServer {
 
     void addJob(Job job);
 
-    void removeJob(Job job);
+    boolean removeJob(Job job);
 
     Job getMinRemainingLifeJob();
     

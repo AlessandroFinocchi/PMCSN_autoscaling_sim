@@ -1,5 +1,6 @@
 package it.uniroma2.controllers;
 
+import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.JobList;
 import it.uniroma2.models.sys.SystemStats;
@@ -18,14 +19,30 @@ public abstract class AbstractServer implements IServer {
         stats = new SystemStats();
     }
 
+    /**
+     * Computes the advancement of all jobs using a Processor Sharing scheduling
+     * @param startTs the interval start time
+     * @param endTs the interval end time
+     * @param completed weather a job is completing or not
+     */
     @Override
-    public void addJob(Job job) {
-        jobs.add(job);
+    public void computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
+        /*  At this point the job has already been removed, so if this is the server
+         *   where completion happened, it must be taken into consideration */
+        int jobAdvanced = jobs.size() + completed;
+
+        stats.updateSystemStats(startTs, endTs, jobAdvanced, completed);
+
+        /* Compute the advancement of each job */
+        double quantum = (this.capacity / jobAdvanced) * (endTs - startTs);
+        for(Job job: this.jobs.getJobs()) {
+            job.decreaseRemainingLife(quantum);
+        }
     }
 
     @Override
-    public void removeJob(Job job) {
-        jobs.removeJob(job);
+    public void addJob(Job job) {
+        jobs.add(job);
     }
     
     @Override
@@ -50,7 +67,7 @@ public abstract class AbstractServer implements IServer {
 
     @Override
     public void printStats(DecimalFormat f, double currentTs) {
-        System.out.println("\nfor " + stats.getCompletedJobs() + " jobs");
+        System.out.println("for " + stats.getCompletedJobs() + " jobs");
         System.out.println("   average interarrival time =   " + f.format(currentTs / stats.getCompletedJobs()));
         System.out.println("   average response time ... =   " + f.format(stats.getNodeSum() / stats.getCompletedJobs()));
         System.out.println("   average service time .... =   " + f.format(stats.getServiceSum() / stats.getCompletedJobs()));

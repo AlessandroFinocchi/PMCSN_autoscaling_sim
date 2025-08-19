@@ -2,6 +2,7 @@ package it.uniroma2.models;
 
 import it.uniroma2.ExampleApp;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -23,6 +24,10 @@ public class Config {
     public static final int MAX_NUM_SERVERS;
     public static final int START_NUM_SERVERS;
     public static final double ALPHA;
+    public static final int SI_MAX;
+    public static final double SPIKE_CAPACITY;
+    public static final boolean SPIKESERVER_ACTIVE;
+
 
     static {
         try(InputStream in = ExampleApp.class
@@ -43,6 +48,9 @@ public class Config {
             MAX_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.max_num_server"));
             START_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.start_num_server"));
             ALPHA = Double.parseDouble(props.getProperty("stats.alpha"));
+            SI_MAX = Integer.parseInt(props.getProperty("infrastructure.si_max"));
+            SPIKE_CAPACITY = Double.parseDouble(props.getProperty("spikeserver.capacity"));
+            SPIKESERVER_ACTIVE = Boolean.parseBoolean(props.getProperty("infrastructure.spikeserver.active"));
 
         } catch (IOException e) {
             throw new ExceptionInInitializerError(
