@@ -5,15 +5,18 @@ import it.uniroma2.models.Job;
 import it.uniroma2.models.JobList;
 import it.uniroma2.models.sys.SystemStats;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.text.DecimalFormat;
 
 public abstract class AbstractServer implements IServer {
+    @Getter @Setter private ServerState serverState;
     @Getter protected double capacity;
     protected JobList jobs;
     protected SystemStats stats;
 
-    public AbstractServer(double capacity) {
+    public AbstractServer(double capacity, ServerState serverState) {
+        this.serverState = serverState;
         this.capacity = capacity;
         this.jobs = new JobList();
         stats = new SystemStats();
