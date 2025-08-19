@@ -11,4 +11,5 @@ public enum DataField {
     EVENT_TYPE,
     JOBS_IN_SERVER,
     STATUS_OF_SERVER,
+    SPIKE_CURRENT_CAPACITY,
 }

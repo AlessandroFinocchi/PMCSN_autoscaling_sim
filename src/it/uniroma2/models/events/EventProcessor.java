@@ -115,6 +115,11 @@ public class EventProcessor implements EventVisitor {
         double nextActivationTS = nextScaleOut == null ? INFINITY : nextScaleOut.getActivationTimestamp();
         s.addEvent(new ScalingOutEvent(nextActivationTS, nextScaleOut));
 
+        /* Generate next completion */
+        double nextCompletionTs = servers.activeJobExists() ? servers.computeNextCompletionTs(endTs) : INFINITY;
+        Event nextCompletion = new CompletionEvent(nextCompletionTs);
+        s.addEvent(nextCompletion);
+
         /* Update the current system clock */
         s.setCurrent(endTs);
     }
@@ -123,8 +128,16 @@ public class EventProcessor implements EventVisitor {
     public void visit(SystemState s, ScalingInEvent event) {
         ServerInfrastructure servers = s.getServers();
         double endTs = event.getTimestamp();
+
         servers.scaleIn(endTs);
+
         s.addEvent(new ScalingInEvent(INFINITY));
+
+        /* Generate next completion */
+        double nextCompletionTs = servers.activeJobExists() ? servers.computeNextCompletionTs(endTs) : INFINITY;
+        Event nextCompletion = new CompletionEvent(nextCompletionTs);
+        s.addEvent(nextCompletion);
+
         s.setCurrent(endTs);
     }
 }

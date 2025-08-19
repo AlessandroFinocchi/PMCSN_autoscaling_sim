@@ -2,6 +2,7 @@ package it.uniroma2.controllers;
 
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
+import it.uniroma2.models.sys.SystemStats;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class ServerInfrastructure {
     private SpikeServer spikeServer = null;
     private final List<AbstractServer> allServers;
     private double movingExpMeanResponseTime;
+    private SystemStats stats;
 
     public ServerInfrastructure() {
         this.nextAssigningServer = 0;
@@ -29,7 +31,7 @@ public class ServerInfrastructure {
             this.webServers.add(new WebServer(WEBSERVER_CAPACITY, serverState));
         }
         if(SPIKESERVER_ACTIVE) {
-            this.spikeServer = new SpikeServer(SPIKE_CAPACITY);
+            this.spikeServer = new SpikeServer(SPIKE_CAPACITY * this.getNumServersByState(ServerState.ACTIVE));
             this.allServers.add(this.spikeServer);
         }
         this.allServers.addAll(webServers);
@@ -101,10 +103,10 @@ public class ServerInfrastructure {
         IServer minServer = null;
         double lifeRemaining, minRemainingLife = INFINITY;
 
-        for (IServer server : allServers) {
+        for (AbstractServer server : allServers) {
             Job j = server.getMinRemainingLifeJob();
             if (j != null) {
-                lifeRemaining = j.getRemainingLife() * server.size();
+                lifeRemaining = j.getRemainingLife() * server.size() / server.getCapacity();
                 if (lifeRemaining < minRemainingLife) {
                     minRemainingLife = lifeRemaining;
                     minServer = server;
@@ -282,7 +284,10 @@ public class ServerInfrastructure {
             addStateToScalingData(endTs);
         }
 
-        /* If no server is found, all servers are active */
+        if(SPIKESERVER_ACTIVE) // todo: apply decorator for deleting these ifs
+            this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumServersByState(ServerState.ACTIVE));
+
+        /* If no server is found, only 1 server is active */
         else System.out.println("No active servers found!");
     }
 
@@ -290,6 +295,8 @@ public class ServerInfrastructure {
         targetWebServer.setServerState(ServerState.ACTIVE);
         SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.ACTIVE);
         addStateToScalingData(endTs);
+        if(SPIKESERVER_ACTIVE) // todo: apply decorator for deleting these ifs
+            this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumServersByState(ServerState.ACTIVE));
     }
 
     public void updateMovingExpResponseTime(double lastResponseTime) {
@@ -307,6 +314,7 @@ public class ServerInfrastructure {
         }
         if(SPIKESERVER_ACTIVE) {
             JOBS_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(0), spikeServer.size());
+            JOBS_DATA.addField(endTs, SPIKE_CURRENT_CAPACITY, spikeServer.getCapacity());
         }
     }
 }

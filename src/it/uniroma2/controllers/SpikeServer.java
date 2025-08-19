@@ -13,5 +13,9 @@ public class SpikeServer extends AbstractServer{
         jobs.removeJob(job);
         return false;
     }
+    
+    public void setCapacity(double newCapacity) {
+        this.capacity = newCapacity;
+    }
 
 }

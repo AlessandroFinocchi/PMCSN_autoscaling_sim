@@ -3,7 +3,7 @@ package it.uniroma2.controllers;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.JobList;
-import it.uniroma2.models.sys.SystemStats;
+import it.uniroma2.models.sys.ServerStats;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,13 +13,13 @@ public abstract class AbstractServer implements IServer {
     @Getter @Setter private ServerState serverState;
     @Getter protected double capacity;
     protected JobList jobs;
-    protected SystemStats stats;
+    protected ServerStats stats;
 
     public AbstractServer(double capacity, ServerState serverState) {
         this.serverState = serverState;
         this.capacity = capacity;
         this.jobs = new JobList();
-        stats = new SystemStats();
+        stats = new ServerStats();
     }
 
     /**
@@ -34,12 +34,17 @@ public abstract class AbstractServer implements IServer {
          *   where completion happened, it must be taken into consideration */
         int jobAdvanced = jobs.size() + completed;
 
-        stats.updateSystemStats(startTs, endTs, jobAdvanced, completed);
+        stats.updateServerStats(startTs, endTs, jobAdvanced, completed, this.serverState, this.capacity);
 
         /* Compute the advancement of each job */
         double quantum = (this.capacity / jobAdvanced) * (endTs - startTs);
-        for(Job job: this.jobs.getJobs()) {
-            job.decreaseRemainingLife(quantum);
+        try{
+            for (Job job : this.jobs.getJobs()) {
+                job.decreaseRemainingLife(quantum);
+            }
+        } catch (IllegalLifeException e) { // #TODO: remove
+            System.out.printf("endTs: %f", endTs);
+            throw e;
         }
     }
 
@@ -82,3 +87,4 @@ public abstract class AbstractServer implements IServer {
         return stats.getNodeSum() / stats.getCompletedJobs();
     }
 }
+
