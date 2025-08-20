@@ -18,8 +18,10 @@ public class SystemState {
     @Getter private ServerInfrastructure servers;
     @Getter private final Distribution arrivalVA;
     @Getter private final Distribution servicesVA;
+    @Getter private final Distribution turnOnVA;
 
-    public SystemState(EventCalendar calendar, Distribution arrivalVA, Distribution servicesVA) {
+    public SystemState(EventCalendar calendar, Distribution arrivalVA, Distribution servicesVA, Distribution turnOnVA) {
+        this.turnOnVA = turnOnVA;
         this.capacity = WEBSERVER_CAPACITY;
         this.current = START;
         this.calendar = calendar;

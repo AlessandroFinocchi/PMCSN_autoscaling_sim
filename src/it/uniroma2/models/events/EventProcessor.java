@@ -81,8 +81,11 @@ public class EventProcessor implements EventVisitor {
         ServerInfrastructure servers = s.getServers();
         double endTs = event.getTimestamp();
 
+        /* Generate time for turn on a web sever */
+        double turnOnTime = s.getTurnOnVA().gen();
+
         // From request to effective scale out
-        var serverTarget = servers.requestScaleOut(endTs);
+        var serverTarget = servers.requestScaleOut(endTs, turnOnTime);
 
         /* Find the earliest WS to make active: it needs to be done
            in case no scaling out event is already scheduled */
@@ -99,7 +102,6 @@ public class EventProcessor implements EventVisitor {
     @Override
     public void visit(SystemState s, ScalingOutEvent event) throws IllegalLifeException {
         ServerInfrastructure servers = s.getServers();
-
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
         double endTs = event.getTimestamp();

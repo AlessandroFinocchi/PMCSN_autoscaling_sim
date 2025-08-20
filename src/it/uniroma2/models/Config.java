@@ -27,6 +27,8 @@ public class Config {
     public static final int SI_MAX;
     public static final double SPIKE_CAPACITY;
     public static final boolean SPIKESERVER_ACTIVE;
+    public static final double TURN_ON_MU;
+    public static final double TURN_ON_STD;
 
 
     static {
@@ -51,6 +53,8 @@ public class Config {
             SI_MAX = Integer.parseInt(props.getProperty("infrastructure.si_max"));
             SPIKE_CAPACITY = Double.parseDouble(props.getProperty("spikeserver.capacity"));
             SPIKESERVER_ACTIVE = Boolean.parseBoolean(props.getProperty("infrastructure.spikeserver.active"));
+            TURN_ON_MU = Double.parseDouble(props.getProperty("turn.on.mu"));
+            TURN_ON_STD = Double.parseDouble(props.getProperty("turn.on.std"));
 
         } catch (IOException e) {
             throw new ExceptionInInitializerError(

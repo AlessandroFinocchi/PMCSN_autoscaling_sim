@@ -4,6 +4,7 @@ import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.libs.Rngs;
 import it.uniroma2.models.distr.Distribution;
 import it.uniroma2.models.distr.Exponential;
+import it.uniroma2.models.distr.Normal;
 import it.uniroma2.models.events.*;
 import it.uniroma2.models.sys.SystemState;
 import it.uniroma2.utils.DataCSVWriter;
@@ -23,6 +24,7 @@ public class ExampleApp {
 
         Distribution arrivalVA  = new Exponential(r, 0, ARRIVALS_MU);
         Distribution servicesVA = new Exponential(r, 1, SERVICES_Z);
+        Distribution turnOnVA = new Normal(r, 2, TURN_ON_MU, TURN_ON_STD);
 
         /* Compute first arrival time */
         double nextArrival = arrivalVA.gen();
@@ -35,7 +37,7 @@ public class ExampleApp {
         calendar.addEvent(firstCompletion);
 
         /* Setup state of the system */
-        SystemState s = new SystemState(calendar, arrivalVA, servicesVA);
+        SystemState s = new SystemState(calendar, arrivalVA, servicesVA, turnOnVA);
 
         ProgressBar bar = new ProgressBar(STOP);
         while (s.getCurrent() < STOP || s.activeJobExists()) {
