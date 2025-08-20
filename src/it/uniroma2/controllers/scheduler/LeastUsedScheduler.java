@@ -1,6 +1,5 @@
 package it.uniroma2.controllers.scheduler;
 
-import it.uniroma2.controllers.servers.AbstractServer;
 import it.uniroma2.controllers.servers.ServerState;
 import it.uniroma2.controllers.servers.WebServer;
 
@@ -10,7 +9,7 @@ import java.util.List;
 public class LeastUsedScheduler implements IScheduler{
 
     @Override
-    public AbstractServer select(List<WebServer> webServers) {
+    public WebServer select(List<WebServer> webServers) {
         return webServers
                 .stream()
                 .filter(server -> server.getServerState() == ServerState.ACTIVE)

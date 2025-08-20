@@ -1,6 +1,6 @@
 package it.uniroma2.models.events;
 
-import it.uniroma2.controllers.servers.ServerInfrastructure;
+import it.uniroma2.controllers.infrastructure.BaseServerInfrastructure;
 import it.uniroma2.controllers.servers.ServerState;
 import it.uniroma2.controllers.servers.WebServer;
 import it.uniroma2.exceptions.IllegalLifeException;
@@ -13,7 +13,7 @@ public class EventProcessor implements EventVisitor {
 
     @Override
     public void visit(SystemState s, ArrivalEvent event) throws IllegalLifeException {
-        ServerInfrastructure servers = s.getServers();
+        BaseServerInfrastructure servers = s.getServers();
 
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
@@ -47,7 +47,7 @@ public class EventProcessor implements EventVisitor {
 
     @Override
     public void visit(SystemState s, CompletionEvent event) throws IllegalLifeException {
-        ServerInfrastructure servers = s.getServers();
+        BaseServerInfrastructure servers = s.getServers();
 
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
@@ -78,7 +78,7 @@ public class EventProcessor implements EventVisitor {
 
     @Override
     public void visit(SystemState s, ScalingOutReqEvent event) {
-        ServerInfrastructure servers = s.getServers();
+        BaseServerInfrastructure servers = s.getServers();
         double endTs = event.getTimestamp();
 
         // From request to effective scale out
@@ -98,7 +98,7 @@ public class EventProcessor implements EventVisitor {
 
     @Override
     public void visit(SystemState s, ScalingOutEvent event) throws IllegalLifeException {
-        ServerInfrastructure servers = s.getServers();
+        BaseServerInfrastructure servers = s.getServers();
 
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
@@ -126,7 +126,7 @@ public class EventProcessor implements EventVisitor {
 
     @Override
     public void visit(SystemState s, ScalingInEvent event) {
-        ServerInfrastructure servers = s.getServers();
+        BaseServerInfrastructure servers = s.getServers();
         double endTs = event.getTimestamp();
 
         servers.scaleIn(endTs);

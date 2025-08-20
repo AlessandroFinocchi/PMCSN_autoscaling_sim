@@ -1,6 +1,6 @@
 package it.uniroma2.models.sys;
 
-import it.uniroma2.controllers.servers.ServerInfrastructure;
+import it.uniroma2.controllers.infrastructure.BaseServerInfrastructure;
 import it.uniroma2.models.distr.Distribution;
 import it.uniroma2.models.events.Event;
 import it.uniroma2.models.events.EventCalendar;
@@ -13,7 +13,7 @@ public class SystemState {
     @Getter private final double capacity;
     @Getter @Setter private double current;                 /* current time                        */
     private EventCalendar calendar;
-    @Getter private ServerInfrastructure servers;
+    @Getter private BaseServerInfrastructure servers;
     @Getter private final Distribution arrivalVA;
     @Getter private final Distribution servicesVA;
 
@@ -21,7 +21,7 @@ public class SystemState {
         this.capacity = WEBSERVER_CAPACITY;
         this.current = START;
         this.calendar = calendar;
-        this.servers = new ServerInfrastructure();
+        this.servers = new BaseServerInfrastructure();
         this.arrivalVA = arrivalVA;
         this.servicesVA = servicesVA;
     }
