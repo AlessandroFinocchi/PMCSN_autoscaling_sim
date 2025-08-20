@@ -1,6 +1,6 @@
 package it.uniroma2.models.sys;
 
-import it.uniroma2.controllers.ServerState;
+import it.uniroma2.controllers.servers.ServerState;
 import lombok.Getter;
 
 /**

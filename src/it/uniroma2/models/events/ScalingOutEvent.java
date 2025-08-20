@@ -1,6 +1,6 @@
 package it.uniroma2.models.events;
 
-import it.uniroma2.controllers.WebServer;
+import it.uniroma2.controllers.servers.WebServer;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.sys.SystemState;
 import lombok.Getter;

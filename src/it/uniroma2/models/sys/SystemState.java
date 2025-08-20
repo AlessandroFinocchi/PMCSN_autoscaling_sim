@@ -1,13 +1,11 @@
 package it.uniroma2.models.sys;
 
-import it.uniroma2.controllers.ServerInfrastructure;
+import it.uniroma2.controllers.servers.ServerInfrastructure;
 import it.uniroma2.models.distr.Distribution;
 import it.uniroma2.models.events.Event;
 import it.uniroma2.models.events.EventCalendar;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.text.DecimalFormat;
 
 import static it.uniroma2.models.Config.*;
 

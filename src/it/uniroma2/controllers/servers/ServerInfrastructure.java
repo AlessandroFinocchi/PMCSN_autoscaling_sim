@@ -1,5 +1,7 @@
-package it.uniroma2.controllers;
+package it.uniroma2.controllers.servers;
 
+import it.uniroma2.controllers.scheduler.IScheduler;
+import it.uniroma2.controllers.scheduler.SchedulerFactory;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.SystemStats;
@@ -15,7 +17,7 @@ import static it.uniroma2.utils.DataCSVWriter.SCALING_DATA;
 import static it.uniroma2.utils.DataField.*;
 
 public class ServerInfrastructure {
-    private int nextAssigningServer; // todo: refactor into a scheduler class
+    private final IScheduler scheduler;
     private final List<WebServer> webServers;
     private SpikeServer spikeServer = null;
     private final List<AbstractServer> allServers;
@@ -23,7 +25,9 @@ public class ServerInfrastructure {
     private SystemStats stats;
 
     public ServerInfrastructure() {
-        this.nextAssigningServer = 0;
+        // NEW: init scheduler in base a Config.SCHEDULER_TYPE
+        this.scheduler = SchedulerFactory.create();
+
         this.allServers = new ArrayList<>();
         this.webServers = new ArrayList<>();
         for (int i = 0; i < MAX_NUM_SERVERS; i++) {
@@ -136,30 +140,14 @@ public class ServerInfrastructure {
      */
     public void assignJob(Job job) {
         AbstractServer target;
-        if (!SPIKESERVER_ACTIVE || this.webServersSize() < SI_MAX ) {
-            /* Find the least used Web Server */
-            target = webServers
-                    .stream()
-                    .filter(server -> server.getServerState() == ServerState.ACTIVE)
-                    .min(Comparator.comparingDouble(WebServer::size))
-                    .stream().toList().get(0);
-        } else {
+
+        if (SPIKESERVER_ACTIVE && this.webServersSize() < SI_MAX ) {
             target = spikeServer;
+        } else {
+            target = scheduler.select(this.webServers);
         }
 
         target.addJob(job);
-
-//        for(int currIndex, i = 0; i < webServers.size(); i++) {
-//            currIndex = (nextAssigningServer + i) % webServers.size();
-//            WebServer server = webServers.get(currIndex);
-//            if (server.getServerState() == ServerState.ACTIVE) {
-//                server.addJob(job);
-//                nextAssigningServer = (currIndex + 1) % webServers.size();
-//                return;
-//            }
-//        }
-//
-//        throw new RuntimeException("No active server found");
     }
 
     /**

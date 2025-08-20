@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import static it.uniroma2.models.Config.*;
 
-public class ExampleApp {
+public class SimulateRunApp {
 
     public static void main(String[] args) throws IllegalLifeException {
         Rngs r = new Rngs();

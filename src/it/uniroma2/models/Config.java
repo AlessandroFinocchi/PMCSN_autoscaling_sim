@@ -1,8 +1,7 @@
 package it.uniroma2.models;
 
-import it.uniroma2.ExampleApp;
+import it.uniroma2.SimulateRunApp;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -27,10 +26,12 @@ public class Config {
     public static final int SI_MAX;
     public static final double SPIKE_CAPACITY;
     public static final boolean SPIKESERVER_ACTIVE;
+    public static final String SCHEDULER_TYPE;
+
 
 
     static {
-        try(InputStream in = ExampleApp.class
+        try(InputStream in = SimulateRunApp.class
                 .getClassLoader()
                 .getResourceAsStream(CONFIG_FILE)){
             Properties props = new Properties();
@@ -51,6 +52,7 @@ public class Config {
             SI_MAX = Integer.parseInt(props.getProperty("infrastructure.si_max"));
             SPIKE_CAPACITY = Double.parseDouble(props.getProperty("spikeserver.capacity"));
             SPIKESERVER_ACTIVE = Boolean.parseBoolean(props.getProperty("infrastructure.spikeserver.active"));
+            SCHEDULER_TYPE =  props.getProperty("infrastructure.scheduler");
 
         } catch (IOException e) {
             throw new ExceptionInInitializerError(

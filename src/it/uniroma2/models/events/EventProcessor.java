@@ -1,8 +1,8 @@
 package it.uniroma2.models.events;
 
-import it.uniroma2.controllers.ServerInfrastructure;
-import it.uniroma2.controllers.ServerState;
-import it.uniroma2.controllers.WebServer;
+import it.uniroma2.controllers.servers.ServerInfrastructure;
+import it.uniroma2.controllers.servers.ServerState;
+import it.uniroma2.controllers.servers.WebServer;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.SystemState;

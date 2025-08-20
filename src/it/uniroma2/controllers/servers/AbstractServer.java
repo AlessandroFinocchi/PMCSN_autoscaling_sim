@@ -1,4 +1,4 @@
-package it.uniroma2.controllers;
+package it.uniroma2.controllers.servers;
 
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;

@@ -1,4 +1,4 @@
-package it.uniroma2.controllers;
+package it.uniroma2.controllers.servers;
 
 import it.uniroma2.models.Job;
 import lombok.Getter;
