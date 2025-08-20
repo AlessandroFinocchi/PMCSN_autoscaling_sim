@@ -141,7 +141,7 @@ public class ServerInfrastructure {
     public void assignJob(Job job) {
         AbstractServer target;
 
-        if (SPIKESERVER_ACTIVE && this.webServersSize() < SI_MAX ) {
+        if (SPIKESERVER_ACTIVE && this.webServersSize() >= SI_MAX ) {
             target = spikeServer;
         } else {
             target = scheduler.select(this.webServers);

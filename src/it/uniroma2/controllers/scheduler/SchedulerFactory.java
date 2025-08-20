@@ -9,9 +9,10 @@ import static it.uniroma2.models.Config.SCHEDULER_TYPE;
 public class SchedulerFactory {
 
     public static IScheduler create() {
+        System.out.println("Using scheduler: " +  SCHEDULER_TYPE);
         return switch (SCHEDULER_TYPE) {
             case "leastUsed", "round_robin", "rr" -> new RoundRobinScheduler();
-            case "roundRobin", "least_used", "lu", "" -> new LeastUsedScheduler(); // default
+            case "roundRobin", "least_used", "lu", "" -> new LeastUsedScheduler();
             default -> throw new IllegalArgumentException("Invalid scheduler type: " + SCHEDULER_TYPE);
         };
     }
