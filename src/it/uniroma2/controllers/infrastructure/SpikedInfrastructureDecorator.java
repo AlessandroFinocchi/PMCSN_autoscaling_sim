@@ -3,6 +3,8 @@ package it.uniroma2.controllers.infrastructure;
 import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
+import it.uniroma2.models.sys.ServerStats;
+import it.uniroma2.models.sys.SystemStats;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -101,12 +103,20 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         return Math.min(spikeServerMinRemainingLife, base.computeNextCompletionTs(endTs));
     }
 
-    public void printStats(double currentTs) {
-        DecimalFormat f = new DecimalFormat("###0.00000000");
-        System.out.print("\nSpikeServer : ");
-        this.spikeServer.printStats(f, currentTs);
+    public void printServerStats(DecimalFormat f, double currentTs) {
+        System.out.print("\n\nSpikeServer : ");
+        this.spikeServer.printServerStats(f, currentTs);
 
-        base.printStats(currentTs);
+        base.printServerStats(f, currentTs);
+    }
+
+    public void printSystemStats(DecimalFormat f, double currentTs) {
+        List<ServerStats> serverStats = this.allServers.stream()
+                .map(AbstractServer::getStats)
+                .toList();
+
+        SystemStats sysStats = new SystemStats(serverStats);
+        sysStats.processStats(f, currentTs);
     }
 
     public WebServer requestScaleOut(double endTs) {

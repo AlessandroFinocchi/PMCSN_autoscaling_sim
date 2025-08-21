@@ -5,12 +5,14 @@ import it.uniroma2.controllers.scheduler.SchedulerFactory;
 import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
+import it.uniroma2.models.sys.ServerStats;
 import it.uniroma2.models.sys.SystemStats;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.JOBS_DATA;
@@ -21,7 +23,6 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
     final IScheduler scheduler;
     final List<WebServer> webServers;
     double movingExpMeanResponseTime;
-    SystemStats stats;
 
     public BaseServerInfrastructure() {
         this.scheduler = SchedulerFactory.create();
@@ -127,13 +128,20 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
         return endTs + minRemainingLife;
     }
 
-    public void printStats(double currentTs) {
-        DecimalFormat f = new DecimalFormat("###0.00000000");
-
+    public void printServerStats(DecimalFormat f, double currentTs) {
         for (WebServer server : webServers) {
             System.out.printf("\nWebServer %d: ", webServers.indexOf(server) + 1);
-            server.printStats(f, currentTs);
+            server.printServerStats(f, currentTs);
         }
+    }
+
+    public void printSystemStats(DecimalFormat f, double currentTs) {
+        List<ServerStats> serverStats = this.webServers.stream()
+                .map(AbstractServer::getStats)
+                .toList();
+
+        SystemStats sysStats = new SystemStats(serverStats);
+        sysStats.processStats(f, currentTs);
     }
 
     WebServer findScaleOutTarget() {

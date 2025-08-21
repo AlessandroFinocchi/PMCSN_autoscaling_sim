@@ -29,6 +29,5 @@ public class ServerStats {
         }
         if(serverState == ServerState.ACTIVE || serverState == ServerState.TO_BE_REMOVED)
             this.allocatedCapacity += (endTs - startTs) * currentCapacity;
-
     }
 }

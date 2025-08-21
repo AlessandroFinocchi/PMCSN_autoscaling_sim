@@ -8,6 +8,8 @@ import it.uniroma2.models.events.EventCalendar;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.text.DecimalFormat;
+
 import static it.uniroma2.models.Config.*;
 
 public class SystemState {
@@ -36,6 +38,9 @@ public class SystemState {
     }
 
     public void printStats() {
-        servers.printStats(this.getCurrent());
+        DecimalFormat f = new DecimalFormat("###0.00000000");
+
+        servers.printServerStats(f, this.getCurrent());
+        servers.printSystemStats(f, this.getCurrent());
     }
 }

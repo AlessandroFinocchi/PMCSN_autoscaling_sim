@@ -13,7 +13,7 @@ public abstract class AbstractServer implements IServer {
     @Getter @Setter private ServerState serverState;
     @Getter protected double capacity;
     protected JobList jobs;
-    protected ServerStats stats;
+    @Getter protected ServerStats stats;
 
     public AbstractServer(double capacity, ServerState serverState) {
         this.serverState = serverState;
@@ -74,7 +74,7 @@ public abstract class AbstractServer implements IServer {
     }
 
     @Override
-    public void printStats(DecimalFormat f, double currentTs) {
+    public void printServerStats(DecimalFormat f, double currentTs) {
         System.out.println("for " + stats.getCompletedJobs() + " jobs");
         System.out.println("   average interarrival time =   " + f.format(currentTs / stats.getCompletedJobs()));
         System.out.println("   average response time ... =   " + f.format(stats.getNodeSum() / stats.getCompletedJobs()));
