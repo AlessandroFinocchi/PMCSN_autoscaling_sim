@@ -5,11 +5,11 @@ import static it.uniroma2.models.Config.SPIKESERVER_ACTIVE;
 public final class InfrastructureFactory {
     private InfrastructureFactory() {}
 
-    public static AbstractServerInfrastructure create() {
-        AbstractServerInfrastructure instance = new BaseServerInfrastructure();
+    public static IServerInfrastructure create() {
+        IServerInfrastructure instance = new BaseServerInfrastructure();
 
         if (SPIKESERVER_ACTIVE)
-            instance = new SpikedInfrastructureDecorator(instance);
+            instance = new SpikedInfrastructureDecorator((BaseServerInfrastructure)instance);
 
         return instance;
     }

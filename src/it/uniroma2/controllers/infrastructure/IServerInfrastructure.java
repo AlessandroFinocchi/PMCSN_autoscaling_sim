@@ -4,14 +4,13 @@ import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 
-interface IServerInfrastructure {
-
+public interface IServerInfrastructure {
     /**
      * Returns the number of Web Servers in a given state
      * @param state the state of the web servers
      * @return the number of web servers in the state 'state'
      */
-    int getNumServersByState(ServerState state);
+    int getNumWebServersByState(ServerState state);
 
     /**
      * Processes the job advancement in their execution

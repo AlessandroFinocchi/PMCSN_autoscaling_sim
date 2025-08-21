@@ -1,28 +1,46 @@
 package it.uniroma2.controllers.infrastructure;
 
-import it.uniroma2.controllers.servers.AbstractServer;
-import it.uniroma2.controllers.servers.IServer;
-import it.uniroma2.controllers.servers.ServerState;
-import it.uniroma2.controllers.servers.WebServer;
+import it.uniroma2.controllers.scheduler.IScheduler;
+import it.uniroma2.controllers.scheduler.SchedulerFactory;
+import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
+import it.uniroma2.models.sys.SystemStats;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
-import static it.uniroma2.models.Config.INFINITY;
+import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.JOBS_DATA;
 import static it.uniroma2.utils.DataCSVWriter.SCALING_DATA;
 import static it.uniroma2.utils.DataField.*;
 
-public class BaseServerInfrastructure extends AbstractServerInfrastructure{
+public class BaseServerInfrastructure implements IServerInfrastructure{
+    final IScheduler scheduler;
+    final List<WebServer> webServers;
+    double movingExpMeanResponseTime;
+    SystemStats stats;
 
-    /**
-     * Assign the job to a server with a round-robin policy
-     * @param job the job to assign
-     */
-    public void assignJob(Job job) {
-        WebServer target = this.scheduler.select(this.webServers);
-        target.addJob(job);
+    public BaseServerInfrastructure() {
+        this.scheduler = SchedulerFactory.create();
+        this.webServers = new ArrayList<>();
+        for (int i = 0; i < MAX_NUM_SERVERS; i++) {
+            var serverState = i < START_NUM_SERVERS ? ServerState.ACTIVE : ServerState.REMOVED;
+            this.webServers.add(new WebServer(WEBSERVER_CAPACITY, serverState));
+        }
+    }
+
+    public int getNumWebServersByState(ServerState state) {
+        return (int) webServers.stream().filter(server -> server.getServerState() == state).count();
+    }
+
+    void addStateToScalingData(double endTs) {
+        SCALING_DATA.addField(endTs, TO_BE_ACTIVE, getNumWebServersByState(ServerState.TO_BE_ACTIVE));
+        SCALING_DATA.addField(endTs, ACTIVE, getNumWebServersByState(ServerState.ACTIVE));
+        SCALING_DATA.addField(endTs, TO_BE_REMOVED, getNumWebServersByState(ServerState.TO_BE_REMOVED));
+        SCALING_DATA.addField(endTs, REMOVED, getNumWebServersByState(ServerState.REMOVED));
     }
 
     public double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
@@ -30,7 +48,7 @@ public class BaseServerInfrastructure extends AbstractServerInfrastructure{
 
         Job removedJob = null;
         if (completionServerIndex != -1) {
-            AbstractServer minServer = webServers.get(completionServerIndex);
+            WebServer minServer = webServers.get(completionServerIndex);
             removedJob = minServer.getMinRemainingLifeJob();
             boolean isServerRemoved = minServer.removeJob(removedJob);
             if (isServerRemoved)
@@ -57,7 +75,7 @@ public class BaseServerInfrastructure extends AbstractServerInfrastructure{
         return this.movingExpMeanResponseTime;
     }
 
-    private int getCompletingServerIndex() {
+    int getCompletingServerIndex() {
         IServer minServer = null;
         double lifeRemaining, minRemainingLife = INFINITY;
 
@@ -76,8 +94,21 @@ public class BaseServerInfrastructure extends AbstractServerInfrastructure{
         return webServers.indexOf(minServer);
     }
 
+    int webServersSize() {
+        int size = 0;
+        for (WebServer server : webServers) {
+            size += server.size();
+        }
+        return size;
+    }
+
+    public void assignJob(Job job) {
+        AbstractServer target = scheduler.select(this.webServers);
+        target.addJob(job);
+    }
+
     public boolean activeJobExists() {
-        for (IServer server : webServers) {
+        for (WebServer server : webServers) {
             if (server.activeJobExists()) return true;
         }
         return false;
@@ -86,7 +117,7 @@ public class BaseServerInfrastructure extends AbstractServerInfrastructure{
     public double computeNextCompletionTs(double endTs) {
         double currRemainingLife, minRemainingLife = INFINITY;
 
-        for (AbstractServer server : webServers.stream().filter(server -> server.size() != 0).toList()) {
+        for (WebServer server : webServers.stream().filter(server -> server.size() != 0).toList()) {
             currRemainingLife = server.getMinRemainingLife() * server.size() / server.getCapacity();
             if (currRemainingLife < minRemainingLife) {
                 minRemainingLife = currRemainingLife;
@@ -97,13 +128,79 @@ public class BaseServerInfrastructure extends AbstractServerInfrastructure{
     }
 
     public void printStats(double currentTs) {
-        /* Print results */
         DecimalFormat f = new DecimalFormat("###0.00000000");
 
         for (WebServer server : webServers) {
             System.out.printf("\nWebServer %d: ", webServers.indexOf(server) + 1);
             server.printStats(f, currentTs);
         }
+    }
+
+    WebServer findScaleOutTarget() {
+        WebServer targetWebServer;
+
+        // Search if there is a server still active but to be removed
+        targetWebServer = webServers.stream()
+                .filter(ws -> ws.getServerState() == ServerState.TO_BE_REMOVED)
+                .min(Comparator.comparingDouble(webServers::indexOf))
+                .orElse(null);
+
+        // If no servers are active but to be removed, look for a removed one
+        if (targetWebServer == null) {
+            targetWebServer = webServers.stream()
+                    .filter(ws -> ws.getServerState() == ServerState.REMOVED)
+                    .min(Comparator.comparingDouble(webServers::indexOf))
+                    .orElse(null);
+        }
+
+        return targetWebServer;
+    }
+
+    WebServer findScaleInTarget() {
+        WebServer targetWebServer;
+
+        // Search if there is a server still active
+        targetWebServer = webServers.stream()
+                .filter(ws -> ws.getServerState() == ServerState.TO_BE_ACTIVE)
+                .max(Comparator.comparingDouble(webServers::indexOf))
+                .orElse(null);
+
+        // If no servers are to be active, look for an active one
+        if (targetWebServer == null) {
+            targetWebServer = webServers.stream()
+                    .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
+                    .max(Comparator.comparingDouble(webServers::indexOf))
+                    .orElse(null);
+        }
+
+        return targetWebServer;
+    }
+
+    public WebServer requestScaleOut(double endTs) {
+        WebServer targetWebServer = findScaleOutTarget();
+
+        /* If found server, make it active */
+        if (targetWebServer != null) {
+            targetWebServer.setServerState(ServerState.TO_BE_ACTIVE);
+            targetWebServer.setActivationTimestamp(endTs + 1); // #TODO: change
+
+            SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_ACTIVE);
+            addStateToScalingData(endTs);
+
+            return targetWebServer;
+        }
+
+        /* If no server is found, all servers are active */
+        else System.out.println("All servers are active");
+
+        return null;
+    }
+
+    public WebServer findNextScaleOut() {
+        return webServers.stream()
+                .filter(ws -> ws.getServerState() == ServerState.TO_BE_ACTIVE)
+                .min(Comparator.comparingDouble(WebServer::getActivationTimestamp))
+                .orElse(null);
     }
 
     public void scaleIn(double endTs) {
@@ -117,7 +214,7 @@ public class BaseServerInfrastructure extends AbstractServerInfrastructure{
             addStateToScalingData(endTs);
         }
 
-        /* If no server is found, only 1 server is active */
+            /* If no server is found, only 1 server is active */
         else System.out.println("No active servers found!");
     }
 
@@ -125,6 +222,11 @@ public class BaseServerInfrastructure extends AbstractServerInfrastructure{
         targetWebServer.setServerState(ServerState.ACTIVE);
         SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.ACTIVE);
         addStateToScalingData(endTs);
+    }
+
+    void updateMovingExpResponseTime(double lastResponseTime) {
+        this.movingExpMeanResponseTime = this.movingExpMeanResponseTime * ALPHA +
+                lastResponseTime * (1 - ALPHA);
     }
 
     public void logFineJobs(double endTs, String eventType) {

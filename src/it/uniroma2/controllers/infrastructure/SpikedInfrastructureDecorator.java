@@ -13,31 +13,26 @@ import static it.uniroma2.utils.DataCSVWriter.JOBS_DATA;
 import static it.uniroma2.utils.DataCSVWriter.SCALING_DATA;
 import static it.uniroma2.utils.DataField.*;
 
-public class SpikedInfrastructureDecorator extends AbstractServerInfrastructure {
-    private final AbstractServerInfrastructure base;
-    private SpikeServer spikeServer;
+public class SpikedInfrastructureDecorator implements IServerInfrastructure{
+    private final BaseServerInfrastructure base;
+    private final SpikeServer spikeServer;
     private final List<AbstractServer> allServers;
 
-    public SpikedInfrastructureDecorator(AbstractServerInfrastructure base) {
-        super();
+    public SpikedInfrastructureDecorator(BaseServerInfrastructure base) {
         this.base = base;
+        this.spikeServer = new SpikeServer(SPIKE_CAPACITY * this.getNumWebServersByState(ServerState.ACTIVE));
 
-        this.spikeServer = new SpikeServer(SPIKE_CAPACITY * this.getNumServersByState(ServerState.ACTIVE));
         this.allServers = new ArrayList<>();
         this.allServers.add(this.spikeServer);
-        this.allServers.addAll(this.webServers);
+        this.allServers.addAll(base.webServers);
     }
 
-    public void assignJob(Job job) {
-        if (base.webServersSize() >= SI_MAX) {
-            spikeServer.addJob(job);
-            return;
-        }
-        base.assignJob(job);
+    public int getNumWebServersByState(ServerState state) {
+        return base.getNumWebServersByState(state);
     }
 
     public double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
-        int completionServerIndex = completed == 1 ? getCompletingServerIndex() : -1;
+        int completionServerIndex = completed == 1 ? this.getCompletingServerIndex() : -1;
 
         Job removedJob = null;
         if (completionServerIndex != -1) {
@@ -58,17 +53,17 @@ public class SpikedInfrastructureDecorator extends AbstractServerInfrastructure 
         if (completionServerIndex != -1) {
             assert removedJob != null;
             double lastResponseTime = endTs - removedJob.getArrivalTime();
-            this.updateMovingExpResponseTime(lastResponseTime);
+            base.updateMovingExpResponseTime(lastResponseTime);
 
-            addStateToScalingData(endTs);
+            base.addStateToScalingData(endTs);
             SCALING_DATA.addField(endTs, R_0, lastResponseTime);
-            SCALING_DATA.addField(endTs, MOVING_R_O, this.movingExpMeanResponseTime);
+            SCALING_DATA.addField(endTs, MOVING_R_O, base.movingExpMeanResponseTime);
         }
 
-        return this.movingExpMeanResponseTime;
+        return base.movingExpMeanResponseTime;
     }
 
-    public int getCompletingServerIndex() {
+    int getCompletingServerIndex() {
         IServer minServer = null;
         double lifeRemaining, minRemainingLife = INFINITY;
 
@@ -87,22 +82,26 @@ public class SpikedInfrastructureDecorator extends AbstractServerInfrastructure 
         return allServers.indexOf(minServer);
     }
 
-    public int webServersSize() {
-        return base.webServersSize() + spikeServer.size();
+    public void assignJob(Job job) {
+        if (base.webServersSize() >= SI_MAX ) {
+            spikeServer.addJob(job);
+        } else {
+            base.assignJob(job);
+        }
     }
 
     public boolean activeJobExists() {
-        return this.spikeServer.activeJobExists() || base.activeJobExists();
+        return base.activeJobExists() || spikeServer.activeJobExists();
     }
 
     public double computeNextCompletionTs(double endTs) {
-        double spikeServerMinRemainingLife = spikeServer.getMinRemainingLife() * spikeServer.size() / spikeServer.getCapacity();
-
+        double spikeServerMinRemainingLife = spikeServer.activeJobExists() ?
+                endTs + spikeServer.getMinRemainingLife() * spikeServer.size() / spikeServer.getCapacity()
+                : INFINITY;
         return Math.min(spikeServerMinRemainingLife, base.computeNextCompletionTs(endTs));
     }
 
     public void printStats(double currentTs) {
-        /* Print results */
         DecimalFormat f = new DecimalFormat("###0.00000000");
         System.out.print("\nSpikeServer : ");
         this.spikeServer.printStats(f, currentTs);
@@ -110,14 +109,22 @@ public class SpikedInfrastructureDecorator extends AbstractServerInfrastructure 
         base.printStats(currentTs);
     }
 
+    public WebServer requestScaleOut(double endTs) {
+        return base.requestScaleOut(endTs);
+    }
+
+    public WebServer findNextScaleOut() {
+        return base.findNextScaleOut();
+    }
+
     public void scaleIn(double endTs) {
         base.scaleIn(endTs);
-        this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumServersByState(ServerState.ACTIVE));
+        this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumWebServersByState(ServerState.ACTIVE));
     }
 
     public void scaleOut(double endTs, WebServer targetWebServer) {
         base.scaleOut(endTs, targetWebServer);
-        this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumServersByState(ServerState.ACTIVE));
+        this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumWebServersByState(ServerState.ACTIVE));
     }
 
     public void logFineJobs(double endTs, String eventType) {
@@ -125,7 +132,4 @@ public class SpikedInfrastructureDecorator extends AbstractServerInfrastructure 
         JOBS_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(0), spikeServer.size());
         JOBS_DATA.addField(endTs, SPIKE_CURRENT_CAPACITY, spikeServer.getCapacity());
     }
-
-
-
 }

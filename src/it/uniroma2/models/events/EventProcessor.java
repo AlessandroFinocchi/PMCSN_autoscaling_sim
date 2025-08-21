@@ -1,7 +1,6 @@
 package it.uniroma2.models.events;
 
-import it.uniroma2.controllers.infrastructure.AbstractServerInfrastructure;
-import it.uniroma2.controllers.infrastructure.BaseServerInfrastructure;
+import it.uniroma2.controllers.infrastructure.IServerInfrastructure;
 import it.uniroma2.controllers.servers.ServerState;
 import it.uniroma2.controllers.servers.WebServer;
 import it.uniroma2.exceptions.IllegalLifeException;
@@ -14,7 +13,7 @@ public class EventProcessor implements EventVisitor {
 
     @Override
     public void visit(SystemState s, ArrivalEvent event) throws IllegalLifeException {
-        AbstractServerInfrastructure servers = s.getServers();
+        IServerInfrastructure servers = s.getServers();
 
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
@@ -48,7 +47,7 @@ public class EventProcessor implements EventVisitor {
 
     @Override
     public void visit(SystemState s, CompletionEvent event) throws IllegalLifeException {
-        AbstractServerInfrastructure servers = s.getServers();
+        IServerInfrastructure servers = s.getServers();
 
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
@@ -61,10 +60,10 @@ public class EventProcessor implements EventVisitor {
 
         /* Check scaling */
         if (movingMeanResponseTime > RESPONSE_TIME_OUT_THRESHOLD &&
-                servers.getNumServersByState(ServerState.ACTIVE) + servers.getNumServersByState(ServerState.TO_BE_ACTIVE) < MAX_NUM_SERVERS)
+                servers.getNumWebServersByState(ServerState.ACTIVE) + servers.getNumWebServersByState(ServerState.TO_BE_ACTIVE) < MAX_NUM_SERVERS)
             s.addEvent(new ScalingOutReqEvent(endTs));
         else if (movingMeanResponseTime < RESPONSE_TIME_IN_THRESHOLD &&
-                servers.getNumServersByState(ServerState.ACTIVE) > 1)
+                servers.getNumWebServersByState(ServerState.ACTIVE) > 1)
             s.addEvent(new ScalingInEvent(endTs));
 
 
@@ -79,7 +78,7 @@ public class EventProcessor implements EventVisitor {
 
     @Override
     public void visit(SystemState s, ScalingOutReqEvent event) {
-        AbstractServerInfrastructure servers = s.getServers();
+        IServerInfrastructure servers = s.getServers();
         double endTs = event.getTimestamp();
 
         // From request to effective scale out
@@ -99,7 +98,7 @@ public class EventProcessor implements EventVisitor {
 
     @Override
     public void visit(SystemState s, ScalingOutEvent event) throws IllegalLifeException {
-        AbstractServerInfrastructure servers = s.getServers();
+        IServerInfrastructure servers = s.getServers();
 
         /* Get the current clock and the one of this arrival */
         double startTs = s.getCurrent();
@@ -127,7 +126,7 @@ public class EventProcessor implements EventVisitor {
 
     @Override
     public void visit(SystemState s, ScalingInEvent event) {
-        AbstractServerInfrastructure servers = s.getServers();
+        IServerInfrastructure servers = s.getServers();
         double endTs = event.getTimestamp();
 
         servers.scaleIn(endTs);
