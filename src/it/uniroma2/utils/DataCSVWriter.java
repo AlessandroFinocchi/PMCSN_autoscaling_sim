@@ -103,7 +103,7 @@ public class DataCSVWriter {
         flushList(INTRA_RUN_DATA, "jobs", jobsHeaders.get(), false);
 
         /* Log data about configuration and final results of a run */
-        INTER_RUN_DATA_HEADERS.add(TOTAL_ALLOCATED_CAPACITY, MEAN_SYSTEM_RESPONSE_TIME);
+        INTER_RUN_DATA_HEADERS.add(FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC,  MEAN_SYSTEM_RESPONSE_TIME);
         flushList(INTER_RUN_DATA, "final", INTER_RUN_DATA_HEADERS.get(), true);
     }
 }

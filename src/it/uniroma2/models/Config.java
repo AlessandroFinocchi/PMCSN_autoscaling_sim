@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import static it.uniroma2.utils.DataCSVWriter.*;
@@ -48,7 +49,8 @@ public class Config {
             START           = Double.parseDouble(props.getProperty("system.start"));
             STOP            = Double.parseDouble(props.getProperty("system.stop"));
             INFINITY        = Double.POSITIVE_INFINITY;
-            RESPONSE_TIME_OUT_THRESHOLD  = Double.parseDouble(props.getProperty("webserver.response_time.out_thr"));
+            RESPONSE_TIME_OUT_THRESHOLD  = (Objects.equals(props.getProperty("webserver.response_time.out_thr"), "INFINITY")) ?
+                            Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("webserver.response_time.out_thr"));
             RESPONSE_TIME_IN_THRESHOLD  = Double.parseDouble(props.getProperty("webserver.response_time.in_thr"));
             MAX_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.max_num_server"));
             START_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.start_num_server"));
