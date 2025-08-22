@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
+import static it.uniroma2.utils.DataField.TIMESTAMP;
+
 public class DataTimeTable {
     @Getter
     Map<Double, Map<String, String>> table;
@@ -29,18 +31,22 @@ public class DataTimeTable {
     /**
      * Add a field given the row key, column key and its value.
      */
-    public void addField(Double rowKey, DataField columnKey, Object value) {
+    public void addField(Double rowKey, String columnKey, Object value) {
         if (!table.containsKey(rowKey)) {
             table.put(rowKey, new HashMap<>());
-            table.get(rowKey).put(DataField.TIMESTAMP.toString(), String.valueOf(rowKey));
+            table.get(rowKey).put(TIMESTAMP.toString(), String.valueOf(rowKey));
         }
-        table.get(rowKey).put(columnKey.toString(), String.valueOf(value));
+        table.get(rowKey).put(columnKey, String.valueOf(value));
+    }
+
+    public void addField(Double rowKey, DataField columnKey, Object value) {
+        this.addField(rowKey, columnKey.toString(), value);
     }
 
     public void addFieldWithSuffix(Double rowKey, DataField columnKey, String suffix, Object value) {
         if (!table.containsKey(rowKey)) {
             table.put(rowKey, new HashMap<>());
-            table.get(rowKey).put(DataField.TIMESTAMP.toString(), String.valueOf(rowKey));
+            table.get(rowKey).put(TIMESTAMP.toString(), String.valueOf(rowKey));
         }
         String columnKeyString = columnKey.toString() + "_" + suffix;
         table.get(rowKey).put(columnKeyString, String.valueOf(value));
@@ -55,7 +61,7 @@ public class DataTimeTable {
         for (Map.Entry<Double, Map<String, String>> entry : table.entrySet()) {
             int j = 0;
             for (String field : fields) {
-                data[i][j] = entry.getValue().get(field.toString());
+                data[i][j] = entry.getValue().get(field);
                 j++;
             }
             i++;

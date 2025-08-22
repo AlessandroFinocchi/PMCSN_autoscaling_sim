@@ -11,9 +11,14 @@ import static it.uniroma2.utils.DataField.*;
 public class DataCSVWriter {
 
     // Data table for completion and scaling events
-    public static DataTimeTable CSV_DATA = new DataTimeTable();
+    public static final DataTimeTable INTRA_RUN_DATA = new DataTimeTable();
 
-    private static String OUT_DIR_PATH = "out";
+    public static final DataHeaders INTER_RUN_DATA_HEADERS = new DataHeaders();
+    public static final DataTimeTable INTER_RUN_DATA = new DataTimeTable();
+
+    public static final Double RUN_FINISHED_KEY = -1.0;
+
+    private static final String OUT_DIR_PATH = "out";
 
     /**
      * Flushes a DataTimeTable to a file in .csv format.
@@ -63,10 +68,12 @@ public class DataCSVWriter {
     }
 
     public static void flushAll() throws IOException {
+        /* Log data about scaling events */
         DataHeaders scalingHeaders = new DataHeaders(TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
-        DataTimeTable filteredScalingData = CSV_DATA.filter(EVENT_TYPE, false, "ARRIVAL");
+        DataTimeTable filteredScalingData = INTRA_RUN_DATA.filter(EVENT_TYPE, false, "ARRIVAL");
         flushList(filteredScalingData, "scaling", scalingHeaders.get());
 
+        /* Log data about jobs in each server */
         DataHeaders jobsHeaders = new DataHeaders();
         jobsHeaders.add(TIMESTAMP, EVENT_TYPE, SPIKE_CURRENT_CAPACITY);
         jobsHeaders.add("JOBS_IN_SERVER_0");
@@ -74,6 +81,10 @@ public class DataCSVWriter {
             jobsHeaders.add("STATUS_OF_SERVER_" + i);
             jobsHeaders.add("JOBS_IN_SERVER_" + i);
         }
-        flushList(CSV_DATA, "jobs", jobsHeaders.get());
+        flushList(INTRA_RUN_DATA, "jobs", jobsHeaders.get());
+
+        /* Log data about configuration and final results of a run */
+        INTER_RUN_DATA_HEADERS.add(TOTAL_ALLOCATED_CAPACITY, MEAN_SYSTEM_RESPONSE_TIME);
+        flushList(INTER_RUN_DATA, "final", INTER_RUN_DATA_HEADERS.get());
     }
 }

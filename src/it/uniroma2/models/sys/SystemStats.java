@@ -3,6 +3,11 @@ package it.uniroma2.models.sys;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import static it.uniroma2.utils.DataCSVWriter.RUN_FINISHED_KEY;
+import static it.uniroma2.utils.DataCSVWriter.INTER_RUN_DATA;
+import static it.uniroma2.utils.DataField.MEAN_SYSTEM_RESPONSE_TIME;
+import static it.uniroma2.utils.DataField.TOTAL_ALLOCATED_CAPACITY;
+
 public class SystemStats {
     List<ServerStats> stats;
 
@@ -22,6 +27,9 @@ public class SystemStats {
         }
 
         meanSystemResponseTime /= completedJobs;
+
+        INTER_RUN_DATA.addField(RUN_FINISHED_KEY, TOTAL_ALLOCATED_CAPACITY, totalAllocatedCapacity);
+        INTER_RUN_DATA.addField(RUN_FINISHED_KEY, MEAN_SYSTEM_RESPONSE_TIME, meanSystemResponseTime);
 
         System.out.println();
         System.out.println("Total Allocated Capacity per second ... = " + f.format(totalAllocatedCapacity/currentTs));

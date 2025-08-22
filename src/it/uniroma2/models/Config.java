@@ -4,7 +4,11 @@ import it.uniroma2.SimulateRunApp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+
+import static it.uniroma2.utils.DataCSVWriter.*;
 
 public class Config {
     private static final String CONFIG_FILE = "config.properties";
@@ -53,6 +57,14 @@ public class Config {
             SPIKE_CAPACITY = Double.parseDouble(props.getProperty("spikeserver.capacity"));
             SPIKESERVER_ACTIVE = Boolean.parseBoolean(props.getProperty("infrastructure.spikeserver.active"));
             SCHEDULER_TYPE =  props.getProperty("infrastructure.scheduler");
+
+            /* Add properties to CSV logging */
+            List<String> sortedKeys = new ArrayList<>(props.stringPropertyNames());
+            sortedKeys.sort(String::compareTo);
+            for (String key: sortedKeys) {
+                INTER_RUN_DATA_HEADERS.add(key);
+                INTER_RUN_DATA.addField(RUN_FINISHED_KEY, key, props.getProperty(key));
+            }
 
         } catch (IOException e) {
             throw new ExceptionInInitializerError(

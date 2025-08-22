@@ -1,6 +1,7 @@
 package it.uniroma2.utils;
 
 public enum DataField {
+    /* Intra run data fields */
     TIMESTAMP,
     R_0,
     MOVING_R_O,
@@ -12,4 +13,7 @@ public enum DataField {
     JOBS_IN_SERVER,
     STATUS_OF_SERVER,
     SPIKE_CURRENT_CAPACITY,
+    /* Inter run data fields */
+    TOTAL_ALLOCATED_CAPACITY,
+    MEAN_SYSTEM_RESPONSE_TIME,
 }
