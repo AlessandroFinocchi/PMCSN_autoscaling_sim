@@ -89,7 +89,9 @@ public class DataCSVWriter {
     public static void flushAll() throws IOException {
         /* Log data about scaling events */
         DataHeaders scalingHeaders = new DataHeaders(TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
-        DataTimeTable filteredScalingData = INTRA_RUN_DATA.filter(EVENT_TYPE, false, "ARRIVAL");
+        DataTimeTable filteredScalingData = INTRA_RUN_DATA
+                .filter(EVENT_TYPE, false, "ARRIVAL")
+                .filter(EVENT_TYPE, false, "COMPLETION");
         flushList(filteredScalingData, "scaling", scalingHeaders.get(), false);
 
         /* Log data about jobs in each server */
@@ -100,7 +102,8 @@ public class DataCSVWriter {
             jobsHeaders.add("STATUS_OF_SERVER_" + i);
             jobsHeaders.add("JOBS_IN_SERVER_" + i);
         }
-        flushList(INTRA_RUN_DATA, "jobs", jobsHeaders.get(), false);
+        DataTimeTable filteredJobsData = INTRA_RUN_DATA.filter(EVENT_TYPE, false, "ACTIVE");
+        flushList(filteredJobsData, "jobs", jobsHeaders.get(), false);
 
         /* Log data about configuration and final results of a run */
         INTER_RUN_DATA_HEADERS.add(FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC,  MEAN_SYSTEM_RESPONSE_TIME);
