@@ -22,7 +22,7 @@ public class DataCSVWriter {
 
     public static final Double INTER_RUN_KEY = -1.0;
 
-    private static final String OUT_DIR_PATH = "out";
+    private static final String OUT_DIR_PATH = "out_data";
 
     private static boolean hasHeaders(String filePath, String[] fields) throws IOException {
         File file = new File(filePath);

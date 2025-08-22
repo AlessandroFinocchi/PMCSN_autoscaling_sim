@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.text.DecimalFormat;
+import java.util.Locale;
 
 import static it.uniroma2.models.Config.*;
 
@@ -40,7 +41,8 @@ public class SystemState {
     }
 
     public void printStats() {
-        DecimalFormat f = new DecimalFormat("###0.00000000");
+        DecimalFormat f = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
+        f.applyPattern("###0.00000000");
 
         servers.printServerStats(f, this.getCurrent());
         servers.printSystemStats(f, this.getCurrent());
