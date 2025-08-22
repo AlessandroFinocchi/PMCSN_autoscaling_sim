@@ -33,6 +33,8 @@ public class Config {
     public static double SPIKE_CAPACITY;
     public static boolean SPIKESERVER_ACTIVE;
     public static String SCHEDULER_TYPE;
+    public static double TURN_ON_MU;
+    public static double TURN_ON_STD;
 
     static {
         loadHeaders();
@@ -85,6 +87,8 @@ public class Config {
             SPIKE_CAPACITY = Double.parseDouble(props.getProperty("spikeserver.capacity"));
             SPIKESERVER_ACTIVE = Boolean.parseBoolean(props.getProperty("infrastructure.spikeserver.active"));
             SCHEDULER_TYPE =  props.getProperty("infrastructure.scheduler");
+            TURN_ON_MU = Double.parseDouble(props.getProperty("turn.on.mu"));
+            TURN_ON_STD = Double.parseDouble(props.getProperty("turn.on.std"));
 
         } catch (IOException e) {
             throw new ExceptionInInitializerError(

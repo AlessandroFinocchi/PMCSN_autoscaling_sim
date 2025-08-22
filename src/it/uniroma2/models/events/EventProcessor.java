@@ -81,8 +81,11 @@ public class EventProcessor implements EventVisitor {
         IServerInfrastructure servers = s.getServers();
         double endTs = event.getTimestamp();
 
+        /* Generate time for turn on a web sever */
+        double turnOnTime = s.getTurnOnVA().gen();
+
         // From request to effective scale out
-        var serverTarget = servers.requestScaleOut(endTs);
+        var serverTarget = servers.requestScaleOut(endTs, turnOnTime);
 
         /* Find the earliest WS to make active: it needs to be done
            in case no scaling out event is already scheduled */
