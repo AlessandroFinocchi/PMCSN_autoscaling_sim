@@ -118,8 +118,8 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         sysStats.processStats(f, currentTs);
     }
 
-    public WebServer requestScaleOut(double endTs) {
-        return base.requestScaleOut(endTs);
+    public WebServer requestScaleOut(double endTs, double turnOnTime) {
+        return base.requestScaleOut(endTs, turnOnTime);
     }
 
     public WebServer findNextScaleOut() {

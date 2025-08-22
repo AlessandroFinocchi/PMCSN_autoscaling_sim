@@ -46,7 +46,7 @@ public interface IServerInfrastructure {
 
     void printSystemStats(DecimalFormat f, double currentTs);
 
-    WebServer requestScaleOut(double endTs);
+    WebServer requestScaleOut(double endTs, double turnOnTime);
 
     WebServer findNextScaleOut();
 

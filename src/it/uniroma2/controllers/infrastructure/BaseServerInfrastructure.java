@@ -182,13 +182,13 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
         return targetWebServer;
     }
 
-    public WebServer requestScaleOut(double endTs) {
+    public WebServer requestScaleOut(double endTs, double turnOnTime) {
         WebServer targetWebServer = findScaleOutTarget();
 
         /* If found server, make it active */
         if (targetWebServer != null) {
             targetWebServer.setServerState(ServerState.TO_BE_ACTIVE);
-            targetWebServer.setActivationTimestamp(endTs + 1); // #TODO: change
+            targetWebServer.setActivationTimestamp(endTs + turnOnTime);
 
             INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_ACTIVE);
             addStateToScalingData(endTs);
