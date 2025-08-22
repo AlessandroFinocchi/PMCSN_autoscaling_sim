@@ -1,0 +1,42 @@
+package it.uniroma2.utils;
+
+import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class DataHeaders {
+
+    @Getter
+    List<String> headers;
+
+    public DataHeaders() {
+        this.headers = new ArrayList<>();
+    }
+
+    public DataHeaders(String... headers) {
+        this.headers = new ArrayList<>();
+        this.add(headers);
+    }
+
+    public DataHeaders(DataField... headers) {
+        this.headers = new ArrayList<>();
+        this.add(headers);
+    }
+
+    public void add(DataField... newHeaders) {
+        for (DataField field : newHeaders) {
+            this.headers.add(field.toString());
+        }
+    }
+
+    public void add(String... newHeaders) {
+        Collections.addAll(this.headers, newHeaders);
+    }
+
+    public String[] get() {
+        return headers.toArray(new String[0]);
+    }
+
+}

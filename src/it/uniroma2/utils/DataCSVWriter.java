@@ -68,19 +68,16 @@ public class DataCSVWriter {
     }
 
     public static void flushAll() throws IOException {
-        flushList(SCALING_DATA, "scaling", new DataField[]{
-                TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED
-        });
+        DataHeaders scalingHeaders = new DataHeaders(TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
+        flushList(SCALING_DATA, "scaling", scalingHeaders.get());
 
-        String[] jobsFields = new String[4+ 5 * 2];
-        jobsFields[0] = "TIMESTAMP";
-        jobsFields[1] = "EVENT_TYPE";
-        jobsFields[2] = "SPIKE_CURRENT_CAPACITY";
-        jobsFields[3] = "JOBS_IN_SERVER_0";
-        for (int i = 0; i < 5; i++) {
-            jobsFields[4 + i * 2] = "STATUS_OF_SERVER_" + (i + 1);
-            jobsFields[4 + i * 2 + 1] = "JOBS_IN_SERVER_" + (i + 1);
+        DataHeaders jobsHeaders = new DataHeaders();
+        jobsHeaders.add(TIMESTAMP, EVENT_TYPE, SPIKE_CURRENT_CAPACITY);
+        jobsHeaders.add("JOBS_IN_SERVER_0");
+        for (int i = 1; i <= 5; i++) {
+            jobsHeaders.add("STATUS_OF_SERVER_" + i);
+            jobsHeaders.add("JOBS_IN_SERVER_" + i);
         }
-        flushList(JOBS_DATA, "jobs", jobsFields);
+        flushList(JOBS_DATA, "jobs", jobsHeaders.get());
     }
 }
