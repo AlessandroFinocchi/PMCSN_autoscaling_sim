@@ -2,26 +2,49 @@ package it.uniroma2;
 
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.libs.Rngs;
+import it.uniroma2.models.Config;
 import it.uniroma2.models.distr.Distribution;
 import it.uniroma2.models.distr.Exponential;
 import it.uniroma2.models.events.*;
 import it.uniroma2.models.sys.SystemState;
 import it.uniroma2.utils.DataCSVWriter;
+import it.uniroma2.utils.DataField;
 import it.uniroma2.utils.ProgressBar;
 
 import java.io.IOException;
 
 import static it.uniroma2.models.Config.*;
+import static it.uniroma2.utils.DataCSVWriter.INTER_RUN_DATA;
 
 public class SimulateRunApp {
+    
+    private static int[] EXP_START_NUM_SERVERS;
 
     public static void main(String[] args) throws IllegalLifeException {
+        EXP_START_NUM_SERVERS = new int[]{5, 4, 3, 2};
+        
+        for (int i = 0; i < EXP_START_NUM_SERVERS.length; i++) {
+            setup(i);
+            run();
+        }
+    }
+
+    private static void setup(int runID) {
+        /* Reload default configuration */
+        Config.load();
+        INTER_RUN_DATA.addField(DataCSVWriter.INTER_RUN_KEY, DataField.RUN_ID, runID);
+
+        /* Update experiment specific configuration */
+        START_NUM_SERVERS = EXP_START_NUM_SERVERS[runID];
+    }
+
+    private static void run() throws IllegalLifeException {
         Rngs r = new Rngs();
         r.plantSeeds(SEED);
 
         EventVisitor visitor = new EventProcessor();
 
-        Distribution arrivalVA  = new Exponential(r, 0, ARRIVALS_MU);
+        Distribution arrivalVA = new Exponential(r, 0, ARRIVALS_MU);
         Distribution servicesVA = new Exponential(r, 1, SERVICES_Z);
 
         /* Compute first arrival time */
@@ -53,7 +76,6 @@ public class SimulateRunApp {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
 }

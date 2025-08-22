@@ -20,7 +20,7 @@ public class DataCSVWriter {
     public static final DataHeaders INTER_RUN_DATA_HEADERS = new DataHeaders();
     public static final DataTimeTable INTER_RUN_DATA = new DataTimeTable();
 
-    public static final Double RUN_FINISHED_KEY = -1.0;
+    public static final Double INTER_RUN_KEY = -1.0;
 
     private static final String OUT_DIR_PATH = "out";
 
