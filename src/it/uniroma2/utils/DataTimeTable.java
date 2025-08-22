@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 public class DataTimeTable {
@@ -19,6 +20,10 @@ public class DataTimeTable {
     public DataTimeTable() {
         // TreeMap allows keeping the map ordered by the row key
         this.table = new TreeMap<>();
+    }
+
+    private DataTimeTable(Map<Double, Map<String, String>> table) {
+        this.table = table;
     }
 
     /**
@@ -56,5 +61,31 @@ public class DataTimeTable {
             i++;
         }
         return data;
+    }
+
+    /**
+     * Return a new DataTimeTable containing only the entries that respect the filter.
+     * @param field The field on which to apply the filter.
+     * @param equals If equals is true, the value of the field has to be equals to the target.
+     * @param target The target value.
+     * @return A new filtered DataTimeTable.
+     */
+    public DataTimeTable filter(String field, boolean equals, String target) {
+        Map<Double, Map<String, String>> newTable = new TreeMap<>();
+
+        for (Map.Entry<Double, Map<String, String>> entry : this.table.entrySet()) {
+            String value = entry.getValue().get(field);
+
+            boolean acceptCondition = (Objects.equals(value, target)) == equals;
+            if (acceptCondition) {
+                newTable.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return new DataTimeTable(newTable);
+    }
+
+    public DataTimeTable filter(DataField field, boolean equals, String target) {
+        return this.filter(field.toString(), equals, target);
     }
 }

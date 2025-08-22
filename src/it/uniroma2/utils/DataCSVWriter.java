@@ -71,6 +71,9 @@ public class DataCSVWriter {
         DataHeaders scalingHeaders = new DataHeaders(TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
         flushList(SCALING_DATA, "scaling", scalingHeaders.get());
 
+        DataTimeTable filteredScalingData = SCALING_DATA.filter(MOVING_R_O, true, null);
+        flushList(filteredScalingData, "filtered_scaling", scalingHeaders.get());
+
         DataHeaders jobsHeaders = new DataHeaders();
         jobsHeaders.add(TIMESTAMP, EVENT_TYPE, SPIKE_CURRENT_CAPACITY);
         jobsHeaders.add("JOBS_IN_SERVER_0");
