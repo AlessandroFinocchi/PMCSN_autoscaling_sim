@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static it.uniroma2.models.Config.*;
-import static it.uniroma2.utils.DataCSVWriter.JOBS_DATA;
-import static it.uniroma2.utils.DataCSVWriter.SCALING_DATA;
+import static it.uniroma2.utils.DataCSVWriter.CSV_DATA;
 import static it.uniroma2.utils.DataField.*;
 
 public class SpikedInfrastructureDecorator implements IServerInfrastructure{
@@ -42,7 +41,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
             removedJob = minServer.getMinRemainingLifeJob();
             boolean isServerRemoved = minServer.removeJob(removedJob);
             if (isServerRemoved)
-                SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
+                CSV_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
         }
 
         /* Compute the advancement of each job in each web Server */
@@ -58,8 +57,8 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
             base.updateMovingExpResponseTime(lastResponseTime);
 
             base.addStateToScalingData(endTs);
-            SCALING_DATA.addField(endTs, R_0, lastResponseTime);
-            SCALING_DATA.addField(endTs, MOVING_R_O, base.movingExpMeanResponseTime);
+            CSV_DATA.addField(endTs, R_0, lastResponseTime);
+            CSV_DATA.addField(endTs, MOVING_R_O, base.movingExpMeanResponseTime);
         }
 
         return base.movingExpMeanResponseTime;
@@ -139,7 +138,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
 
     public void logFineJobs(double endTs, String eventType) {
         base.logFineJobs(endTs, eventType);
-        JOBS_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(0), spikeServer.size());
-        JOBS_DATA.addField(endTs, SPIKE_CURRENT_CAPACITY, spikeServer.getCapacity());
+        CSV_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(0), spikeServer.size());
+        CSV_DATA.addField(endTs, SPIKE_CURRENT_CAPACITY, spikeServer.getCapacity());
     }
 }

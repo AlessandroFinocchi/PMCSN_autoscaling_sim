@@ -12,11 +12,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static it.uniroma2.models.Config.*;
-import static it.uniroma2.utils.DataCSVWriter.JOBS_DATA;
-import static it.uniroma2.utils.DataCSVWriter.SCALING_DATA;
+import static it.uniroma2.utils.DataCSVWriter.CSV_DATA;
 import static it.uniroma2.utils.DataField.*;
 
 public class BaseServerInfrastructure implements IServerInfrastructure{
@@ -38,10 +36,10 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
     }
 
     void addStateToScalingData(double endTs) {
-        SCALING_DATA.addField(endTs, TO_BE_ACTIVE, getNumWebServersByState(ServerState.TO_BE_ACTIVE));
-        SCALING_DATA.addField(endTs, ACTIVE, getNumWebServersByState(ServerState.ACTIVE));
-        SCALING_DATA.addField(endTs, TO_BE_REMOVED, getNumWebServersByState(ServerState.TO_BE_REMOVED));
-        SCALING_DATA.addField(endTs, REMOVED, getNumWebServersByState(ServerState.REMOVED));
+        CSV_DATA.addField(endTs, TO_BE_ACTIVE, getNumWebServersByState(ServerState.TO_BE_ACTIVE));
+        CSV_DATA.addField(endTs, ACTIVE, getNumWebServersByState(ServerState.ACTIVE));
+        CSV_DATA.addField(endTs, TO_BE_REMOVED, getNumWebServersByState(ServerState.TO_BE_REMOVED));
+        CSV_DATA.addField(endTs, REMOVED, getNumWebServersByState(ServerState.REMOVED));
     }
 
     public double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
@@ -53,7 +51,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
             removedJob = minServer.getMinRemainingLifeJob();
             boolean isServerRemoved = minServer.removeJob(removedJob);
             if (isServerRemoved)
-                SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
+                CSV_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
         }
 
         /* Compute the advancement of each job in each web Server */
@@ -69,8 +67,8 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
             this.updateMovingExpResponseTime(lastResponseTime);
 
             addStateToScalingData(endTs);
-            SCALING_DATA.addField(endTs, R_0, lastResponseTime);
-            SCALING_DATA.addField(endTs, MOVING_R_O, this.movingExpMeanResponseTime);
+            CSV_DATA.addField(endTs, R_0, lastResponseTime);
+            CSV_DATA.addField(endTs, MOVING_R_O, this.movingExpMeanResponseTime);
         }
 
         return this.movingExpMeanResponseTime;
@@ -192,7 +190,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
             targetWebServer.setServerState(ServerState.TO_BE_ACTIVE);
             targetWebServer.setActivationTimestamp(endTs + 1); // #TODO: change
 
-            SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_ACTIVE);
+            CSV_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_ACTIVE);
             addStateToScalingData(endTs);
 
             return targetWebServer;
@@ -218,7 +216,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
         if (minServer != null) {
             minServer.setServerState(ServerState.TO_BE_REMOVED);
 
-            SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_REMOVED);
+            CSV_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_REMOVED);
             addStateToScalingData(endTs);
         }
 
@@ -228,7 +226,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
 
     public void scaleOut(double endTs, WebServer targetWebServer) {
         targetWebServer.setServerState(ServerState.ACTIVE);
-        SCALING_DATA.addField(endTs, EVENT_TYPE, ServerState.ACTIVE);
+        CSV_DATA.addField(endTs, EVENT_TYPE, ServerState.ACTIVE);
         addStateToScalingData(endTs);
     }
 
@@ -239,10 +237,10 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
 
     public void logFineJobs(double endTs, String eventType) {
         int i = 1;
-        JOBS_DATA.addField(endTs, EVENT_TYPE, eventType);
+        CSV_DATA.addField(endTs, EVENT_TYPE, eventType);
         for (WebServer server : webServers) {
-            JOBS_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(i), server.size());
-            JOBS_DATA.addFieldWithSuffix(endTs, STATUS_OF_SERVER, String.valueOf(i), server.getServerState().toString());
+            CSV_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(i), server.size());
+            CSV_DATA.addFieldWithSuffix(endTs, STATUS_OF_SERVER, String.valueOf(i), server.getServerState().toString());
             i++;
         }
     }
