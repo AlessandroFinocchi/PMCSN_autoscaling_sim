@@ -1,8 +1,11 @@
 package it.uniroma2;
 
+import it.uniroma2.controllers.configurations.ConfigurationFactory;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.libs.Rngs;
 import it.uniroma2.models.Config;
+import it.uniroma2.models.configurations.RunConfiguration;
+import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.distr.Distribution;
 import it.uniroma2.models.distr.Exponential;
 import it.uniroma2.models.distr.Normal;
@@ -13,30 +16,40 @@ import it.uniroma2.utils.DataField;
 import it.uniroma2.utils.ProgressBar;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.INTER_RUN_DATA;
 
 public class SimulateRunApp {
-    
-    private static int[] EXP_START_NUM_SERVERS;
+
+    private static List<RunConfiguration> configurations = new ArrayList<>();
 
     public static void main(String[] args) throws IllegalLifeException {
-        EXP_START_NUM_SERVERS = new int[]{5, 4, 3, 2};
-        
-        for (int i = 0; i < EXP_START_NUM_SERVERS.length; i++) {
-            setup(i);
+        createConfigurations();
+
+        for (RunConfiguration c : configurations) {
+            setup(c);
             run();
         }
     }
 
-    private static void setup(int runID) {
-        /* Reload default configuration */
-        Config.load();
-        INTER_RUN_DATA.addField(DataCSVWriter.INTER_RUN_KEY, DataField.RUN_ID, runID);
+    private static void createConfigurations() {
+        Parameter parStartNumServers = new Parameter("infrastructure.start_num_server");
+        parStartNumServers.addValues("5", "4", "3", "2");
 
+        Parameter parMaxNumServers = new Parameter("infrastructure.spikeserver.active");
+        parMaxNumServers.addValues("false", "true");
+
+        configurations = ConfigurationFactory.createConfigurationsList(parStartNumServers, parMaxNumServers);
+    }
+
+    private static void setup(RunConfiguration c) {
+        /* Reload default configuration */
         /* Update experiment specific configuration */
-        START_NUM_SERVERS = EXP_START_NUM_SERVERS[runID];
+        Config.load(c);
+        INTER_RUN_DATA.addField(DataCSVWriter.INTER_RUN_KEY, DataField.RUN_ID, c.getName());
     }
 
     private static void run() throws IllegalLifeException {

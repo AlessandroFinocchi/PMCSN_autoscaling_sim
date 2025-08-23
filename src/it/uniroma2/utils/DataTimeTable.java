@@ -94,4 +94,8 @@ public class DataTimeTable {
     public DataTimeTable filter(DataField field, boolean equals, String target) {
         return this.filter(field.toString(), equals, target);
     }
+
+    public void clear(){
+        this.table.clear();
+    }
 }
