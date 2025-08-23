@@ -52,6 +52,17 @@ public class DataTimeTable {
         table.get(rowKey).put(columnKeyString, String.valueOf(value));
     }
 
+    public void deleteField(Double rowKey, DataField columnKey) {
+        if (table.containsKey(rowKey)) {
+            table.get(rowKey).remove(columnKey.toString());
+        }
+    }
+
+    public void overwriteField(Double rowKey, DataField columnKey, Object value) {
+        this.deleteField(rowKey, columnKey);
+        this.addField(rowKey, columnKey, value);
+    }
+
     /**
      * Given a list of DataField produce a table of String used for the CSV export.
      */
@@ -95,7 +106,7 @@ public class DataTimeTable {
         return this.filter(field.toString(), equals, target);
     }
 
-    public void clear(){
+    public void clear() {
         this.table.clear();
     }
 }

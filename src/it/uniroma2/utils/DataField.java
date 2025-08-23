@@ -14,6 +14,8 @@ public enum DataField {
     STATUS_OF_SERVER,
     SPIKE_CURRENT_CAPACITY,
     /* Inter run data fields */
+    RUN_SEED,
+    CONFIGURATION_ID,
     RUN_ID,
     FINAL_TS,
     TOTAL_ALLOCATED_CAPACITY,

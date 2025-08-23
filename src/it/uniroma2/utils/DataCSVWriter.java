@@ -106,7 +106,7 @@ public class DataCSVWriter {
         flushList(filteredJobsData, "jobs", jobsHeaders.get(), false);
 
         /* Log data about configuration and final results of a run */
-        INTER_RUN_DATA_HEADERS.add(RUN_ID, FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC,  MEAN_SYSTEM_RESPONSE_TIME);
+        INTER_RUN_DATA_HEADERS.add(CONFIGURATION_ID, RUN_ID, RUN_SEED, FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC, MEAN_SYSTEM_RESPONSE_TIME);
         flushList(INTER_RUN_DATA, "final", INTER_RUN_DATA_HEADERS.get(), true);
     }
 }
