@@ -13,6 +13,7 @@ public class Config {
     private static final String CONFIG_FILE = "config.properties";
 
     public static int SEED;
+    public static int TOTAL_STREAMS;
 
     public static double ARRIVALS_MU;
     public static double SERVICES_Z;
@@ -76,6 +77,7 @@ public class Config {
             }
 
             SEED = Integer.parseInt(props.getProperty("random.seed"));
+            TOTAL_STREAMS = Integer.parseInt(props.getProperty("random.total_streams"));
             ARRIVALS_MU = Double.parseDouble(props.getProperty("distribution.arrivals.mu"));
             SERVICES_Z = Double.parseDouble(props.getProperty("distribution.services.z"));
             WEBSERVER_CAPACITY = Double.parseDouble(props.getProperty("webserver.capacity"));

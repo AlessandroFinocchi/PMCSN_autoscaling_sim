@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static it.uniroma2.models.Config.TOTAL_STREAMS;
 import static it.uniroma2.utils.DataField.*;
 
 public class DataCSVWriter {
@@ -106,7 +107,10 @@ public class DataCSVWriter {
         flushList(filteredJobsData, "jobs", jobsHeaders.get(), false);
 
         /* Log data about configuration and final results of a run */
-        INTER_RUN_DATA_HEADERS.add(CONFIGURATION_ID, RUN_ID, RUN_SEED, FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC, MEAN_SYSTEM_RESPONSE_TIME);
+        for (int stream = 0; stream < TOTAL_STREAMS; stream++) {
+            INTER_RUN_DATA_HEADERS.add(STREAM_SEED + "_" + stream);
+        }
+        INTER_RUN_DATA_HEADERS.add(CONFIGURATION_ID, RUN_ID, FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC, MEAN_SYSTEM_RESPONSE_TIME);
         flushList(INTER_RUN_DATA, "final", INTER_RUN_DATA_HEADERS.get(), true);
     }
 }

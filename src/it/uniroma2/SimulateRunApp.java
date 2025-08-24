@@ -26,7 +26,7 @@ import static it.uniroma2.utils.DataField.*;
 public class SimulateRunApp {
 
     private static final Rngs R = new Rngs();
-    private static final int REPEAT_CONFIGURATION = 3;
+    private static int REPEAT_CONFIGURATION;
     private static List<RunConfiguration> configurations = new ArrayList<>();
 
     public static void main(String[] args) throws IllegalLifeException {
@@ -41,6 +41,8 @@ public class SimulateRunApp {
     }
 
     private static void createConfigurations() {
+        REPEAT_CONFIGURATION = 3;
+
         Parameter parStartNumServers = new Parameter("infrastructure.start_num_server");
         parStartNumServers.addValues("5", "4");
 
@@ -58,19 +60,24 @@ public class SimulateRunApp {
     }
 
     private static void run(int repetition) throws IllegalLifeException {
-        INTER_RUN_DATA.overwriteField(INTER_RUN_KEY, RUN_ID, repetition);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, RUN_ID, repetition);
 
+        /* Plant the seeds only if the first running the new configuration */
         if (repetition == 0) {
             R.plantSeeds(SEED);
         }
-
-        INTER_RUN_DATA.addField(INTER_RUN_KEY, RUN_SEED, R.getSeed());
 
         EventVisitor visitor = new EventProcessor();
 
         Distribution arrivalVA = new Exponential(R, 0, ARRIVALS_MU);
         Distribution servicesVA = new Exponential(R, 1, SERVICES_Z);
         Distribution turnOnVA = new Normal(R, 2, TURN_ON_MU, TURN_ON_STD);
+
+        /* Log to CSV the initial seed for each stream for replayability */
+        for (int stream = 0; stream < TOTAL_STREAMS; stream++) {
+            R.selectStream(stream);
+            INTER_RUN_DATA.addFieldWithSuffix(INTER_RUN_KEY, STREAM_SEED, String.valueOf(stream), R.getSeed());
+        }
 
         /* Compute first arrival time */
         double nextArrival = arrivalVA.gen();

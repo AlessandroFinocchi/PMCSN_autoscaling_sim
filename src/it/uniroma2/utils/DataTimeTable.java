@@ -58,11 +58,6 @@ public class DataTimeTable {
         }
     }
 
-    public void overwriteField(Double rowKey, DataField columnKey, Object value) {
-        this.deleteField(rowKey, columnKey);
-        this.addField(rowKey, columnKey, value);
-    }
-
     /**
      * Given a list of DataField produce a table of String used for the CSV export.
      */
