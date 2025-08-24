@@ -23,4 +23,18 @@ public class RunConfiguration {
     public String get(String key) {
         return this.params.get(key);
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("RunConfiguration{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", params=").append(params).append('\'');
+        if (!params.isEmpty()) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                sb.append(", ").append(entry.getKey()).append('=').append(entry.getValue());
+            }
+        }
+        sb.append('}');
+        return sb.toString();
+    }
 }

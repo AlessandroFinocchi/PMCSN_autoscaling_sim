@@ -15,12 +15,12 @@ import it.uniroma2.utils.DataCSVWriter;
 import it.uniroma2.utils.ProgressBar;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static it.uniroma2.models.Config.*;
-import static it.uniroma2.utils.DataCSVWriter.INTER_RUN_DATA;
-import static it.uniroma2.utils.DataCSVWriter.INTER_RUN_KEY;
+import static it.uniroma2.utils.DataCSVWriter.*;
 import static it.uniroma2.utils.DataField.*;
 
 public class SimulateRunApp {
@@ -30,26 +30,44 @@ public class SimulateRunApp {
     private static List<RunConfiguration> configurations = new ArrayList<>();
 
     public static void main(String[] args) throws IllegalLifeException {
+        INTRA_RUN_DATA.setWritable(false);
+
         createConfigurations();
 
         for (RunConfiguration c : configurations) {
             setup(c);
             for (int i = 0; i < REPEAT_CONFIGURATION; i++) {
-                run(i);
+                run(c, i);
             }
         }
     }
 
     private static void createConfigurations() {
-        REPEAT_CONFIGURATION = 3;
+        REPEAT_CONFIGURATION = 1;
+
+        List<Parameter> parameters = new ArrayList<>();
+
+        Parameter parMaxServer = new Parameter("infrastructure.max_num_server");
+        parMaxServer.addValues("10");
+        parameters.add(parMaxServer);
 
         Parameter parStartNumServers = new Parameter("infrastructure.start_num_server");
-        parStartNumServers.addValues("5", "4");
+        // parStartNumServers.addValues("10", "9", "8", "7", "6", "5", "4", "3");
+        parStartNumServers.addValues("2");
+        parameters.add(parStartNumServers);
 
         Parameter parMaxNumServers = new Parameter("infrastructure.spikeserver.active");
-        parMaxNumServers.addValues("false", "true");
+        parMaxNumServers.addValues("false");
+        parameters.add(parMaxNumServers);
 
-        configurations = ConfigurationFactory.createConfigurationsList(parStartNumServers, parMaxNumServers);
+        Parameter parScheduler = new Parameter("infrastructure.scheduler");
+        parScheduler.addValues("leastUsed");
+        parameters.add(parScheduler);
+
+        configurations = ConfigurationFactory.createConfigurationsList(parameters.toArray(Parameter[]::new));
+
+
+        System.out.printf("Created %d configurations\n\n", configurations.size());
     }
 
     private static void setup(RunConfiguration c) {
@@ -59,8 +77,14 @@ public class SimulateRunApp {
         INTER_RUN_DATA.addField(INTER_RUN_KEY, CONFIGURATION_ID, c.getName());
     }
 
-    private static void run(int repetition) throws IllegalLifeException {
+    private static void run(RunConfiguration c, int repetition) throws IllegalLifeException {
+        System.out.println();
+        System.out.println(c.toString());
+        System.out.println(repetition + 1 + " / " + REPEAT_CONFIGURATION + " repetition");
+        System.out.println("---------------------------------------");
+
         INTER_RUN_DATA.addField(INTER_RUN_KEY, RUN_ID, repetition);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, RUN_DATETIME, String.valueOf(LocalDateTime.now()));
 
         /* Plant the seeds only if the first running the new configuration */
         if (repetition == 0) {
@@ -104,7 +128,7 @@ public class SimulateRunApp {
         s.printStats();
 
         try {
-            DataCSVWriter.flushAll();
+            DataCSVWriter.flushAllInter();
         } catch (IOException e) {
             e.printStackTrace();
         }

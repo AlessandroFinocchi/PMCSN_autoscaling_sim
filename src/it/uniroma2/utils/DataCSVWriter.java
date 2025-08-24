@@ -87,7 +87,7 @@ public class DataCSVWriter {
         flushList(timeTable, fileName, strFields, append);
     }
 
-    public static void flushAll() throws IOException {
+    public static void flushAllIntra() throws IOException {
         /* Log data about scaling events */
         DataHeaders scalingHeaders = new DataHeaders(TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
         DataTimeTable filteredScalingData = INTRA_RUN_DATA
@@ -106,11 +106,15 @@ public class DataCSVWriter {
         DataTimeTable filteredJobsData = INTRA_RUN_DATA.filter(EVENT_TYPE, false, "ACTIVE");
         flushList(filteredJobsData, "jobs", jobsHeaders.get(), false);
 
+        INTRA_RUN_DATA.clear();
+    }
+
+    public static void flushAllInter() throws IOException {
         /* Log data about configuration and final results of a run */
         for (int stream = 0; stream < TOTAL_STREAMS; stream++) {
             INTER_RUN_DATA_HEADERS.add(STREAM_SEED + "_" + stream);
         }
-        INTER_RUN_DATA_HEADERS.add(CONFIGURATION_ID, RUN_ID, FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC, MEAN_SYSTEM_RESPONSE_TIME);
+        INTER_RUN_DATA_HEADERS.add(RUN_DATETIME, CONFIGURATION_ID, RUN_ID, FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC, MEAN_SYSTEM_RESPONSE_TIME);
         flushList(INTER_RUN_DATA, "final", INTER_RUN_DATA_HEADERS.get(), true);
     }
 }

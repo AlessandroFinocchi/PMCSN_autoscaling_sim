@@ -1,6 +1,7 @@
 package it.uniroma2.utils;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +13,7 @@ import static it.uniroma2.utils.DataField.TIMESTAMP;
 public class DataTimeTable {
     @Getter
     Map<Double, Map<String, String>> table;
+    @Getter @Setter private boolean writable = true;
 
 
     /**
@@ -32,6 +34,8 @@ public class DataTimeTable {
      * Add a field given the row key, column key and its value.
      */
     public void addField(Double rowKey, String columnKey, Object value) {
+        if (!writable) return;
+
         if (!table.containsKey(rowKey)) {
             table.put(rowKey, new HashMap<>());
             table.get(rowKey).put(TIMESTAMP.toString(), String.valueOf(rowKey));
@@ -44,6 +48,8 @@ public class DataTimeTable {
     }
 
     public void addFieldWithSuffix(Double rowKey, DataField columnKey, String suffix, Object value) {
+        if (!writable) return;
+
         if (!table.containsKey(rowKey)) {
             table.put(rowKey, new HashMap<>());
             table.get(rowKey).put(TIMESTAMP.toString(), String.valueOf(rowKey));
