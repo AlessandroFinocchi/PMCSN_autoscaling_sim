@@ -131,6 +131,9 @@ public class Config {
         Parameter parStartNumServers = new Parameter("infrastructure.start_num_server");
         parStartNumServers.addValues("8", "4", "2");
 
+        Parameter parStartNumServersWithoutSpike = new Parameter("infrastructure.start_num_server");
+        parStartNumServersWithoutSpike.addValues("16", "8", "4", "2");
+
         Parameter parSpikeServerActive = new Parameter("infrastructure.spikeserver.active");
         parSpikeServerActive.addValues("true");
 
@@ -140,14 +143,11 @@ public class Config {
         Parameter parSiMax = new Parameter("infrastructure.si_max");
         parSiMax.addValues("100", "50", "30", "20");
 
-        Parameter parScheduler = new Parameter("infrastructure.scheduler");
-        parScheduler.addValues("leastUsed");
-
         List<RunConfiguration> configurationsWithoutSpike = ConfigurationFactory
-                .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServers, parSpikeServerAlwaysFalse, parScheduler);
+                .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServersWithoutSpike, parSpikeServerAlwaysFalse);
 
         List<RunConfiguration> configurationsWithSpike = ConfigurationFactory
-                .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServers, parSpikeServerActive, parSiMax, parScheduler);
+                .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServers, parSpikeServerActive, parSiMax);
 
         configurations.addAll(configurationsWithoutSpike);
         configurations.addAll(configurationsWithSpike);
