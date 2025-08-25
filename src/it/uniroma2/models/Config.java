@@ -122,42 +122,47 @@ public class Config {
     public static List<RunConfiguration> createConfigurations() {
         List<RunConfiguration> configurations = new ArrayList<>();
 
+        /* Common */
         Parameter parArrivalMu = new Parameter("distribution.arrivals.mu");
         parArrivalMu.addValues("0.025");
 
         Parameter parServicesZ = new Parameter("distribution.services.z");
         parServicesZ.addValues("0.1");
 
+        Parameter parSpikeServerActive = new Parameter("infrastructure.spikeserver.active");
+        parSpikeServerActive.addValues("true");
+
+        Parameter parSpikeServerInactive = new Parameter("infrastructure.spikeserver.active");
+        parSpikeServerInactive.addValues("false");
+
+        /* For single server w/o spike */
         Parameter parStartNumServersSingleServer = new Parameter("infrastructure.start_num_server");
         parStartNumServersSingleServer.addValues("1");
 
         Parameter parWebServerCapacity = new Parameter("webserver.capacity");
         parWebServerCapacity.addValues("16", "8", "4", "2");
 
-        Parameter parStartNumServersWithSpike = new Parameter("infrastructure.start_num_server");
-        parStartNumServersWithSpike.addValues("8", "4", "2", "1");
+        List<RunConfiguration> configurationsWithSingleServer = ConfigurationFactory
+                .createConfigurationsList(parArrivalMu, parServicesZ, parSpikeServerInactive, parStartNumServersSingleServer, parWebServerCapacity);
 
+        /* For multiple server w/o spike */
         Parameter parStartNumServersWithoutSpike = new Parameter("infrastructure.start_num_server");
         parStartNumServersWithoutSpike.addValues("16", "8", "4", "2");
 
-        Parameter parSpikeServerActive = new Parameter("infrastructure.spikeserver.active");
-        parSpikeServerActive.addValues("true");
+        List<RunConfiguration> configurationsWithoutSpike = ConfigurationFactory
+                .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServersWithoutSpike, parSpikeServerInactive);
 
-        Parameter parSpikeServerAlwaysFalse = new Parameter("infrastructure.spikeserver.active");
-        parSpikeServerAlwaysFalse.addValues("false");
+        /* For multiple server with spike */
+        Parameter parStartNumServersWithSpike = new Parameter("infrastructure.start_num_server");
+        parStartNumServersWithSpike.addValues("8", "4", "2", "1");
 
         Parameter parSiMax = new Parameter("infrastructure.si_max");
         parSiMax.addValues("100", "50", "30", "20");
 
-        List<RunConfiguration> configurationsWithSingleServer = ConfigurationFactory
-                .createConfigurationsList(parArrivalMu, parServicesZ, parSpikeServerAlwaysFalse, parStartNumServersSingleServer, parWebServerCapacity);
-
-        List<RunConfiguration> configurationsWithoutSpike = ConfigurationFactory
-                .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServersWithoutSpike, parSpikeServerAlwaysFalse);
-
         List<RunConfiguration> configurationsWithSpike = ConfigurationFactory
                 .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServersWithSpike, parSpikeServerActive, parSiMax);
 
+        /* Add all to configurations */
         configurations.addAll(configurationsWithSingleServer);
         configurations.addAll(configurationsWithoutSpike);
         configurations.addAll(configurationsWithSpike);
