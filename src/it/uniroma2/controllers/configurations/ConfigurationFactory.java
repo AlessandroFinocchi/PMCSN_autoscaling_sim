@@ -9,6 +9,8 @@ import java.util.List;
 
 public class ConfigurationFactory {
 
+    private static int EXP_COUNTER = 0;
+
     /**
      * Return a list created as the cartesian product of all the possible parameters values.
      */
@@ -25,7 +27,7 @@ public class ConfigurationFactory {
 
         // For each possible configuration
         for (int i = 0; i < totalNumber; i++) {
-            RunConfiguration c = new RunConfiguration("exp_" + i);
+            RunConfiguration c = new RunConfiguration("exp_" + EXP_COUNTER++);
             // For each parameter
             for (int j = 0; j < parameters.length; j++) {
                 String parameterName = parameters[j].getName();

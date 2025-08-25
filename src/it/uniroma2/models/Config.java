@@ -128,8 +128,14 @@ public class Config {
         Parameter parServicesZ = new Parameter("distribution.services.z");
         parServicesZ.addValues("0.1");
 
-        Parameter parStartNumServers = new Parameter("infrastructure.start_num_server");
-        parStartNumServers.addValues("8", "4", "2");
+        Parameter parStartNumServersSingleServer = new Parameter("infrastructure.start_num_server");
+        parStartNumServersSingleServer.addValues("1");
+
+        Parameter parWebServerCapacity = new Parameter("webserver.capacity");
+        parWebServerCapacity.addValues("16", "8", "4", "2");
+
+        Parameter parStartNumServersWithSpike = new Parameter("infrastructure.start_num_server");
+        parStartNumServersWithSpike.addValues("8", "4", "2", "1");
 
         Parameter parStartNumServersWithoutSpike = new Parameter("infrastructure.start_num_server");
         parStartNumServersWithoutSpike.addValues("16", "8", "4", "2");
@@ -143,16 +149,20 @@ public class Config {
         Parameter parSiMax = new Parameter("infrastructure.si_max");
         parSiMax.addValues("100", "50", "30", "20");
 
+        List<RunConfiguration> configurationsWithSingleServer = ConfigurationFactory
+                .createConfigurationsList(parArrivalMu, parServicesZ, parSpikeServerAlwaysFalse, parStartNumServersSingleServer, parWebServerCapacity);
+
         List<RunConfiguration> configurationsWithoutSpike = ConfigurationFactory
                 .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServersWithoutSpike, parSpikeServerAlwaysFalse);
 
         List<RunConfiguration> configurationsWithSpike = ConfigurationFactory
-                .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServers, parSpikeServerActive, parSiMax);
+                .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServersWithSpike, parSpikeServerActive, parSiMax);
 
+        configurations.addAll(configurationsWithSingleServer);
         configurations.addAll(configurationsWithoutSpike);
         configurations.addAll(configurationsWithSpike);
 
-        for (RunConfiguration c: configurations) {
+        for (RunConfiguration c : configurations) {
             c.put("infrastructure.max_num_server", c.get("infrastructure.start_num_server"));
         }
 
