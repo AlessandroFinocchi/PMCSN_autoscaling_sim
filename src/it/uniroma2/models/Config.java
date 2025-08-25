@@ -135,7 +135,7 @@ public class Config {
         parSpikeServerActive.addValues("true");
 
         Parameter parSpikeServerAlwaysFalse = new Parameter("infrastructure.spikeserver.active");
-        parSpikeServerActive.addValues("false");
+        parSpikeServerAlwaysFalse.addValues("false");
 
         Parameter parSiMax = new Parameter("infrastructure.si_max");
         parSiMax.addValues("100", "50", "30", "20");
