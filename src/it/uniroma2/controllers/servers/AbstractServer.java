@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import java.text.DecimalFormat;
 
+import static it.uniroma2.models.Config.STOP;
+
 public abstract class AbstractServer implements IServer {
     @Getter @Setter private ServerState serverState;
     @Getter protected double capacity;
@@ -76,7 +78,8 @@ public abstract class AbstractServer implements IServer {
     @Override
     public void printServerStats(DecimalFormat f, double currentTs) {
         System.out.println("for " + stats.getCompletedJobs() + " jobs");
-        System.out.println("   average interarrival time =   " + f.format(currentTs / stats.getCompletedJobs()));
+        // STOP instead of currentTs, because the arrival process ends at STOP and the simulation ends when all the servers are empty
+        System.out.println("   average interarrival time =   " + f.format(STOP / stats.getCompletedJobs()));
         System.out.println("   average response time ... =   " + f.format(stats.getNodeSum() / stats.getCompletedJobs()));
         System.out.println("   average service time .... =   " + f.format(stats.getServiceSum() / stats.getCompletedJobs()));
         System.out.println("   average # in the node ... =   " + f.format(stats.getNodeSum() / currentTs));

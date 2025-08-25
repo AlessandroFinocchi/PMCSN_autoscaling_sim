@@ -16,7 +16,9 @@ public class Config {
     public static int TOTAL_STREAMS;
 
     public static double ARRIVALS_MU;
+    public static double ARRIVALS_CV;
     public static double SERVICES_Z;
+    public static double SERVICES_CV;
     public static double WEBSERVER_CAPACITY;
 
     public static double START;
@@ -79,7 +81,9 @@ public class Config {
             SEED = Integer.parseInt(props.getProperty("random.seed"));
             TOTAL_STREAMS = Integer.parseInt(props.getProperty("random.total_streams"));
             ARRIVALS_MU = Double.parseDouble(props.getProperty("distribution.arrivals.mu"));
+            ARRIVALS_CV = Double.parseDouble(props.getProperty("distribution.arrivals.cv"));
             SERVICES_Z = Double.parseDouble(props.getProperty("distribution.services.z"));
+            SERVICES_CV = Double.parseDouble(props.getProperty("distribution.services.cv"));
             WEBSERVER_CAPACITY = Double.parseDouble(props.getProperty("webserver.capacity"));
             START = Double.parseDouble(props.getProperty("system.start"));
             STOP = Double.parseDouble(props.getProperty("system.stop"));

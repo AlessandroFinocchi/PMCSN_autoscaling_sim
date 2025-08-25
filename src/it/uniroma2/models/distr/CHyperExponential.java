@@ -7,7 +7,7 @@ public class CHyperExponential extends Distribution {
     private final Exponential exp2;
     private final Bernoulli bernoulli;
 
-    protected CHyperExponential(Rngs r, double variationCoefficient, double mean, int stream1, int stream2, int stream3) {
+    public CHyperExponential(Rngs r, double variationCoefficient, double mean, int stream1, int stream2, int stream3) {
         super(r, 0);
         double p = 1.0 / 2.0 * (1 + Math.sqrt((variationCoefficient - 1.0) / (variationCoefficient + 1.0)));
         double mu1 = mean / (2.0 * p);

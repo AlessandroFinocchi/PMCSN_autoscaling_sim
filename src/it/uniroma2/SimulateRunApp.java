@@ -6,6 +6,7 @@ import it.uniroma2.libs.Rngs;
 import it.uniroma2.models.Config;
 import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.configurations.RunConfiguration;
+import it.uniroma2.models.distr.CHyperExponential;
 import it.uniroma2.models.distr.Distribution;
 import it.uniroma2.models.distr.Exponential;
 import it.uniroma2.models.distr.Normal;
@@ -47,13 +48,21 @@ public class SimulateRunApp {
 
         List<Parameter> parameters = new ArrayList<>();
 
+        Parameter parArrivalMu = new Parameter("distribution.arrivals.mu");
+        parArrivalMu.addValues("0.015");
+        parameters.add(parArrivalMu);
+
+        Parameter parServicesZ = new Parameter("distribution.services.z");
+        parServicesZ.addValues("0.1");
+        parameters.add(parServicesZ);
+
         Parameter parMaxServer = new Parameter("infrastructure.max_num_server");
         parMaxServer.addValues("10");
         parameters.add(parMaxServer);
 
         Parameter parStartNumServers = new Parameter("infrastructure.start_num_server");
-        // parStartNumServers.addValues("10", "9", "8", "7", "6", "5", "4", "3");
-        parStartNumServers.addValues("2");
+         parStartNumServers.addValues("10", "9");
+//        parStartNumServers.addValues("1");
         parameters.add(parStartNumServers);
 
         Parameter parMaxNumServers = new Parameter("infrastructure.spikeserver.active");
@@ -65,7 +74,6 @@ public class SimulateRunApp {
         parameters.add(parScheduler);
 
         configurations = ConfigurationFactory.createConfigurationsList(parameters.toArray(Parameter[]::new));
-
 
         System.out.printf("Created %d configurations\n\n", configurations.size());
     }
@@ -93,9 +101,13 @@ public class SimulateRunApp {
 
         EventVisitor visitor = new EventProcessor();
 
-        Distribution arrivalVA = new Exponential(R, 0, ARRIVALS_MU);
-        Distribution servicesVA = new Exponential(R, 1, SERVICES_Z);
-        Distribution turnOnVA = new Normal(R, 2, TURN_ON_MU, TURN_ON_STD);
+        //todo: change to HyperExp
+//        Distribution arrivalVA = new Exponential(R, 0, ARRIVALS_MU);
+//        Distribution servicesVA = new Exponential(R, 1, SERVICES_Z);
+        Distribution arrivalVA = new CHyperExponential(R, 4, ARRIVALS_MU, 0, 1, 2);
+        Distribution servicesVA = new CHyperExponential(R, 4, SERVICES_Z, 3, 4, 5);
+
+        Distribution turnOnVA = new Normal(R, 6, TURN_ON_MU, TURN_ON_STD);
 
         /* Log to CSV the initial seed for each stream for replayability */
         for (int stream = 0; stream < TOTAL_STREAMS; stream++) {

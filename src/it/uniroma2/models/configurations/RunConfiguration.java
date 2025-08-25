@@ -26,15 +26,15 @@ public class RunConfiguration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("RunConfiguration{");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", params=").append(params).append('\'');
+        final StringBuilder sb = new StringBuilder();
+        sb.append("name='").append(name).append("'");
+        sb.append("\nparams={");
         if (!params.isEmpty()) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                sb.append(", ").append(entry.getKey()).append('=').append(entry.getValue());
+                sb.append("\n\t\t").append(entry.getKey()).append('=').append(entry.getValue());
             }
         }
-        sb.append('}');
+        sb.append("\n}");
         return sb.toString();
     }
 }
