@@ -27,55 +27,16 @@ import static it.uniroma2.utils.DataField.*;
 public class SimulateRunApp {
 
     private static final Rngs R = new Rngs();
-    private static int REPEAT_CONFIGURATION;
-    private static List<RunConfiguration> configurations = new ArrayList<>();
 
     public static void main(String[] args) throws IllegalLifeException {
         INTRA_RUN_DATA.setWritable(false);
 
-        createConfigurations();
-
-        for (RunConfiguration c : configurations) {
+        for (RunConfiguration c : createConfigurations()) {
             setup(c);
             for (int i = 0; i < REPEAT_CONFIGURATION; i++) {
                 run(c, i);
             }
         }
-    }
-
-    private static void createConfigurations() {
-        REPEAT_CONFIGURATION = 1;
-
-        List<Parameter> parameters = new ArrayList<>();
-
-        Parameter parArrivalMu = new Parameter("distribution.arrivals.mu");
-        parArrivalMu.addValues("0.015");
-        parameters.add(parArrivalMu);
-
-        Parameter parServicesZ = new Parameter("distribution.services.z");
-        parServicesZ.addValues("0.1");
-        parameters.add(parServicesZ);
-
-        Parameter parMaxServer = new Parameter("infrastructure.max_num_server");
-        parMaxServer.addValues("10");
-        parameters.add(parMaxServer);
-
-        Parameter parStartNumServers = new Parameter("infrastructure.start_num_server");
-         parStartNumServers.addValues("10", "9");
-//        parStartNumServers.addValues("1");
-        parameters.add(parStartNumServers);
-
-        Parameter parMaxNumServers = new Parameter("infrastructure.spikeserver.active");
-        parMaxNumServers.addValues("false");
-        parameters.add(parMaxNumServers);
-
-        Parameter parScheduler = new Parameter("infrastructure.scheduler");
-        parScheduler.addValues("leastUsed");
-        parameters.add(parScheduler);
-
-        configurations = ConfigurationFactory.createConfigurationsList(parameters.toArray(Parameter[]::new));
-
-        System.out.printf("Created %d configurations\n\n", configurations.size());
     }
 
     private static void setup(RunConfiguration c) {
@@ -101,7 +62,6 @@ public class SimulateRunApp {
 
         EventVisitor visitor = new EventProcessor();
 
-        //todo: change to HyperExp
 //        Distribution arrivalVA = new Exponential(R, 0, ARRIVALS_MU);
 //        Distribution servicesVA = new Exponential(R, 1, SERVICES_Z);
         Distribution arrivalVA = new CHyperExponential(R, 4, ARRIVALS_MU, 0, 1, 2);

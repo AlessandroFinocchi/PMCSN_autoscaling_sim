@@ -3,6 +3,8 @@ package it.uniroma2.models.sys;
 import it.uniroma2.controllers.servers.ServerState;
 import lombok.Getter;
 
+import static it.uniroma2.models.Config.RESPONSE_TIME_SLO;
+
 /**
  * Used for computing statistics
  */
@@ -11,6 +13,7 @@ public class ServerStats {
     @Getter private double serviceSum;                 /* mean population in service intg(x(s))             */
     @Getter private int    completedJobs;              /* number of completed jobs                          */
     @Getter private double allocatedCapacity;          /* total allocated capacity per time                 */
+    @Getter private int    completedJobsInTime;        /* number of jobs that completed withing the SLO     */
 
     public ServerStats(){
         this.nodeSum           = 0.0;
@@ -29,5 +32,10 @@ public class ServerStats {
         }
         if(serverState == ServerState.ACTIVE || serverState == ServerState.TO_BE_REMOVED)
             this.allocatedCapacity += (endTs - startTs) * currentCapacity;
+    }
+
+    public void updateSLO(double responseTime) {
+        if(responseTime <= RESPONSE_TIME_SLO)
+            completedJobsInTime++;
     }
 }

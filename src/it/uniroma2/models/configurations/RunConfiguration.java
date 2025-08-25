@@ -1,6 +1,7 @@
 package it.uniroma2.models.configurations;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,7 @@ import java.util.Map;
 public class RunConfiguration {
     @Getter
     String name;
-    @Getter
+    @Getter @Setter
     Map<String, String> params;
 
     public RunConfiguration(String name) {

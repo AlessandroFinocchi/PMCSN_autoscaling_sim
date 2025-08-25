@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static it.uniroma2.models.Config.*;
-import static it.uniroma2.utils.DataCSVWriter.INTRA_RUN_DATA;
+import static it.uniroma2.utils.DataCSVWriter.*;
 import static it.uniroma2.utils.DataField.*;
 
 public class SpikedInfrastructureDecorator implements IServerInfrastructure{
@@ -39,6 +39,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         if (completionServerIndex != -1) {
             AbstractServer minServer = allServers.get(completionServerIndex);
             removedJob = minServer.getMinRemainingLifeJob();
+            minServer.getStats().updateSLO(endTs - removedJob.getArrivalTime());
             boolean isServerRemoved = minServer.removeJob(removedJob);
             if (isServerRemoved)
                 INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
@@ -84,7 +85,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
     }
 
     public void assignJob(Job job) {
-        if (base.webServersSize() >= SI_MAX ) {
+        if (base.webServersSize() >= SI_MAX * getNumWebServersByState(ServerState.ACTIVE) ) {
             spikeServer.addJob(job);
         } else {
             base.assignJob(job);
@@ -113,6 +114,8 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         List<ServerStats> serverStats = this.allServers.stream()
                 .map(AbstractServer::getStats)
                 .toList();
+
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SPIKE_JOBS_COMPLETED, spikeServer.getStats().getCompletedJobs());
 
         SystemStats sysStats = new SystemStats(serverStats);
         sysStats.processStats(f, currentTs);

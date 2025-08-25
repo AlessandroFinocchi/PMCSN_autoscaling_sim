@@ -14,7 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static it.uniroma2.models.Config.*;
-import static it.uniroma2.utils.DataCSVWriter.INTRA_RUN_DATA;
+import static it.uniroma2.utils.DataCSVWriter.*;
 import static it.uniroma2.utils.DataField.*;
 
 public class BaseServerInfrastructure implements IServerInfrastructure{
@@ -49,6 +49,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
         if (completionServerIndex != -1) {
             WebServer minServer = webServers.get(completionServerIndex);
             removedJob = minServer.getMinRemainingLifeJob();
+            minServer.getStats().updateSLO(endTs - removedJob.getArrivalTime());
             boolean isServerRemoved = minServer.removeJob(removedJob);
             if (isServerRemoved)
                 INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
@@ -137,6 +138,8 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
         List<ServerStats> serverStats = this.webServers.stream()
                 .map(AbstractServer::getStats)
                 .toList();
+
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SPIKE_JOBS_COMPLETED, "");
 
         SystemStats sysStats = new SystemStats(serverStats);
         sysStats.processStats(f, currentTs);

@@ -1,6 +1,8 @@
 package it.uniroma2.models;
 
 import it.uniroma2.SimulateRunApp;
+import it.uniroma2.controllers.configurations.ConfigurationFactory;
+import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.configurations.RunConfiguration;
 
 import java.io.IOException;
@@ -14,6 +16,7 @@ public class Config {
 
     public static int SEED;
     public static int TOTAL_STREAMS;
+    public static int REPEAT_CONFIGURATION;
 
     public static double ARRIVALS_MU;
     public static double ARRIVALS_CV;
@@ -26,6 +29,7 @@ public class Config {
     public static double INFINITY;
     public static double RESPONSE_TIME_OUT_THRESHOLD;
     public static double RESPONSE_TIME_IN_THRESHOLD;
+    public static double RESPONSE_TIME_SLO;
     public static int MAX_NUM_SERVERS;
     public static int START_NUM_SERVERS;
     public static double ALPHA;
@@ -80,6 +84,7 @@ public class Config {
 
             SEED = Integer.parseInt(props.getProperty("random.seed"));
             TOTAL_STREAMS = Integer.parseInt(props.getProperty("random.total_streams"));
+            REPEAT_CONFIGURATION = Integer.parseInt(props.getProperty("random.repeat_config"));
             ARRIVALS_MU = Double.parseDouble(props.getProperty("distribution.arrivals.mu"));
             ARRIVALS_CV = Double.parseDouble(props.getProperty("distribution.arrivals.cv"));
             SERVICES_Z = Double.parseDouble(props.getProperty("distribution.services.z"));
@@ -91,6 +96,7 @@ public class Config {
             RESPONSE_TIME_OUT_THRESHOLD = (Objects.equals(props.getProperty("webserver.response_time.out_thr"), "INFINITY")) ?
                     Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("webserver.response_time.out_thr"));
             RESPONSE_TIME_IN_THRESHOLD = Double.parseDouble(props.getProperty("webserver.response_time.in_thr"));
+            RESPONSE_TIME_SLO = Double.parseDouble(props.getProperty("infrastructure.response_time_slo"));
             MAX_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.max_num_server"));
             START_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.start_num_server"));
             ALPHA = Double.parseDouble(props.getProperty("stats.alpha"));
@@ -112,4 +118,47 @@ public class Config {
                     "Impossible loading " + CONFIG_FILE + ": " + e.getMessage());
         }
     }
+
+    public static List<RunConfiguration> createConfigurations() {
+        List<RunConfiguration> configurations = new ArrayList<>();
+
+        Parameter parArrivalMu = new Parameter("distribution.arrivals.mu");
+        parArrivalMu.addValues("0.025");
+
+        Parameter parServicesZ = new Parameter("distribution.services.z");
+        parServicesZ.addValues("0.1");
+
+        Parameter parStartNumServers = new Parameter("infrastructure.start_num_server");
+        parStartNumServers.addValues("8", "4", "2");
+
+        Parameter parSpikeServerActive = new Parameter("infrastructure.spikeserver.active");
+        parSpikeServerActive.addValues("true");
+
+        Parameter parSpikeServerAlwaysFalse = new Parameter("infrastructure.spikeserver.active");
+        parSpikeServerActive.addValues("false");
+
+        Parameter parSiMax = new Parameter("infrastructure.si_max");
+        parSiMax.addValues("100", "50", "30", "20");
+
+        Parameter parScheduler = new Parameter("infrastructure.scheduler");
+        parScheduler.addValues("leastUsed");
+
+        List<RunConfiguration> configurationsWithoutSpike = ConfigurationFactory
+                .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServers, parSpikeServerAlwaysFalse, parScheduler);
+
+        List<RunConfiguration> configurationsWithSpike = ConfigurationFactory
+                .createConfigurationsList(parArrivalMu, parServicesZ, parStartNumServers, parSpikeServerActive, parSiMax, parScheduler);
+
+        configurations.addAll(configurationsWithoutSpike);
+        configurations.addAll(configurationsWithSpike);
+
+        for (RunConfiguration c: configurations) {
+            c.put("infrastructure.max_num_server", c.get("infrastructure.start_num_server"));
+        }
+
+        System.out.printf("Created %d configurations\n\n", configurations.size());
+
+        return configurations;
+    }
+
 }
