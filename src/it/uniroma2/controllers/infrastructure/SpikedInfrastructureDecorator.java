@@ -119,14 +119,8 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
     }
 
     public void printSystemStats(double currentTs) {
-        List<ServerStats> serverStats = this.allServers.stream()
-                .map(AbstractServer::getStats)
-                .toList();
-
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SPIKE_JOBS_COMPLETED, spikeServer.getStats().getCompletedJobs());
-
-        SystemStats sysStats = new SystemStats(serverStats);
-        sysStats.processStats(currentTs);
+        systemStats.processStats(currentTs);
     }
 
     public WebServer requestScaleOut(double endTs, double turnOnTime) {
