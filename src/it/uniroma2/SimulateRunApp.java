@@ -24,12 +24,11 @@ public class SimulateRunApp {
     private static final Rngs R = new Rngs();
 
     public static void main(String[] args) throws IllegalLifeException {
-        INTRA_RUN_DATA.setWritable(false);
-
         for (RunConfiguration c : createConfigurations()) {
             setup(c);
             for (int i = 0; i < REPEAT_CONFIGURATION; i++) {
                 run(c, i);
+                log();
             }
         }
     }
@@ -38,6 +37,7 @@ public class SimulateRunApp {
         /* Reload default configuration */
         /* Update experiment specific configuration */
         Config.load(c);
+        INTRA_RUN_DATA.setWritable(LOG_INTRA_RUN);
         INTER_RUN_DATA.addField(INTER_RUN_KEY, CONFIGURATION_ID, c.getName());
     }
 
@@ -93,12 +93,11 @@ public class SimulateRunApp {
         }
 
         s.printStats();
+    }
 
-        try {
-            DataCSVWriter.flushAllInter();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private static void log() {
+        if (LOG_INTRA_RUN) DataCSVWriter.flushAllIntra();
+        DataCSVWriter.flushAllInter();
     }
 
 }

@@ -8,12 +8,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static it.uniroma2.models.Config.TOTAL_STREAMS;
 import static it.uniroma2.utils.DataField.*;
 
 public class DataCSVWriter {
+
+    private static final String START_DATETIME = "1";
 
     // Data table for completion and scaling events
     public static final DataTimeTable INTRA_RUN_DATA = new DataTimeTable();
@@ -23,7 +26,7 @@ public class DataCSVWriter {
 
     public static final Double INTER_RUN_KEY = -1.0;
 
-    private static final String OUT_DIR_PATH = "out_data";
+    private static final String OUT_DIR_PATH = "out_data/" + START_DATETIME;
 
     private static boolean hasHeaders(String filePath, String[] fields) throws IOException {
         File file = new File(filePath);
@@ -40,32 +43,28 @@ public class DataCSVWriter {
 
     /**
      * Flushes a DataTimeTable to a file in .csv format.
+     *
      * @param timeTable The DataTimeTable containing the data.
-     * @param fileName The name of the file in the OUT_DIR_PATH.
-     * @param fields The lists of the fields that will be flushed on file.
-     * @throws IOException
+     * @param fileName  The name of the file in the OUT_DIR_PATH.
+     * @param fields    The lists of the fields that will be flushed on file.
      */
-    public static void flushList(DataTimeTable timeTable, String fileName, String[] fields, boolean append) throws IOException {
+    public static void flushList(DataTimeTable timeTable, String fileName, String[] fields, boolean append) {
         String filePath = OUT_DIR_PATH + "/" + fileName + ".csv";
 
         // Create the directory if not exists
         File directory = new File(OUT_DIR_PATH);
         if (!directory.exists() && !directory.mkdirs()) {
-            throw new IOException("Failed to create output directory");
+            throw new RuntimeException("Failed to create output directory");
         }
 
         // Check if the file is writable
         File file = new File(filePath);
         if (file.exists() && !file.canWrite()) {
-            throw new IOException("File exists but is not writable: " + filePath);
+            throw new RuntimeException("File exists but is not writable: " + filePath);
         }
 
         // Write on file
-        try (CSVWriter writer = new CSVWriter(new FileWriter(filePath, append),
-                                              CSVWriter.DEFAULT_SEPARATOR,
-                                              CSVWriter.NO_QUOTE_CHARACTER,
-                                              CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-                                              CSVWriter.DEFAULT_LINE_END)) {
+        try (CSVWriter writer = new CSVWriter(new FileWriter(filePath, append), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END)) {
 
             // Write headers only if not already written
             if (!append || !hasHeaders(filePath, fields)) {
@@ -76,6 +75,8 @@ public class DataCSVWriter {
             for (String[] row : timeTable.getDataFromHeaders(fields)) {
                 writer.writeNext(row);
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -87,12 +88,10 @@ public class DataCSVWriter {
         flushList(timeTable, fileName, strFields, append);
     }
 
-    public static void flushAllIntra() throws IOException {
+    public static void flushAllIntra() {
         /* Log data about scaling events */
         DataHeaders scalingHeaders = new DataHeaders(TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
-        DataTimeTable filteredScalingData = INTRA_RUN_DATA
-                .filter(EVENT_TYPE, false, "ARRIVAL")
-                .filter(EVENT_TYPE, false, "COMPLETION");
+        DataTimeTable filteredScalingData = INTRA_RUN_DATA.filter(EVENT_TYPE, false, "ARRIVAL").filter(EVENT_TYPE, false, "COMPLETION");
         flushList(filteredScalingData, "scaling", scalingHeaders.get(), false);
 
         /* Log data about jobs in each server */
@@ -109,17 +108,12 @@ public class DataCSVWriter {
         INTRA_RUN_DATA.clear();
     }
 
-    public static void flushAllInter() throws IOException {
+    public static void flushAllInter() {
         /* Log data about configuration and final results of a run */
         for (int stream = 0; stream < TOTAL_STREAMS; stream++) {
             INTER_RUN_DATA_HEADERS.add(STREAM_SEED + "_" + stream);
         }
-        INTER_RUN_DATA_HEADERS.add(
-                RUN_DATETIME, CONFIGURATION_ID, RUN_ID, FINAL_TS, TOTAL_ALLOCATED_CAPACITY,
-                TOTAL_ALLOCATED_CAPACITY_PER_SEC, SYSTEM_UTILIZATION, MEAN_SYSTEM_RESPONSE_TIME,
-                TOTAL_JOBS_COMPLETED, TOTAL_SPIKE_JOBS_COMPLETED,
-                TOTAL_SLO_VIOLATIONS, SLO_VIOLATIONS_PERCENTAGE
-        );
+        INTER_RUN_DATA_HEADERS.add(RUN_DATETIME, CONFIGURATION_ID, RUN_ID, FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC, SYSTEM_UTILIZATION, MEAN_SYSTEM_RESPONSE_TIME, TOTAL_JOBS_COMPLETED, TOTAL_SPIKE_JOBS_COMPLETED, TOTAL_SLO_VIOLATIONS, SLO_VIOLATIONS_PERCENTAGE);
         flushList(INTER_RUN_DATA, "final", INTER_RUN_DATA_HEADERS.get(), true);
     }
 }

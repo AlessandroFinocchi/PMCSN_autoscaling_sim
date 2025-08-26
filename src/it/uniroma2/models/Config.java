@@ -5,6 +5,7 @@ import it.uniroma2.controllers.configurations.ConfigurationFactory;
 import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.configurations.RunConfiguration;
 import it.uniroma2.models.configurations.experiments.Experiment;
+import it.uniroma2.models.configurations.experiments.ExperimentBaseTransitory;
 import it.uniroma2.models.configurations.experiments.SiMaxExperiment;
 
 import java.io.IOException;
@@ -15,6 +16,8 @@ import static it.uniroma2.utils.DataCSVWriter.*;
 
 public class Config {
     private static final String CONFIG_FILE = "config.properties";
+
+    public static boolean LOG_INTRA_RUN;
 
     public static int SEED;
     public static int TOTAL_STREAMS;
@@ -58,6 +61,7 @@ public class Config {
             List<String> sortedKeys = new ArrayList<>(props.stringPropertyNames());
             sortedKeys.sort(String::compareTo);
             for (String key : sortedKeys) {
+                if (key.startsWith("log.")) continue; // skip log properties
                 INTER_RUN_DATA_HEADERS.add(key);
             }
 
@@ -84,6 +88,7 @@ public class Config {
                 }
             }
 
+            LOG_INTRA_RUN = Boolean.parseBoolean(props.getProperty("log.intra_run"));
             SEED = Integer.parseInt(props.getProperty("random.seed"));
             TOTAL_STREAMS = Integer.parseInt(props.getProperty("random.total_streams"));
             REPEAT_CONFIGURATION = Integer.parseInt(props.getProperty("random.repeat_config"));
@@ -124,9 +129,8 @@ public class Config {
     public static List<RunConfiguration> createConfigurations() {
         List<RunConfiguration> configurations = new ArrayList<>();
 
-        Experiment siMax = new SiMaxExperiment();
-
-        configurations.addAll(siMax.getRunConfigurations());
+        Experiment ExperimentBaseTransitory = new ExperimentBaseTransitory();
+        configurations.addAll(ExperimentBaseTransitory.getRunConfigurations());
 
         System.out.printf("Created %d configurations\n\n", configurations.size());
 
