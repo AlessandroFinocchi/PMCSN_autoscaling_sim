@@ -20,7 +20,8 @@ public class Parameter {
         this.values = new ArrayList<>();
     }
 
-    public void addValues(String... newValues) {
+    public Parameter addValues(String... newValues) {
         Collections.addAll(this.values, newValues);
+        return this;
     }
 }

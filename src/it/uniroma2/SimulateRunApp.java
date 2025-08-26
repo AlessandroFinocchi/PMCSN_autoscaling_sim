@@ -1,14 +1,11 @@
 package it.uniroma2;
 
-import it.uniroma2.controllers.configurations.ConfigurationFactory;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.libs.Rngs;
 import it.uniroma2.models.Config;
-import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.configurations.RunConfiguration;
 import it.uniroma2.models.distr.CHyperExponential;
 import it.uniroma2.models.distr.Distribution;
-import it.uniroma2.models.distr.Exponential;
 import it.uniroma2.models.distr.Normal;
 import it.uniroma2.models.events.*;
 import it.uniroma2.models.sys.SystemState;
@@ -17,8 +14,6 @@ import it.uniroma2.utils.ProgressBar;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.*;
@@ -62,8 +57,8 @@ public class SimulateRunApp {
 
         EventVisitor visitor = new EventProcessor();
 
-//        Distribution arrivalVA = new Exponential(R, 0, ARRIVALS_MU);
-//        Distribution servicesVA = new Exponential(R, 1, SERVICES_Z);
+        // Distribution arrivalVA = new Exponential(R, 0, ARRIVALS_MU);
+        // Distribution servicesVA = new Exponential(R, 1, SERVICES_Z);
         Distribution arrivalVA = new CHyperExponential(R, 4, ARRIVALS_MU, 0, 1, 2);
         Distribution servicesVA = new CHyperExponential(R, 4, SERVICES_Z, 3, 4, 5);
 
