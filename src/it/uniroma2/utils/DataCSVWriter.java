@@ -11,22 +11,26 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-import static it.uniroma2.models.Config.TOTAL_STREAMS;
+import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataField.*;
 
 public class DataCSVWriter {
 
-    private static final String START_DATETIME = "1";
+    private static final LocalDateTime START_DATE_TIME = LocalDateTime.now();
 
     // Data table for completion and scaling events
     public static final DataTimeTable INTRA_RUN_DATA = new DataTimeTable();
 
     public static final DataHeaders INTER_RUN_DATA_HEADERS = new DataHeaders();
     public static final DataTimeTable INTER_RUN_DATA = new DataTimeTable();
-
     public static final Double INTER_RUN_KEY = -1.0;
 
-    private static final String OUT_DIR_PATH = "out_data/" + START_DATETIME;
+    private static final String OUT_DIR_PATH = "out_data/" + OUT_DIR_PATH_SUFFIX();
+
+    private static String OUT_DIR_PATH_SUFFIX() {
+        // return START_DATE_TIME.getYear() + "-" + START_DATE_TIME.getMonthValue() + "-" + START_DATE_TIME.getDayOfMonth() + "_" + START_DATE_TIME.getHour() + "-" + START_DATE_TIME.getMinute() + "-" + START_DATE_TIME.getSecond();
+        return "";
+    }
 
     private static boolean hasHeaders(String filePath, String[] fields) throws IOException {
         File file = new File(filePath);
@@ -88,22 +92,27 @@ public class DataCSVWriter {
         flushList(timeTable, fileName, strFields, append);
     }
 
-    public static void flushAllIntra() {
+    public static void flushAllIntra(String suffix) {
+        String fileNameSuffix = (suffix == null || suffix.isEmpty()) ? "" : "-" + suffix;
+
         /* Log data about scaling events */
         DataHeaders scalingHeaders = new DataHeaders(TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
         DataTimeTable filteredScalingData = INTRA_RUN_DATA.filter(EVENT_TYPE, false, "ARRIVAL").filter(EVENT_TYPE, false, "COMPLETION");
-        flushList(filteredScalingData, "scaling", scalingHeaders.get(), false);
+        flushList(filteredScalingData, "scaling" + fileNameSuffix, scalingHeaders.get(), false);
 
         /* Log data about jobs in each server */
         DataHeaders jobsHeaders = new DataHeaders();
-        jobsHeaders.add(TIMESTAMP, EVENT_TYPE, SPIKE_CURRENT_CAPACITY);
-        jobsHeaders.add("JOBS_IN_SERVER_0");
-        for (int i = 1; i <= 5; i++) {
+        jobsHeaders.add(TIMESTAMP, EVENT_TYPE);
+        if (SPIKESERVER_ACTIVE) {
+            jobsHeaders.add(SPIKE_CURRENT_CAPACITY);
+            jobsHeaders.add("JOBS_IN_SERVER_0");
+        }
+        for (int i = 1; i <= MAX_NUM_SERVERS; i++) {
             jobsHeaders.add("STATUS_OF_SERVER_" + i);
             jobsHeaders.add("JOBS_IN_SERVER_" + i);
         }
         DataTimeTable filteredJobsData = INTRA_RUN_DATA.filter(EVENT_TYPE, false, "ACTIVE");
-        flushList(filteredJobsData, "jobs", jobsHeaders.get(), false);
+        flushList(filteredJobsData, "jobs" + fileNameSuffix, jobsHeaders.get(), false);
 
         INTRA_RUN_DATA.clear();
     }

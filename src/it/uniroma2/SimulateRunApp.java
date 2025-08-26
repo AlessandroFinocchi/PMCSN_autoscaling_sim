@@ -12,7 +12,6 @@ import it.uniroma2.models.sys.SystemState;
 import it.uniroma2.utils.DataCSVWriter;
 import it.uniroma2.utils.ProgressBar;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 import static it.uniroma2.models.Config.*;
@@ -28,7 +27,7 @@ public class SimulateRunApp {
             setup(c);
             for (int i = 0; i < REPEAT_CONFIGURATION; i++) {
                 run(c, i);
-                log();
+                log(c, i);
             }
         }
     }
@@ -95,8 +94,9 @@ public class SimulateRunApp {
         s.printStats();
     }
 
-    private static void log() {
-        if (LOG_INTRA_RUN) DataCSVWriter.flushAllIntra();
+    private static void log(RunConfiguration c, int repetition) {
+        String suffix = c.getName() + "_" + repetition;
+        if (LOG_INTRA_RUN) DataCSVWriter.flushAllIntra(suffix);
         DataCSVWriter.flushAllInter();
     }
 
