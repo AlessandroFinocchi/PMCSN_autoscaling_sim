@@ -7,6 +7,7 @@ import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.ServerStats;
 import it.uniroma2.models.sys.SystemStats;
+import it.uniroma2.models.sys.TransientStats;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
     final List<WebServer> webServers;
     double movingExpMeanResponseTime;
     SystemStats systemStats;
+    TransientStats transientStats;
 
     public BaseServerInfrastructure() {
         this.scheduler = SchedulerFactory.create();
@@ -31,7 +33,9 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
             this.webServers.add(new WebServer(WEBSERVER_CAPACITY, serverState));
         }
 
-        systemStats = new SystemStats(this.webServers.stream().map(AbstractServer::getStats).toList());
+        List<ServerStats> serverStats = this.webServers.stream().map(AbstractServer::getStats).toList();
+        systemStats = new SystemStats(serverStats);
+        transientStats = new TransientStats(serverStats);
     }
 
     public int getNumWebServersByState(ServerState state) {
@@ -75,6 +79,8 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
             assert removedJob != null;
             double lastResponseTime = endTs - removedJob.getArrivalTime();
             this.updateMovingExpResponseTime(lastResponseTime);
+
+            this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
 
             addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, lastResponseTime);

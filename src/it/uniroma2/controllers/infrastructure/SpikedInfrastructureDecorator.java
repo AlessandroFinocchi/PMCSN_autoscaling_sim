@@ -5,6 +5,7 @@ import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.ServerStats;
 import it.uniroma2.models.sys.SystemStats;
+import it.uniroma2.models.sys.TransientStats;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
     private final SpikeServer spikeServer;
     private final List<AbstractServer> allServers;
     SystemStats systemStats;
+    TransientStats transientStats;
 
     public SpikedInfrastructureDecorator(BaseServerInfrastructure base) {
         this.base = base;
@@ -27,7 +29,10 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         this.allServers = new ArrayList<>();
         this.allServers.add(this.spikeServer);
         this.allServers.addAll(base.webServers);
-        systemStats = new SystemStats(this.allServers.stream().map(AbstractServer::getStats).toList());
+
+        List<ServerStats> serverStats = this.allServers.stream().map(AbstractServer::getStats).toList();
+        systemStats = new SystemStats(serverStats);
+        transientStats = new TransientStats(serverStats);
     }
 
     public int getNumWebServersByState(ServerState state) {
@@ -64,6 +69,8 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
             assert removedJob != null;
             double lastResponseTime = endTs - removedJob.getArrivalTime();
             base.updateMovingExpResponseTime(lastResponseTime);
+
+            this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
 
             base.addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, lastResponseTime);

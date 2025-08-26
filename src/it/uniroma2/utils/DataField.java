@@ -15,6 +15,11 @@ public enum DataField {
     JOBS_IN_SERVER,
     STATUS_OF_SERVER,
     SPIKE_CURRENT_CAPACITY,
+
+    /* Intra run transient data fields */
+    AGG_RESPONSE_TIME,
+
+    /*----------------------------------*/
     /* Inter run data fields */
     RUN_DATETIME,
     STREAM_SEED,

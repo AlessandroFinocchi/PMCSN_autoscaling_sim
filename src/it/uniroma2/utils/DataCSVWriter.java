@@ -97,7 +97,8 @@ public class DataCSVWriter {
 
         /* Log data about jobs in each server */
         DataHeaders jobsHeaders = new DataHeaders();
-        jobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
+        jobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME,
+                AGG_RESPONSE_TIME);
         if (SPIKESERVER_ACTIVE) {
             jobsHeaders.add(SPIKE_CURRENT_CAPACITY);
             jobsHeaders.add("JOBS_IN_SERVER_0");
@@ -113,7 +114,8 @@ public class DataCSVWriter {
 
         /* Log data about jobs in each server */
         DataHeaders allJobsHeaders = new DataHeaders();
-        allJobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
+        allJobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME,
+                AGG_RESPONSE_TIME);
         if (ALL_SPIKESERVER_ACTIVE) {
             allJobsHeaders.add(SPIKE_CURRENT_CAPACITY);
             allJobsHeaders.add("JOBS_IN_SERVER_0");
