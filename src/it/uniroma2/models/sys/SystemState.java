@@ -41,10 +41,7 @@ public class SystemState {
     }
 
     public void printStats() {
-        DecimalFormat f = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
-        f.applyPattern("###0.00000000");
-
-        servers.printServerStats(f, this.getCurrent());
-        servers.printSystemStats(f, this.getCurrent());
+        servers.printServerStats(this.getCurrent());
+        servers.printSystemStats(this.getCurrent());
     }
 }

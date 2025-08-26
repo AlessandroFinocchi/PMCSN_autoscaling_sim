@@ -18,6 +18,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
     private final BaseServerInfrastructure base;
     private final SpikeServer spikeServer;
     private final List<AbstractServer> allServers;
+    SystemStats systemStats;
 
     public SpikedInfrastructureDecorator(BaseServerInfrastructure base) {
         this.base = base;
@@ -26,6 +27,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         this.allServers = new ArrayList<>();
         this.allServers.add(this.spikeServer);
         this.allServers.addAll(base.webServers);
+        systemStats = new SystemStats(this.allServers.stream().map(AbstractServer::getStats).toList());
     }
 
     public int getNumWebServersByState(ServerState state) {
@@ -109,14 +111,14 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         return Math.min(spikeServerMinRemainingLife, base.computeNextCompletionTs(endTs));
     }
 
-    public void printServerStats(DecimalFormat f, double currentTs) {
+    public void printServerStats(double currentTs) {
         System.out.print("\n\nSpikeServer : ");
-        this.spikeServer.printServerStats(f, currentTs);
+        this.spikeServer.printServerStats(currentTs);
 
-        base.printServerStats(f, currentTs);
+        base.printServerStats(currentTs);
     }
 
-    public void printSystemStats(DecimalFormat f, double currentTs) {
+    public void printSystemStats(double currentTs) {
         List<ServerStats> serverStats = this.allServers.stream()
                 .map(AbstractServer::getStats)
                 .toList();
@@ -124,7 +126,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SPIKE_JOBS_COMPLETED, spikeServer.getStats().getCompletedJobs());
 
         SystemStats sysStats = new SystemStats(serverStats);
-        sysStats.processStats(f, currentTs);
+        sysStats.processStats(currentTs);
     }
 
     public WebServer requestScaleOut(double endTs, double turnOnTime) {

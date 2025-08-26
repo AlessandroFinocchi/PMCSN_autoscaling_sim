@@ -42,9 +42,9 @@ public interface IServerInfrastructure {
      */
     double computeNextCompletionTs(double endTs);
 
-    void printServerStats(DecimalFormat f, double currentTs);
+    void printServerStats(double currentTs);
 
-    void printSystemStats(DecimalFormat f, double currentTs);
+    void printSystemStats(double currentTs);
 
     WebServer requestScaleOut(double endTs, double turnOnTime);
 

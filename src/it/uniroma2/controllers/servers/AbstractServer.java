@@ -8,20 +8,26 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.text.DecimalFormat;
+import java.util.Locale;
 
 import static it.uniroma2.models.Config.STOP;
 
 public abstract class AbstractServer implements IServer {
+    private final DecimalFormat f;
     @Getter @Setter private ServerState serverState;
     @Getter protected double capacity;
     protected JobList jobs;
     @Getter protected ServerStats stats;
+
 
     public AbstractServer(double capacity, ServerState serverState) {
         this.serverState = serverState;
         this.capacity = capacity;
         this.jobs = new JobList();
         stats = new ServerStats();
+
+        this.f = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
+        this.f.applyPattern("###0.00000000");
     }
 
     /**
@@ -76,7 +82,7 @@ public abstract class AbstractServer implements IServer {
     }
 
     @Override
-    public void printServerStats(DecimalFormat f, double currentTs) {
+    public void printServerStats(double currentTs) {
         System.out.println("for " + stats.getCompletedJobs() + " jobs");
         // STOP instead of currentTs, because the arrival process ends at STOP and the simulation ends when all the servers are empty
         System.out.println("   average interarrival time =   " + f.format(STOP / stats.getCompletedJobs()));

@@ -2,19 +2,23 @@ package it.uniroma2.models.sys;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 
-import static it.uniroma2.utils.DataCSVWriter.INTER_RUN_DATA;
-import static it.uniroma2.utils.DataCSVWriter.INTER_RUN_KEY;
+import static it.uniroma2.utils.DataCSVWriter.*;
 import static it.uniroma2.utils.DataField.*;
 
 public class SystemStats {
+    private final DecimalFormat f;
     List<ServerStats> stats;
 
     public SystemStats(List<ServerStats> stats) {
         this.stats = stats;
+
+        this.f = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
+        this.f.applyPattern("###0.00000000");
     }
 
-    public void processStats(DecimalFormat f, double currentTs) {
+    public void processStats(double currentTs) {
         double systemUtilization = 0.0f;
         double totalAllocatedCapacity = 0.0f;
         double meanSystemResponseTime = 0.0f;
@@ -33,7 +37,7 @@ public class SystemStats {
 
         INTER_RUN_DATA.addField(INTER_RUN_KEY, FINAL_TS, f.format(currentTs));
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_ALLOCATED_CAPACITY, f.format(totalAllocatedCapacity));
-        INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_ALLOCATED_CAPACITY_PER_SEC, f.format(totalAllocatedCapacity / currentTs));
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, ALLOCATED_CAPACITY_PER_SEC, f.format(totalAllocatedCapacity / currentTs));
         INTER_RUN_DATA.addField(INTER_RUN_KEY, SYSTEM_UTILIZATION, f.format(systemUtilization));
         INTER_RUN_DATA.addField(INTER_RUN_KEY, MEAN_SYSTEM_RESPONSE_TIME, f.format(meanSystemResponseTime));
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_JOBS_COMPLETED, completedJobs);

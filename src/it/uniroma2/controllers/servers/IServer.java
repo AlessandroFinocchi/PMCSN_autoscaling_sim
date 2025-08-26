@@ -22,5 +22,5 @@ public interface IServer {
 
     double getResponseTime();
 
-    void printServerStats(DecimalFormat f, double currentTs);
+    void printServerStats(double currentTs);
 }

@@ -21,6 +21,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
     final IScheduler scheduler;
     final List<WebServer> webServers;
     double movingExpMeanResponseTime;
+    SystemStats systemStats;
 
     public BaseServerInfrastructure() {
         this.scheduler = SchedulerFactory.create();
@@ -29,6 +30,8 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
             var serverState = i < START_NUM_SERVERS ? ServerState.ACTIVE : ServerState.REMOVED;
             this.webServers.add(new WebServer(WEBSERVER_CAPACITY, serverState));
         }
+
+        systemStats = new SystemStats(this.webServers.stream().map(AbstractServer::getStats).toList());
     }
 
     public int getNumWebServersByState(ServerState state) {
@@ -133,22 +136,16 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         return endTs + minRemainingLife;
     }
 
-    public void printServerStats(DecimalFormat f, double currentTs) {
+    public void printServerStats(double currentTs) {
         for (WebServer server : webServers) {
             System.out.printf("\nWebServer %d: ", webServers.indexOf(server) + 1);
-            server.printServerStats(f, currentTs);
+            server.printServerStats(currentTs);
         }
     }
 
-    public void printSystemStats(DecimalFormat f, double currentTs) {
-        List<ServerStats> serverStats = this.webServers.stream()
-                .map(AbstractServer::getStats)
-                .toList();
-
+    public void printSystemStats(double currentTs) {
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SPIKE_JOBS_COMPLETED, "");
-
-        SystemStats sysStats = new SystemStats(serverStats);
-        sysStats.processStats(f, currentTs);
+        systemStats.processStats(currentTs);
     }
 
     WebServer findScaleOutTarget() {
