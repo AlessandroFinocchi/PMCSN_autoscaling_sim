@@ -1,12 +1,9 @@
 package it.uniroma2.models;
 
 import it.uniroma2.SimulateRunApp;
-import it.uniroma2.controllers.configurations.ConfigurationFactory;
-import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.configurations.RunConfiguration;
 import it.uniroma2.models.configurations.experiments.Experiment;
 import it.uniroma2.models.configurations.experiments.ExperimentBaseTransitory;
-import it.uniroma2.models.configurations.experiments.SiMaxExperiment;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +41,9 @@ public class Config {
     public static String SCHEDULER_TYPE;
     public static double TURN_ON_MU;
     public static double TURN_ON_STD;
+
+    public static int ALL_MAX_NUM_SERVERS;
+    public static boolean ALL_SPIKESERVER_ACTIVE;
 
     static {
         loadHeaders();
@@ -132,7 +132,23 @@ public class Config {
         Experiment ExperimentBaseTransitory = new ExperimentBaseTransitory();
         configurations.addAll(ExperimentBaseTransitory.getRunConfigurations());
 
+        // Set variables used to CSV log
+        ALL_MAX_NUM_SERVERS = MAX_NUM_SERVERS;
+        ALL_SPIKESERVER_ACTIVE = SPIKESERVER_ACTIVE;
+        for (RunConfiguration c : configurations) {
+            if (c.get("infrastructure.start_num_server") != null) {
+                ALL_MAX_NUM_SERVERS = Math.max(ALL_MAX_NUM_SERVERS, Integer.parseInt(c.get("infrastructure.start_num_server")));
+            }
+            if (c.get("infrastructure.spikeserver.capacity") != null) {
+                ALL_SPIKESERVER_ACTIVE = ALL_SPIKESERVER_ACTIVE || Boolean.parseBoolean(c.get("infrastructure.spikeserver.active"));
+            }
+        }
+
         System.out.printf("Created %d configurations\n\n", configurations.size());
+        for (RunConfiguration c : configurations) {
+            System.out.println(c.toString());
+            System.out.println();
+        }
 
         return configurations;
     }

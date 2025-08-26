@@ -13,7 +13,9 @@ import static it.uniroma2.utils.DataField.TIMESTAMP;
 public class DataTimeTable {
     @Getter
     Map<Double, Map<String, String>> table;
-    @Getter @Setter private boolean writable = true;
+    @Getter
+    @Setter
+    private boolean writable = true;
 
 
     /**
@@ -83,7 +85,8 @@ public class DataTimeTable {
 
     /**
      * Return a new DataTimeTable containing only the entries that respect the filter.
-     * @param field The field on which to apply the filter.
+     *
+     * @param field  The field on which to apply the filter.
      * @param equals If equals is true, the value of the field has to be equals to the target.
      * @param target The target value.
      * @return A new filtered DataTimeTable.
@@ -109,5 +112,20 @@ public class DataTimeTable {
 
     public void clear() {
         this.table.clear();
+    }
+
+    public DataTimeTable setEach(DataField field, Object value) {
+        return this.setEach(field.toString(), String.valueOf(value));
+    }
+
+    public DataTimeTable setEach(String field, Object value) {
+        Map<Double, Map<String, String>> newTable = new TreeMap<>();
+
+        for (Map.Entry<Double, Map<String, String>> entry : this.table.entrySet()) {
+            newTable.put(entry.getKey(), entry.getValue());
+            newTable.get(entry.getKey()).put(field, String.valueOf(value));
+        }
+
+        return new DataTimeTable(newTable);
     }
 }

@@ -7,9 +7,7 @@ import it.uniroma2.models.configurations.RunConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SiMaxExperiment implements Experiment{
-
-
+public class ExperimentSiMax implements Experiment{
 
     @Override
     public List<RunConfiguration> getRunConfigurations() {

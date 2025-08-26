@@ -46,7 +46,7 @@ public class SimulateRunApp {
         System.out.println(repetition + 1 + " / " + REPEAT_CONFIGURATION + " repetition");
         System.out.println("---------------------------------------");
 
-        INTER_RUN_DATA.addField(INTER_RUN_KEY, RUN_ID, repetition);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, REPETITION_ID, repetition);
         INTER_RUN_DATA.addField(INTER_RUN_KEY, RUN_DATETIME, String.valueOf(LocalDateTime.now()));
 
         /* Plant the seeds only if the first running the new configuration */
@@ -61,7 +61,7 @@ public class SimulateRunApp {
         Distribution arrivalVA = new CHyperExponential(R, 4, ARRIVALS_MU, 0, 1, 2);
         Distribution servicesVA = new CHyperExponential(R, 4, SERVICES_Z, 3, 4, 5);
 
-        Distribution turnOnVA = new Normal(R, 6, TURN_ON_MU, TURN_ON_STD);
+        Distribution turnOnVA = new Normal(R, 6, 7, TURN_ON_MU, TURN_ON_STD);
 
         /* Log to CSV the initial seed for each stream for replayability */
         for (int stream = 0; stream < TOTAL_STREAMS; stream++) {
@@ -96,7 +96,7 @@ public class SimulateRunApp {
 
     private static void log(RunConfiguration c, int repetition) {
         String suffix = c.getName() + "_" + repetition;
-        if (LOG_INTRA_RUN) DataCSVWriter.flushAllIntra(suffix);
+        if (LOG_INTRA_RUN) DataCSVWriter.flushAllIntra(c, repetition);
         DataCSVWriter.flushAllInter();
     }
 

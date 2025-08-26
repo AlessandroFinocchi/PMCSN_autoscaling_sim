@@ -17,7 +17,7 @@ import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.*;
 import static it.uniroma2.utils.DataField.*;
 
-public class BaseServerInfrastructure implements IServerInfrastructure{
+public class BaseServerInfrastructure implements IServerInfrastructure {
     final IScheduler scheduler;
     final List<WebServer> webServers;
     double movingExpMeanResponseTime;
@@ -49,7 +49,13 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
         if (completionServerIndex != -1) {
             WebServer minServer = webServers.get(completionServerIndex);
             removedJob = minServer.getMinRemainingLifeJob();
-            minServer.getStats().updateSLO(endTs - removedJob.getArrivalTime());
+
+            double jobResponseTime = endTs - removedJob.getArrivalTime();
+            minServer.getStats().updateSLO(jobResponseTime);
+
+            INTRA_RUN_DATA.addField(endTs, COMPLETING_SERVER_INDEX, completionServerIndex + 1); // +1 because there is no spike server
+            INTRA_RUN_DATA.addField(endTs, PER_JOB_RESPONSE_TIME, jobResponseTime);
+
             boolean isServerRemoved = minServer.removeJob(removedJob);
             if (isServerRemoved)
                 INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
@@ -223,7 +229,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure{
             addStateToScalingData(endTs);
         }
 
-            /* If no server is found, only 1 server is active */
+        /* If no server is found, only 1 server is active */
         else System.out.println("No active servers found!");
     }
 

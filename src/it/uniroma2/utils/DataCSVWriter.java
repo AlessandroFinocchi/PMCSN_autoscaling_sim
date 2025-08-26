@@ -3,6 +3,7 @@ package it.uniroma2.utils;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
+import it.uniroma2.models.configurations.RunConfiguration;
 
 import java.io.File;
 import java.io.FileReader;
@@ -28,8 +29,8 @@ public class DataCSVWriter {
     private static final String OUT_DIR_PATH = "out_data/" + OUT_DIR_PATH_SUFFIX();
 
     private static String OUT_DIR_PATH_SUFFIX() {
-        // return START_DATE_TIME.getYear() + "-" + START_DATE_TIME.getMonthValue() + "-" + START_DATE_TIME.getDayOfMonth() + "_" + START_DATE_TIME.getHour() + "-" + START_DATE_TIME.getMinute() + "-" + START_DATE_TIME.getSecond();
-        return "";
+        // return "";
+        return START_DATE_TIME.getYear() + "-" + START_DATE_TIME.getMonthValue() + "-" + START_DATE_TIME.getDayOfMonth() + "_" + START_DATE_TIME.getHour() + "-" + START_DATE_TIME.getMinute() + "-" + START_DATE_TIME.getSecond();
     }
 
     private static boolean hasHeaders(String filePath, String[] fields) throws IOException {
@@ -92,8 +93,8 @@ public class DataCSVWriter {
         flushList(timeTable, fileName, strFields, append);
     }
 
-    public static void flushAllIntra(String suffix) {
-        String fileNameSuffix = (suffix == null || suffix.isEmpty()) ? "" : "-" + suffix;
+    public static void flushAllIntra(RunConfiguration c, int repetition) {
+        String fileNameSuffix = "-" + c.getName() + "_" + repetition;
 
         /* Log data about scaling events */
         DataHeaders scalingHeaders = new DataHeaders(TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE, TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
@@ -102,7 +103,7 @@ public class DataCSVWriter {
 
         /* Log data about jobs in each server */
         DataHeaders jobsHeaders = new DataHeaders();
-        jobsHeaders.add(TIMESTAMP, EVENT_TYPE);
+        jobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
         if (SPIKESERVER_ACTIVE) {
             jobsHeaders.add(SPIKE_CURRENT_CAPACITY);
             jobsHeaders.add("JOBS_IN_SERVER_0");
@@ -114,6 +115,23 @@ public class DataCSVWriter {
         DataTimeTable filteredJobsData = INTRA_RUN_DATA.filter(EVENT_TYPE, false, "ACTIVE");
         flushList(filteredJobsData, "jobs" + fileNameSuffix, jobsHeaders.get(), false);
 
+        /* Log data about jobs in each server */
+        DataHeaders allJobsHeaders = new DataHeaders();
+        allJobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
+        if (ALL_SPIKESERVER_ACTIVE) {
+            allJobsHeaders.add(SPIKE_CURRENT_CAPACITY);
+            allJobsHeaders.add("JOBS_IN_SERVER_0");
+        }
+        for (int i = 1; i <= ALL_MAX_NUM_SERVERS; i++) {
+            allJobsHeaders.add("STATUS_OF_SERVER_" + i);
+            allJobsHeaders.add("JOBS_IN_SERVER_" + i);
+        }
+        allJobsHeaders.add(CONFIGURATION_ID, REPETITION_ID);
+        DataTimeTable combinedJobsData = filteredJobsData
+                .setEach(CONFIGURATION_ID, c.getName())
+                .setEach(REPETITION_ID, repetition);
+        flushList(combinedJobsData, "jobs" + "-all", allJobsHeaders.get(), true);
+
         INTRA_RUN_DATA.clear();
     }
 
@@ -122,7 +140,7 @@ public class DataCSVWriter {
         for (int stream = 0; stream < TOTAL_STREAMS; stream++) {
             INTER_RUN_DATA_HEADERS.add(STREAM_SEED + "_" + stream);
         }
-        INTER_RUN_DATA_HEADERS.add(RUN_DATETIME, CONFIGURATION_ID, RUN_ID, FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC, SYSTEM_UTILIZATION, MEAN_SYSTEM_RESPONSE_TIME, TOTAL_JOBS_COMPLETED, TOTAL_SPIKE_JOBS_COMPLETED, TOTAL_SLO_VIOLATIONS, SLO_VIOLATIONS_PERCENTAGE);
+        INTER_RUN_DATA_HEADERS.add(RUN_DATETIME, CONFIGURATION_ID, REPETITION_ID, FINAL_TS, TOTAL_ALLOCATED_CAPACITY, TOTAL_ALLOCATED_CAPACITY_PER_SEC, SYSTEM_UTILIZATION, MEAN_SYSTEM_RESPONSE_TIME, TOTAL_JOBS_COMPLETED, TOTAL_SPIKE_JOBS_COMPLETED, TOTAL_SLO_VIOLATIONS, SLO_VIOLATIONS_PERCENTAGE);
         flushList(INTER_RUN_DATA, "final", INTER_RUN_DATA_HEADERS.get(), true);
     }
 }
