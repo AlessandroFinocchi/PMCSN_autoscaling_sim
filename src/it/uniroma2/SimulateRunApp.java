@@ -47,7 +47,7 @@ public class SimulateRunApp {
 
         Distribution arrivalVA = new Exponential(r, 0, ARRIVALS_MU);
         Distribution servicesVA = new Exponential(r, 1, SERVICES_Z);
-        Distribution turnOnVA = new Normal(r, 2, TURN_ON_MU, TURN_ON_STD);
+        Distribution turnOnVA = new Normal(r, 2, 3, TURN_ON_MU, TURN_ON_STD);
 
         /* Compute first arrival time */
         double nextArrival = arrivalVA.gen();
