@@ -13,8 +13,10 @@ public class ExperimentBaseTransitory implements Experiment {
         Parameter parServicesZ = new Parameter("distribution.services.z").addValues("0.1");
         Parameter parLogIntraRun = new Parameter("log.intra_run").addValues("true");
         // Parameter parStartNumServers = new Parameter("infrastructure.start_num_server").addValues("1", "2", "3", "4");
-        Parameter parStartNumServers = new Parameter("infrastructure.start_num_server").addValues("3", "4");
-        Parameter parSpikeActive = new Parameter("infrastructure.spikeserver.active").addValues("false", "true");
+        // Parameter parStartNumServers = new Parameter("infrastructure.start_num_server").addValues("3", "4");
+        Parameter parStartNumServers = new Parameter("infrastructure.start_num_server").addValues("3");
+        // Parameter parSpikeActive = new Parameter("infrastructure.spikeserver.active").addValues("false", "true");
+        Parameter parSpikeActive = new Parameter("infrastructure.spikeserver.active").addValues("false");
 
         List<RunConfiguration> result = ConfigurationFactory.createConfigurationsList(
                 parArrivalMu, parServicesZ,

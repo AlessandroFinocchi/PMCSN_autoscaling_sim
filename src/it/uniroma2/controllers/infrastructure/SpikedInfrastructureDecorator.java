@@ -41,6 +41,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
 
     public double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
         int completionServerIndex = completed == 1 ? this.getCompletingServerIndex() : -1;
+        Double lastResponseTime = null;
 
         Job removedJob = null;
         if (completionServerIndex != -1) {
@@ -67,15 +68,15 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         /* Compute the moving exponential average of the response time */
         if (completionServerIndex != -1) {
             assert removedJob != null;
-            double lastResponseTime = endTs - removedJob.getArrivalTime();
+            lastResponseTime = endTs - removedJob.getArrivalTime();
             base.updateMovingExpResponseTime(lastResponseTime);
-
-            this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
 
             base.addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, lastResponseTime);
             INTRA_RUN_DATA.addField(endTs, MOVING_R_O, base.movingExpMeanResponseTime);
         }
+
+        this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
 
         return base.movingExpMeanResponseTime;
     }

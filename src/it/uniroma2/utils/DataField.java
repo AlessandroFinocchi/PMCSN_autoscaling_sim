@@ -17,7 +17,14 @@ public enum DataField {
     SPIKE_CURRENT_CAPACITY,
 
     /* Intra run transient data fields */
-    AGG_RESPONSE_TIME,
+    AGG_SYSTEM_RESPONSE_TIME,
+    AGG_SYSTEM_JOB_NUMBER,
+    AGG_SYSTEM_UTILIZATION,
+    AGG_SYSTEM_ALLOCATED_CAPACITY_PER_SEC,
+    AGG_SERVER_RESPONSE_TIME,
+    AGG_SERVER_JOB_NUMBER,
+    AGG_SERVER_UTILIZATION,
+    AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC,
 
     /*----------------------------------*/
     /* Inter run data fields */

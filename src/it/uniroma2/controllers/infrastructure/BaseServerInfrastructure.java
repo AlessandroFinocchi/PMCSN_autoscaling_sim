@@ -51,6 +51,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
 
     public double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
         int completionServerIndex = completed == 1 ? getCompletingServerIndex() : -1;
+        Double lastResponseTime = null;
 
         Job removedJob = null;
         if (completionServerIndex != -1) {
@@ -77,15 +78,15 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         /* Compute the moving exponential average of the response time */
         if (completionServerIndex != -1) {
             assert removedJob != null;
-            double lastResponseTime = endTs - removedJob.getArrivalTime();
+            lastResponseTime = endTs - removedJob.getArrivalTime();
             this.updateMovingExpResponseTime(lastResponseTime);
-
-            this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
 
             addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, lastResponseTime);
             INTRA_RUN_DATA.addField(endTs, MOVING_R_O, this.movingExpMeanResponseTime);
         }
+
+        this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
 
         return this.movingExpMeanResponseTime;
     }
