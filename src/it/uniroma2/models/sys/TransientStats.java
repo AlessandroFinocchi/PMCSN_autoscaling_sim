@@ -57,47 +57,15 @@ public class TransientStats {
         }
 
         /* Update transient statistics for all events */
-        // double meanCurrSystemJobNumber = stats.stream().mapToDouble(ServerStats::getNodeSum).sum() / endTs;
-        double sum = 0.0;
-        for (ServerStats serverStats : stats) {
-            double nodeSum = serverStats.getNodeSum();
-            sum += nodeSum;
-        }
-        double meanCurrSystemJobNumber = sum / endTs;
-        double meanCurrSystemAllocatedCapacityPerSec = stats.stream().mapToDouble(ServerStats::getAllocatedCapacity).sum() / endTs;
-        double meanCurrSystemUtilization =  stats.stream().mapToDouble(ServerStats::getServiceSum).sum() / endTs;
-
-        // this.aggSystemJobNumber =
-        //         (this.aggSystemJobNumber * startTs + (meanCurrSystemJobNumber) * (endTs - startTs))
-        //         / endTs;
-
-        this.aggSystemJobNumber = meanCurrSystemJobNumber;
-
-        this.aggSystemUtilization =
-                (this.aggSystemUtilization * startTs + meanCurrSystemUtilization * (endTs - startTs))
-                        / endTs;
-
-        this.aggSystemAllocatedCapacityPerSec =
-                (this.aggSystemAllocatedCapacityPerSec * startTs + meanCurrSystemAllocatedCapacityPerSec * (endTs - startTs))
-                        / endTs;
+        this.aggSystemJobNumber = stats.stream().mapToDouble(ServerStats::getNodeSum).sum() / endTs;
+        this.aggSystemUtilization = stats.stream().mapToDouble(ServerStats::getServiceSum).sum() / endTs;
+        this.aggSystemAllocatedCapacityPerSec = stats.stream().mapToDouble(ServerStats::getAllocatedCapacity).sum() / endTs;
 
         for (ServerStats stat : stats){
             int serverIndex = stats.indexOf(stat);
-            double meanCurrServerJobNumber = stat.getNodeSum() / endTs;
-            double meanCurrServerUtilization = stat.getServiceSum() / endTs;
-            double meanCurrServerAllocatedCapacityPerSec = stat.getAllocatedCapacity() / endTs;
-
-            this.aggServerJobNumber[serverIndex] =
-                    (this.aggServerJobNumber[serverIndex] * startTs + meanCurrServerJobNumber * (endTs - startTs))
-                    / endTs;
-
-            this.aggServerUtilization[serverIndex] =
-                    (this.aggServerUtilization[serverIndex] * startTs + meanCurrServerUtilization * (endTs - startTs))
-                    / endTs;
-
-            this.aggServerAllocatedCapacityPerSec[serverIndex] =
-                    (this.aggServerAllocatedCapacityPerSec[serverIndex] * startTs + meanCurrServerAllocatedCapacityPerSec * (endTs - startTs))
-                    / endTs;
+            this.aggServerJobNumber[serverIndex] = stat.getNodeSum() / endTs;
+            this.aggServerUtilization[serverIndex] = stat.getServiceSum() / endTs;
+            this.aggServerAllocatedCapacityPerSec[serverIndex] = stat.getAllocatedCapacity() / endTs;
         }
 
         INTRA_RUN_DATA.addField(endTs, AGG_SYSTEM_RESPONSE_TIME, this.aggSystemResponseTime);

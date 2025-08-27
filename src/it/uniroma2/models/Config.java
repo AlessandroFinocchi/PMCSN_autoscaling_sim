@@ -3,7 +3,8 @@ package it.uniroma2.models;
 import it.uniroma2.SimulateRunApp;
 import it.uniroma2.models.configurations.RunConfiguration;
 import it.uniroma2.models.configurations.experiments.Experiment;
-import it.uniroma2.models.configurations.experiments.ExperimentBaseTransitory;
+import it.uniroma2.models.configurations.experiments.ExperimentBaseTransient;
+import it.uniroma2.utils.DataCSVWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +29,7 @@ public class Config {
 
     public static double START;
     public static double STOP;
+    public static boolean EMPTY_JOBS;
     public static double INFINITY;
     public static double RESPONSE_TIME_OUT_THRESHOLD;
     public static double RESPONSE_TIME_IN_THRESHOLD;
@@ -99,6 +101,7 @@ public class Config {
             WEBSERVER_CAPACITY = Double.parseDouble(props.getProperty("webserver.capacity"));
             START = Double.parseDouble(props.getProperty("system.start"));
             STOP = Double.parseDouble(props.getProperty("system.stop"));
+            EMPTY_JOBS =  Boolean.parseBoolean(props.getProperty("system.empty_jobs"));
             INFINITY = Double.POSITIVE_INFINITY;
             RESPONSE_TIME_OUT_THRESHOLD = (Objects.equals(props.getProperty("webserver.response_time.out_thr"), "INFINITY")) ?
                     Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("webserver.response_time.out_thr"));
@@ -129,7 +132,7 @@ public class Config {
     public static List<RunConfiguration> createConfigurations() {
         List<RunConfiguration> configurations = new ArrayList<>();
 
-        Experiment ExperimentBaseTransitory = new ExperimentBaseTransitory();
+        Experiment ExperimentBaseTransitory = new ExperimentBaseTransient();
         configurations.addAll(ExperimentBaseTransitory.getRunConfigurations());
 
         // Set variables used to CSV log

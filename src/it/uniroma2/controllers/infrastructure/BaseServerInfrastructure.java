@@ -49,6 +49,17 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         INTRA_RUN_DATA.addField(endTs, REMOVED, getNumWebServersByState(ServerState.REMOVED));
     }
 
+    public void addJobsData(double endTs, String eventType) {
+        INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, eventType);
+        int i = 1;
+        for (WebServer server : webServers) {
+            INTRA_RUN_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(i), server.size());
+            INTRA_RUN_DATA.addFieldWithSuffix(endTs, STATUS_OF_SERVER, String.valueOf(i), server.getServerState().toString());
+            i++;
+        }
+        INTRA_RUN_DATA.addField(endTs, JOBS_IN_SYSTEM, webServers.stream().mapToInt(AbstractServer::size).sum());
+    }
+
     public double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
         int completionServerIndex = completed == 1 ? getCompletingServerIndex() : -1;
         Double lastResponseTime = null;
@@ -246,15 +257,5 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
     void updateMovingExpResponseTime(double lastResponseTime) {
         this.movingExpMeanResponseTime = this.movingExpMeanResponseTime * ALPHA +
                 lastResponseTime * (1 - ALPHA);
-    }
-
-    public void logFineJobs(double endTs, String eventType) {
-        int i = 1;
-        INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, eventType);
-        for (WebServer server : webServers) {
-            INTRA_RUN_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(i), server.size());
-            INTRA_RUN_DATA.addFieldWithSuffix(endTs, STATUS_OF_SERVER, String.valueOf(i), server.getServerState().toString());
-            i++;
-        }
     }
 }

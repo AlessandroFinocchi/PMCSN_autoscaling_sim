@@ -4,8 +4,6 @@ import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 
-import java.text.DecimalFormat;
-
 public interface IServerInfrastructure {
     /**
      * Returns the number of Web Servers in a given state
@@ -54,5 +52,5 @@ public interface IServerInfrastructure {
 
     void scaleOut(double endTs, WebServer targetWebServer);
 
-    void logFineJobs(double endTs, String eventType);
+    void addJobsData(double endTs, String eventType);
 }

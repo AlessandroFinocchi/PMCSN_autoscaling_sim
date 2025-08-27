@@ -83,7 +83,7 @@ public class SimulateRunApp {
         SystemState s = new SystemState(calendar, arrivalVA, servicesVA, turnOnVA);
 
         ProgressBar bar = new ProgressBar(STOP);
-        while (s.getCurrent() < STOP || s.activeJobExists()) {
+        while (s.getCurrent() < STOP || (EMPTY_JOBS && s.activeJobExists())) {
             /* Compute the next event time */
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());

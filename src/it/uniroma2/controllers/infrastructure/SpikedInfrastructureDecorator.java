@@ -7,7 +7,6 @@ import it.uniroma2.models.sys.ServerStats;
 import it.uniroma2.models.sys.SystemStats;
 import it.uniroma2.models.sys.TransientStats;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -149,8 +148,9 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumWebServersByState(ServerState.ACTIVE));
     }
 
-    public void logFineJobs(double endTs, String eventType) {
-        base.logFineJobs(endTs, eventType);
+    public void addJobsData(double endTs, String eventType) {
+        base.addJobsData(endTs, eventType);
+        INTRA_RUN_DATA.addField(endTs, JOBS_IN_SYSTEM, allServers.stream().mapToInt(AbstractServer::size).sum());
         INTRA_RUN_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(0), spikeServer.size());
         INTRA_RUN_DATA.addField(endTs, SPIKE_CURRENT_CAPACITY, spikeServer.getCapacity());
     }

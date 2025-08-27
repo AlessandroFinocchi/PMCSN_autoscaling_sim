@@ -97,7 +97,7 @@ public class DataCSVWriter {
 
         /* Log data about jobs in each server */
         DataHeaders jobsHeaders = new DataHeaders();
-        jobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
+        jobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME, JOBS_IN_SYSTEM);
         if (SPIKESERVER_ACTIVE) {
             jobsHeaders.add(SPIKE_CURRENT_CAPACITY);
             jobsHeaders.add("JOBS_IN_SERVER_0");
@@ -109,10 +109,10 @@ public class DataCSVWriter {
         jobsHeaders.add(AGG_SYSTEM_RESPONSE_TIME, AGG_SYSTEM_JOB_NUMBER, AGG_SYSTEM_UTILIZATION, AGG_SYSTEM_ALLOCATED_CAPACITY_PER_SEC);
         for (int serverIndex = (SPIKESERVER_ACTIVE) ? 0 : 1; serverIndex <= MAX_NUM_SERVERS; serverIndex++) {
             jobsHeaders.add(
-                    // AGG_SERVER_RESPONSE_TIME + "_" + serverIndex
-                    AGG_SERVER_JOB_NUMBER + "_" + serverIndex
-                    // AGG_SERVER_UTILIZATION + "_" + serverIndex,
-                    // AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + serverIndex
+                    AGG_SERVER_RESPONSE_TIME + "_" + serverIndex,
+                    AGG_SERVER_JOB_NUMBER + "_" + serverIndex,
+                    AGG_SERVER_UTILIZATION + "_" + serverIndex,
+                    AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + serverIndex
             );
         }
         DataTimeTable filteredJobsData = INTRA_RUN_DATA.filter(EVENT_TYPE, false, "ACTIVE");
@@ -121,23 +121,17 @@ public class DataCSVWriter {
                 jobsHeaders.get(), false);
 
         /* Log data about jobs in each server */
-        // DataHeaders allJobsHeaders = new DataHeaders();
-        // allJobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME,
-        //         AGG_RESPONSE_TIME);
-        // if (ALL_SPIKESERVER_ACTIVE) {
-        //     allJobsHeaders.add(SPIKE_CURRENT_CAPACITY);
-        //     allJobsHeaders.add("JOBS_IN_SERVER_0");
-        // }
-        // for (int i = 1; i <= ALL_MAX_NUM_SERVERS; i++) {
-        //     allJobsHeaders.add("STATUS_OF_SERVER_" + i);
-        //     allJobsHeaders.add("JOBS_IN_SERVER_" + i);
-        // }
-        // allJobsHeaders.add(REPETITION_ID);
-        // DataTimeTable combinedJobsData = filteredJobsData
-        //         .setEach(REPETITION_ID, repetition);
-        // flushList(combinedJobsData,
-        //         OUT_DIR_PATH_WITH_SUFFIX, "jobs" + "-" + c.getName() + "_all",
-        //         allJobsHeaders.get(), true);
+        DataHeaders allJobsHeaders = new DataHeaders();
+        allJobsHeaders.add(TIMESTAMP, AGG_SYSTEM_RESPONSE_TIME, AGG_SYSTEM_JOB_NUMBER);
+        if (SPIKESERVER_ACTIVE) {
+            allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + 0, AGG_SERVER_JOB_NUMBER + "_" + 0);
+        }
+        allJobsHeaders.add(REPETITION_ID);
+        DataTimeTable combinedJobsData = filteredJobsData
+                .setEach(REPETITION_ID, repetition);
+        flushList(combinedJobsData,
+                OUT_DIR_PATH_WITH_SUFFIX, "jobs" + "-" + c.getName() + "_all",
+                allJobsHeaders.get(), true);
 
         INTRA_RUN_DATA.clear();
     }
