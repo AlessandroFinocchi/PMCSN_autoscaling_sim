@@ -138,7 +138,7 @@ public class DataCSVWriter {
         // flushList(combinedJobsData,
         //         OUT_DIR_PATH_WITH_SUFFIX, "jobs" + "-" + c.getName() + "_all",
         //         allJobsHeaders.get(), true);
-
+        
         INTRA_RUN_DATA.clear();
     }
 

@@ -35,7 +35,7 @@ public class SystemStats {
 
         meanSystemResponseTime /= completedJobs;
 
-        stationaryStats.updateStats(meanSystemResponseTime);
+        stationaryStats.updateStats(currentTs, meanSystemResponseTime);
     }
 
     public void processStats(double currentTs) {

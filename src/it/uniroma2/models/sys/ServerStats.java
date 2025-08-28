@@ -39,7 +39,7 @@ public class ServerStats {
             this.allocatedCapacity += (endTs - startTs) * currentCapacity;
 
         if (stationaryStats.advanceCounterReady())
-            updateStationaryStats();
+            updateStationaryStats(endTs);
     }
 
     public void updateSLO(double responseTime) {
@@ -47,8 +47,8 @@ public class ServerStats {
             completedJobsInTime++;
     }
 
-    private void updateStationaryStats() {
+    private void updateStationaryStats(double endTs) {
         double currResponseTime = this.getNodeSum() / this.getCompletedJobs();
-        stationaryStats.updateStats(currResponseTime);
+        stationaryStats.updateStats(endTs, currResponseTime);
     }
 }
