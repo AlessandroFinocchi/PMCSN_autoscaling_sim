@@ -83,7 +83,7 @@ public class SimulateRunApp {
         SystemState s = new SystemState(calendar, arrivalVA, servicesVA, turnOnVA);
 
         ProgressBar bar = new ProgressBar(STOP);
-        while (s.getCurrent() < STOP || s.activeJobExists()) {
+        while (continueSimulating(s)) {
             /* Compute the next event time */
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());
@@ -92,6 +92,14 @@ public class SimulateRunApp {
         }
 
         s.printStats();
+    }
+
+    //TODO: nelle run che non studiano lo stazionario basta mettere nella configurazione
+    // STATS_BATCH_NUM a infinity così non si triggera mai il calcolo delle stationary stats
+    // e il controllo in quest'if è sempre vero quindi è come non ci fosse
+    private static boolean continueSimulating(SystemState s) {
+        return (s.getCurrent() < STOP || s.activeJobExists())
+                && s.getCompletedJobNumber() <= STATS_BATCH_NUM * STATS_BATCH_SIZE + 1;
     }
 
     private static void log(RunConfiguration c, int repetition) {

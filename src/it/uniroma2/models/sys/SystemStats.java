@@ -10,12 +10,32 @@ import static it.uniroma2.utils.DataField.*;
 public class SystemStats {
     private final DecimalFormat f;
     List<ServerStats> stats;
+    StationaryStats stationaryStats;
 
     public SystemStats(List<ServerStats> stats) {
         this.stats = stats;
+        this.stationaryStats = new StationaryStats();
 
         this.f = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
         this.f.applyPattern("###0.00000000");
+    }
+
+
+
+    public void updateStationaryStats(double currentTs) {
+        if (!stationaryStats.advanceCounterReady()) return;
+
+        double meanSystemResponseTime = 0.0f;
+        int completedJobs = 0;
+
+        for (ServerStats stat : stats) {
+            meanSystemResponseTime += stat.getNodeSum();
+            completedJobs += stat.getCompletedJobs();
+        }
+
+        meanSystemResponseTime /= completedJobs;
+
+        stationaryStats.updateStats(meanSystemResponseTime);
     }
 
     public void processStats(double currentTs) {

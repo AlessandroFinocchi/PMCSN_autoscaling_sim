@@ -101,7 +101,8 @@ public class Config {
             SERVICES_CV = Double.parseDouble(props.getProperty("distribution.services.cv"));
             WEBSERVER_CAPACITY = Double.parseDouble(props.getProperty("webserver.capacity"));
             START = Double.parseDouble(props.getProperty("system.start"));
-            STOP = Double.parseDouble(props.getProperty("system.stop"));
+            STOP = (Objects.equals(props.getProperty("system.stop"), "INFINITY")) ?
+                    Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("system.stop"));
             INFINITY = Double.POSITIVE_INFINITY;
             RESPONSE_TIME_OUT_THRESHOLD = (Objects.equals(props.getProperty("webserver.response_time.out_thr"), "INFINITY")) ?
                     Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("webserver.response_time.out_thr"));
@@ -117,7 +118,8 @@ public class Config {
             TURN_ON_STD = Double.parseDouble(props.getProperty("turn.on.std"));
 
             ALPHA = Double.parseDouble(props.getProperty("stats.alpha"));
-            STATS_BATCH_SIZE = Integer.parseInt(props.getProperty("stats.batch.size"));
+            STATS_BATCH_SIZE = (Objects.equals(props.getProperty("stats.batch.size"), "INFINITY")) ?
+                    Integer.MAX_VALUE : Integer.parseInt(props.getProperty("stats.batch.size"));
             STATS_BATCH_NUM = Integer.parseInt(props.getProperty("stats.batch.num"));
 
             /* Add property values for CSV logging */

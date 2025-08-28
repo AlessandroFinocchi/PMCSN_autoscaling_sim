@@ -11,6 +11,7 @@ import it.uniroma2.models.sys.TransientStats;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -87,6 +88,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         }
 
         this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
+        this.systemStats.updateStationaryStats(endTs);
 
         return this.movingExpMeanResponseTime;
     }
@@ -141,6 +143,12 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         }
 
         return endTs + minRemainingLife;
+    }
+
+    public int getCompletedJobNumber(){
+        return webServers.stream()
+                .map(AbstractServer::getStats)
+                .map(ServerStats::getCompletedJobs).reduce(0, Integer::sum);
     }
 
     public void printServerStats(double currentTs) {
