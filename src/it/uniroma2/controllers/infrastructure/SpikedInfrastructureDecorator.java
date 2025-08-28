@@ -76,6 +76,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         }
 
         this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
+        this.systemStats.updateStationaryStats(endTs);
 
         return base.movingExpMeanResponseTime;
     }
@@ -116,6 +117,12 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
                 endTs + spikeServer.getMinRemainingLife() * spikeServer.size() / spikeServer.getCapacity()
                 : INFINITY;
         return Math.min(spikeServerMinRemainingLife, base.computeNextCompletionTs(endTs));
+    }
+
+    public int getCompletedJobNumber(){
+        return allServers.stream()
+                .map(AbstractServer::getStats)
+                .map(ServerStats::getCompletedJobs).reduce(0, Integer::sum);
     }
 
     public void printServerStats(double currentTs) {

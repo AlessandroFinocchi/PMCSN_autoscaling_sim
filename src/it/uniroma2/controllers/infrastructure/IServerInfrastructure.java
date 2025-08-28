@@ -40,6 +40,8 @@ public interface IServerInfrastructure {
      */
     double computeNextCompletionTs(double endTs);
 
+    int getCompletedJobNumber();
+
     void printServerStats(double currentTs);
 
     void printSystemStats(double currentTs);

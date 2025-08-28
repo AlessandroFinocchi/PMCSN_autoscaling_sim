@@ -27,6 +27,10 @@ public enum DataField {
     AGG_SERVER_UTILIZATION,
     AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC,
 
+    /* Intra run Batch means data fields */
+    BM_SYSTEM_RESPONSE_TIME,
+    BM_SERVER_RESPONSE_TIME,
+
     /*----------------------------------*/
     /* Inter run data fields */
     RUN_DATETIME,
