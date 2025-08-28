@@ -19,12 +19,11 @@ public abstract class AbstractServer implements IServer {
     protected JobList jobs;
     @Getter protected ServerStats stats;
 
-
-    public AbstractServer(double capacity, ServerState serverState) {
+    public AbstractServer(double capacity, ServerState serverState, int index) {
         this.serverState = serverState;
         this.capacity = capacity;
         this.jobs = new JobList();
-        stats = new ServerStats();
+        stats = new ServerStats(index);
 
         this.f = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
         this.f.applyPattern("###0.00000000");

@@ -14,7 +14,7 @@ public class SystemStats {
 
     public SystemStats(List<ServerStats> stats) {
         this.stats = stats;
-        this.stationaryStats = new StationaryStats();
+        this.stationaryStats = new StationaryStats(null);
 
         this.f = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
         this.f.applyPattern("###0.00000000");

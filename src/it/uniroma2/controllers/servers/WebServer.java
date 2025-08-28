@@ -8,8 +8,8 @@ public class WebServer extends AbstractServer {
     @Getter @Setter private Double activationTimestamp;
     private double timeActive;
 
-    public WebServer(double capacity, ServerState serverState) {
-        super(capacity, serverState);
+    public WebServer(double capacity, ServerState serverState, int index) {
+        super(capacity, serverState, index);
     }
     
     public double getRemainingServerLife() {

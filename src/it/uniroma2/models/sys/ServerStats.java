@@ -17,13 +17,13 @@ public class ServerStats {
 
     private StationaryStats stationaryStats;
 
-    public ServerStats(){
+    public ServerStats(int serverIndex){
         this.nodeSum           = 0.0;
         this.serviceSum        = 0.0;
         this.completedJobs     =   0;
         this.allocatedCapacity = 0.0;
 
-        this.stationaryStats   = new StationaryStats();
+        this.stationaryStats   = new StationaryStats(serverIndex);
     }
 
     public void updateServerStats(double startTs, double endTs, double jobNum, int completed,

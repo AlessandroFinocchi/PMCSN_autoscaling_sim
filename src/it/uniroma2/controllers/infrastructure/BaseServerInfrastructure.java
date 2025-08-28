@@ -31,7 +31,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         this.webServers = new ArrayList<>();
         for (int i = 0; i < MAX_NUM_SERVERS; i++) {
             var serverState = i < START_NUM_SERVERS ? ServerState.ACTIVE : ServerState.REMOVED;
-            this.webServers.add(new WebServer(WEBSERVER_CAPACITY, serverState));
+            this.webServers.add(new WebServer(WEBSERVER_CAPACITY, serverState, i+1));
         }
 
         List<ServerStats> serverStats = this.webServers.stream().map(AbstractServer::getStats).toList();
