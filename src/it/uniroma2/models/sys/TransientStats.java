@@ -44,16 +44,9 @@ public class TransientStats {
 
         /* Update transient statistics for completion events */
         if (completionServerIndex != null) {
-            ServerStats currServerStats = stats.get(completionServerIndex);
             double currSystemCompletedJobs = stats.stream().mapToInt(ServerStats::getCompletedJobs).sum();
-            double currServerCompletedJobs = currServerStats.getCompletedJobs();
-            this.aggSystemResponseTime =
-                    (this.aggSystemResponseTime * (currSystemCompletedJobs-1) + currJobResponseTime)
-                    / currSystemCompletedJobs;
-
-            this.aggServerResponseTimes[completionServerIndex] =
-                    (this.aggServerResponseTimes[completionServerIndex] * (currServerCompletedJobs-1) + currJobResponseTime)
-                    / currServerCompletedJobs;
+            this.aggSystemResponseTime += (currJobResponseTime - this.aggSystemResponseTime) / currSystemCompletedJobs;
+            this.aggServerResponseTimes[completionServerIndex] = stats.get(completionServerIndex).getCurrMeanResponseTime();
         }
 
         /* Update transient statistics for all events */
