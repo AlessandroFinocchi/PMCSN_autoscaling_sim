@@ -34,7 +34,6 @@ public class Config {
     public static double RESPONSE_TIME_SLO;
     public static int MAX_NUM_SERVERS;
     public static int START_NUM_SERVERS;
-    public static double ALPHA;
     public static int SI_MAX;
     public static double SPIKE_CAPACITY;
     public static boolean SPIKESERVER_ACTIVE;
@@ -44,6 +43,10 @@ public class Config {
 
     public static int ALL_MAX_NUM_SERVERS;
     public static boolean ALL_SPIKESERVER_ACTIVE;
+
+    public static double ALPHA;
+    public static int STATS_BATCH_SIZE;
+    public static int STATS_BATCH_NUM;
 
     static {
         loadHeaders();
@@ -106,7 +109,6 @@ public class Config {
             RESPONSE_TIME_SLO = Double.parseDouble(props.getProperty("infrastructure.response_time_slo"));
             MAX_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.max_num_server"));
             START_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.start_num_server"));
-            ALPHA = Double.parseDouble(props.getProperty("stats.alpha"));
             SI_MAX = Integer.parseInt(props.getProperty("infrastructure.si_max"));
             SPIKE_CAPACITY = Double.parseDouble(props.getProperty("spikeserver.capacity"));
             SPIKESERVER_ACTIVE = Boolean.parseBoolean(props.getProperty("infrastructure.spikeserver.active"));
@@ -114,7 +116,11 @@ public class Config {
             TURN_ON_MU = Double.parseDouble(props.getProperty("turn.on.mu"));
             TURN_ON_STD = Double.parseDouble(props.getProperty("turn.on.std"));
 
-            /* Add properties values for CSV logging */
+            ALPHA = Double.parseDouble(props.getProperty("stats.alpha"));
+            STATS_BATCH_SIZE = Integer.parseInt(props.getProperty("stats.batch.size"));
+            STATS_BATCH_NUM = Integer.parseInt(props.getProperty("stats.batch.num"));
+
+            /* Add property values for CSV logging */
             INTER_RUN_DATA.clear();
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 INTER_RUN_DATA.addField(INTER_RUN_KEY, (String) entry.getKey(), entry.getValue());
