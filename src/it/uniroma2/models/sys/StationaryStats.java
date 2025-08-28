@@ -5,12 +5,13 @@ import java.util.Arrays;
 import static it.uniroma2.models.Config.STATS_BATCH_NUM;
 import static it.uniroma2.models.Config.STATS_BATCH_SIZE;
 import static it.uniroma2.utils.DataCSVWriter.INTER_RUN_DATA;
+import static it.uniroma2.utils.DataCSVWriter.INTRA_RUN_DATA;
 import static it.uniroma2.utils.DataField.*;
 
 public class StationaryStats {
     private int counter;
     private int currBatch;
-    private final Double[] batchesResponseTimes;
+    private double sumBatchesResponseTime;
     private Integer serverIndex;
 
     /**
@@ -19,10 +20,8 @@ public class StationaryStats {
     public StationaryStats(Integer serverIndex) {
         this.counter = 1;
         this.currBatch = 0;
-        this.batchesResponseTimes = new Double[STATS_BATCH_NUM];
+        this.sumBatchesResponseTime = 0.0f;
         this.serverIndex = serverIndex;
-
-        Arrays.fill(batchesResponseTimes, 0.0);
     }
 
     private boolean isBatchEnd(){
@@ -35,26 +34,29 @@ public class StationaryStats {
     }
 
     public void updateStats(double endTs, double currMeanResponseTime) {
-        /* Return if all batches were computed or the batch is not ready*/
-        if (this.currBatch == STATS_BATCH_NUM || !isBatchEnd()) return;
+        /* Return if all batches were computed or the batch is not ready */
+//        if (isCompleted()) return;
 
-        double sumResponseTimes = Arrays.stream(this.batchesResponseTimes).reduce(0.0, Double::sum);
-        this.batchesResponseTimes[this.currBatch] =
-                (this.currBatch + 1) * currMeanResponseTime - sumResponseTimes;
+        /* Compute batch statistics */
+        double currBatchResponseTime = (this.currBatch + 1) * currMeanResponseTime - this.sumBatchesResponseTime;
+
+        /* Update statistic sums */
+        this.sumBatchesResponseTime += currBatchResponseTime;
 
         /* System stationary stats */
         if (this.serverIndex == null){
-            INTER_RUN_DATA.addField(
-                    endTs, BM_SYSTEM_RESPONSE_TIME, this.batchesResponseTimes[this.currBatch]
-            );
+            INTRA_RUN_DATA.addField(endTs, BM_SYSTEM_RESPONSE_TIME, currBatchResponseTime);
         }
         /* Server stationary stats */
         else {
-            INTER_RUN_DATA.addFieldWithSuffix(
-                    endTs, BM_SERVER_RESPONSE_TIME, String.valueOf(serverIndex), this.batchesResponseTimes[this.currBatch]
-            );
+            INTRA_RUN_DATA.addFieldWithSuffix(
+                    endTs, BM_SERVER_RESPONSE_TIME, String.valueOf(serverIndex), currBatchResponseTime);
         }
 
         this.currBatch++;
+    }
+
+    public boolean isCompleted(){
+        return this.currBatch >= STATS_BATCH_NUM;
     }
 }

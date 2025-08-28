@@ -99,7 +99,7 @@ public class SimulateRunApp {
     // e il controllo in quest'if è sempre vero quindi è come non ci fosse
     private static boolean continueSimulating(SystemState s) {
         return (s.getCurrent() < STOP || (EMPTY_JOBS && s.activeJobExists()))
-                && s.getCompletedJobNumber() <= STATS_BATCH_NUM * STATS_BATCH_SIZE + 1;
+                && !s.getServers().isCompletedStationaryStats();
     }
 
     private static void log(RunConfiguration c, int repetition) {

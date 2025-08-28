@@ -4,6 +4,7 @@ import it.uniroma2.SimulateRunApp;
 import it.uniroma2.models.configurations.RunConfiguration;
 import it.uniroma2.models.configurations.experiments.Experiment;
 import it.uniroma2.models.configurations.experiments.ExperimentBaseTransient;
+import it.uniroma2.models.configurations.experiments.ExperimentSimpleBM;
 import it.uniroma2.utils.DataCSVWriter;
 
 import java.io.IOException;
@@ -140,8 +141,8 @@ public class Config {
     public static List<RunConfiguration> createConfigurations() {
         List<RunConfiguration> configurations = new ArrayList<>();
 
-        Experiment ExperimentBaseTransitory = new ExperimentBaseTransient();
-        configurations.addAll(ExperimentBaseTransitory.getRunConfigurations());
+        Experiment experiment = new ExperimentSimpleBM();
+        configurations.addAll(experiment.getRunConfigurations());
 
         // Set variables used to CSV log
         ALL_MAX_NUM_SERVERS = MAX_NUM_SERVERS;

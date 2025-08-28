@@ -4,6 +4,7 @@ import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.ServerStats;
+import it.uniroma2.models.sys.StationaryStats;
 import it.uniroma2.models.sys.SystemStats;
 import it.uniroma2.models.sys.TransientStats;
 
@@ -73,10 +74,10 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
             base.addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, lastResponseTime);
             INTRA_RUN_DATA.addField(endTs, MOVING_R_O, base.movingExpMeanResponseTime);
+            this.systemStats.updateStationaryStats(endTs);
         }
 
         this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
-        this.systemStats.updateStationaryStats(endTs);
 
         return base.movingExpMeanResponseTime;
     }
@@ -119,10 +120,14 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         return Math.min(spikeServerMinRemainingLife, base.computeNextCompletionTs(endTs));
     }
 
-    public int getCompletedJobNumber(){
-        return allServers.stream()
-                .map(AbstractServer::getStats)
-                .map(ServerStats::getCompletedJobs).reduce(0, Integer::sum);
+    public boolean isCompletedStationaryStats(){
+        boolean isServerStationaryStatsCompleted =
+                this.allServers.stream().map(AbstractServer::getStats)
+                        .map(ServerStats::getStationaryStats)
+                        .map(StationaryStats::isCompleted)
+                        .reduce(true, (a, b) -> a && b);
+        boolean isSystemStationaryStatsCompleted = this.systemStats.getStationaryStats().isCompleted();
+        return isSystemStationaryStatsCompleted && isServerStationaryStatsCompleted;
     }
 
     public void printServerStats(double currentTs) {

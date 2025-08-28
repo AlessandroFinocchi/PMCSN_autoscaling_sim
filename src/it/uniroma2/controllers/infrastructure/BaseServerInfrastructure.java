@@ -6,6 +6,7 @@ import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.Job;
 import it.uniroma2.models.sys.ServerStats;
+import it.uniroma2.models.sys.StationaryStats;
 import it.uniroma2.models.sys.SystemStats;
 import it.uniroma2.models.sys.TransientStats;
 
@@ -96,10 +97,10 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
             addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, lastResponseTime);
             INTRA_RUN_DATA.addField(endTs, MOVING_R_O, this.movingExpMeanResponseTime);
+            this.systemStats.updateStationaryStats(endTs);
         }
 
         this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
-        this.systemStats.updateStationaryStats(endTs);
 
         return this.movingExpMeanResponseTime;
     }
@@ -156,10 +157,14 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         return endTs + minRemainingLife;
     }
 
-    public int getCompletedJobNumber(){
-        return webServers.stream()
-                .map(AbstractServer::getStats)
-                .map(ServerStats::getCompletedJobs).reduce(0, Integer::sum);
+    public boolean isCompletedStationaryStats(){
+        boolean isServerStationaryStatsCompleted =
+                this.webServers.stream().map(AbstractServer::getStats)
+                        .map(ServerStats::getStationaryStats)
+                        .map(StationaryStats::isCompleted)
+                        .reduce(true, (a, b) -> a && b);
+        boolean isSystemStationaryStatsCompleted = this.systemStats.getStationaryStats().isCompleted();
+        return isSystemStationaryStatsCompleted && isServerStationaryStatsCompleted;
     }
 
     public void printServerStats(double currentTs) {

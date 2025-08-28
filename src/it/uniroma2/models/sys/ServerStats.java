@@ -15,7 +15,7 @@ public class ServerStats {
     @Getter private double allocatedCapacity;          /* total allocated capacity per time                 */
     @Getter private int    completedJobsInTime;        /* number of jobs that completed withing the SLO     */
 
-    private StationaryStats stationaryStats;
+    @Getter private StationaryStats stationaryStats;
 
     public ServerStats(int serverIndex){
         this.nodeSum           = 0.0;
@@ -38,8 +38,10 @@ public class ServerStats {
         if(serverState == ServerState.ACTIVE || serverState == ServerState.TO_BE_REMOVED)
             this.allocatedCapacity += (endTs - startTs) * currentCapacity;
 
-        if (stationaryStats.advanceCounterReady())
-            updateStationaryStats(endTs);
+        if (completed == 1){
+            if (stationaryStats.advanceCounterReady())
+                updateStationaryStats(endTs);
+        }
     }
 
     public void updateSLO(double responseTime) {

@@ -40,7 +40,7 @@ public interface IServerInfrastructure {
      */
     double computeNextCompletionTs(double endTs);
 
-    int getCompletedJobNumber();
+    boolean isCompletedStationaryStats();
 
     void printServerStats(double currentTs);
 

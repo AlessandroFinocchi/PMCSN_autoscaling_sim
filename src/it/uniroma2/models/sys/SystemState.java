@@ -44,8 +44,4 @@ public class SystemState {
         servers.printServerStats(this.getCurrent());
         servers.printSystemStats(this.getCurrent());
     }
-
-    public int getCompletedJobNumber() {
-        return servers.getCompletedJobNumber();
-    }
 }
