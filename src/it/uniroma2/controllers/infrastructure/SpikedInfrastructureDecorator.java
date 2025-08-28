@@ -10,6 +10,7 @@ import it.uniroma2.models.sys.TransientStats;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.*;
@@ -39,45 +40,46 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         return base.getNumWebServersByState(state);
     }
 
-    public double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
-        int completionServerIndex = completed == 1 ? this.getCompletingServerIndex() : -1;
-        Double lastResponseTime = null;
+    public double computeJobsAdvancement(double startTs, double endTs, boolean isCompletion) throws IllegalLifeException {
+        Integer completionServerIndex = null;
+        Double completedJobResponseTime = null;
+        Job completedJob;
 
-        Job removedJob = null;
-        if (completionServerIndex != -1) {
+        if (isCompletion) {
+            completionServerIndex = getCompletingServerIndex();
             AbstractServer minServer = allServers.get(completionServerIndex);
-            removedJob = minServer.getMinRemainingLifeJob();
 
-            double jobResponseTime = endTs - removedJob.getArrivalTime();
-            minServer.getStats().updateOnCompletion(jobResponseTime);
+            completedJob = minServer.getMinRemainingLifeJob();
+            completedJobResponseTime = endTs - completedJob.getArrivalTime();
+            // minServer.getStats().updateOnCompletion(completedJobResponseTime);
 
             INTRA_RUN_DATA.addField(endTs, COMPLETING_SERVER_INDEX, completionServerIndex);
-            INTRA_RUN_DATA.addField(endTs, PER_JOB_RESPONSE_TIME, jobResponseTime);
+            INTRA_RUN_DATA.addField(endTs, PER_JOB_RESPONSE_TIME, completedJobResponseTime);
 
-            boolean isServerRemoved = minServer.removeJob(removedJob);
-            if (isServerRemoved)
+            boolean isServerRemoved = minServer.removeJob(completedJob);
+            if (isServerRemoved && completionServerIndex != 0) // spike server can't be removed
                 INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
         }
 
         /* Compute the advancement of each job in each web Server */
         for (int currIndex = 0; currIndex < allServers.size(); currIndex++) {
             AbstractServer server = allServers.get(currIndex);
-            server.computeJobsAdvancement(startTs, endTs, currIndex == completionServerIndex ? 1 : 0);
+            server.computeJobsAdvancement(
+                    startTs, endTs,
+                    Objects.equals(currIndex, completionServerIndex) ? completedJobResponseTime : null);
         }
 
         /* Compute the moving exponential average of the response time */
-        if (completionServerIndex != -1) {
-            assert removedJob != null;
-            lastResponseTime = endTs - removedJob.getArrivalTime();
-            base.updateMovingExpResponseTime(lastResponseTime);
+        if (isCompletion) {
+            base.updateMovingExpResponseTime(completedJobResponseTime);
 
             base.addStateToScalingData(endTs);
-            INTRA_RUN_DATA.addField(endTs, R_0, lastResponseTime);
+            INTRA_RUN_DATA.addField(endTs, R_0, completedJobResponseTime);
             INTRA_RUN_DATA.addField(endTs, MOVING_R_O, base.movingExpMeanResponseTime);
             this.systemStats.updateStationaryStats(endTs);
         }
 
-        this.transientStats.updateStats(completionServerIndex, startTs, endTs, lastResponseTime);
+        this.transientStats.updateStats(startTs, endTs, completionServerIndex, completedJobResponseTime);
 
         return base.movingExpMeanResponseTime;
     }

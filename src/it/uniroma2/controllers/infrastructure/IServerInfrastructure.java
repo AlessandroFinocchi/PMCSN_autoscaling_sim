@@ -14,12 +14,13 @@ public interface IServerInfrastructure {
 
     /**
      * Processes the job advancement in their execution
-     * @param startTs the computation interval start
-     * @param endTs the computation interval end
-     * @param completed if the advancement is a completion or not
+     *
+     * @param startTs      the computation interval start
+     * @param endTs        the computation interval end
+     * @param isCompletion if the advancement is a completion or not
      * @return the medium response time of the webservers
      */
-    double computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException;
+    double computeJobsAdvancement(double startTs, double endTs, boolean isCompletion) throws IllegalLifeException;
 
     /**
      * Assign the job to a server with a round-robin policy

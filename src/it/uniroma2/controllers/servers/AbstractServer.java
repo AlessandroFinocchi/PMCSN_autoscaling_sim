@@ -33,15 +33,16 @@ public abstract class AbstractServer implements IServer {
      * Computes the advancement of all jobs using a Processor Sharing scheduling
      * @param startTs the interval start time
      * @param endTs the interval end time
-     * @param completed weather a job is completing or not
+     * @param completedJobResponseTime null if no job was completed, otherwise the response time of the completed job
      */
     @Override
-    public void computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException {
+    public void computeJobsAdvancement(double startTs, double endTs, Double completedJobResponseTime) throws IllegalLifeException {
         /*  At this point the job has already been removed, so if this is the server
          *   where completion happened, it must be taken into consideration */
-        int jobAdvanced = jobs.size() + completed;
+        int completedJob = completedJobResponseTime == null ? 0 : 1;
+        int jobAdvanced = jobs.size() + completedJob;
 
-        stats.updateServerStats(startTs, endTs, jobAdvanced, completed, this.serverState, this.capacity);
+        stats.updateServerStats(startTs, endTs, jobAdvanced, completedJobResponseTime, this.serverState, this.capacity);
 
         /* Compute the advancement of each job */
         double quantum = (this.capacity / jobAdvanced) * (endTs - startTs);

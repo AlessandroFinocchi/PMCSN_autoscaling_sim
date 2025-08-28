@@ -20,7 +20,7 @@ public class EventProcessor implements EventVisitor {
         double endTs = event.getTimestamp();
 
         /* Advance job execution */
-        servers.computeJobsAdvancement(startTs, endTs, 0);
+        servers.computeJobsAdvancement(startTs, endTs, false);
 
         /* Add the next job to the list */
         double nextServiceLife = s.getServicesVA().gen();
@@ -54,7 +54,7 @@ public class EventProcessor implements EventVisitor {
         double endTs = event.getTimestamp();
 
         /* Advance job execution */
-        double movingMeanResponseTime = servers.computeJobsAdvancement(startTs, endTs, 1);
+        double movingMeanResponseTime = servers.computeJobsAdvancement(startTs, endTs, true);
 
         servers.addJobsData(endTs, "COMPLETION");
 
@@ -108,7 +108,7 @@ public class EventProcessor implements EventVisitor {
         double endTs = event.getTimestamp();
 
         /* Advance job execution */
-        servers.computeJobsAdvancement(startTs, endTs, 0);
+        servers.computeJobsAdvancement(startTs, endTs, false);
 
         /* Set server to be effectively active */
         servers.scaleOut(endTs, event.getTarget());

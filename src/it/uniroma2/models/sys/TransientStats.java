@@ -38,12 +38,12 @@ public class TransientStats {
         Arrays.fill(this.aggServerAllocatedCapacityPerSec, 0.0);
     }
 
-    public void updateStats(int completionServerIndex, double startTs, double endTs, Double currJobResponseTime) {
-        assert (completionServerIndex == -1 && currJobResponseTime == null) ||
-               (completionServerIndex >=  0 && currJobResponseTime != null);
+    public void updateStats(double startTs, double endTs, Integer completionServerIndex, Double currJobResponseTime) {
+        assert (completionServerIndex == null && currJobResponseTime == null) ||
+               (completionServerIndex != null && currJobResponseTime != null);
 
         /* Update transient statistics for completion events */
-        if (completionServerIndex != -1) {
+        if (completionServerIndex != null) {
             ServerStats currServerStats = stats.get(completionServerIndex);
             double currSystemCompletedJobs = stats.stream().mapToInt(ServerStats::getCompletedJobs).sum();
             double currServerCompletedJobs = currServerStats.getCompletedJobs();

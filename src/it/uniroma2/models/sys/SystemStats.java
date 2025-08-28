@@ -29,7 +29,7 @@ public class SystemStats {
         int completedJobs = 0;
 
         for (ServerStats stat : stats) {
-            meanSystemResponseTime += stat.getMeanResponseTime() * stat.getCompletedJobs();
+            meanSystemResponseTime += stat.getCurrMeanResponseTime() * stat.getCompletedJobs();
             completedJobs += stat.getCompletedJobs();
         }
 

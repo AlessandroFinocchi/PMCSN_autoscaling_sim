@@ -6,7 +6,7 @@ import it.uniroma2.models.Job;
 import java.text.DecimalFormat;
 
 public interface IServer {
-    void computeJobsAdvancement(double startTs, double endTs, int completed) throws IllegalLifeException;
+    void computeJobsAdvancement(double startTs, double endTs, Double completedJobResponseTime) throws IllegalLifeException;
 
     void addJob(Job job);
 
