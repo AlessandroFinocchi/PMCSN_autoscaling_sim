@@ -94,7 +94,7 @@ public class SimulateRunApp {
         s.printStats();
     }
 
-    //TODO: nelle run che non studiano lo stazionario basta mettere nella configurazione
+    // TODO: nelle run che non studiano lo stazionario basta mettere nella configurazione
     // STATS_BATCH_NUM a infinity così non si triggera mai il calcolo delle stationary stats
     // e il controllo in quest'if è sempre vero quindi è come non ci fosse
     private static boolean continueSimulating(SystemState s) {
@@ -103,8 +103,9 @@ public class SimulateRunApp {
     }
 
     private static void log(RunConfiguration c, int repetition) {
-        String suffix = c.getName() + "_" + repetition;
         if (LOG_INTRA_RUN) DataCSVWriter.flushAllIntra(c, repetition);
+        // TODO: add configuration
+        DataCSVWriter.flushAllIntraBM(c, repetition);
         DataCSVWriter.flushAllInter();
     }
 

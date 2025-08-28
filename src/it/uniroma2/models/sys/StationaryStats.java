@@ -1,10 +1,8 @@
 package it.uniroma2.models.sys;
 
-import java.util.Arrays;
-
 import static it.uniroma2.models.Config.STATS_BATCH_NUM;
 import static it.uniroma2.models.Config.STATS_BATCH_SIZE;
-import static it.uniroma2.utils.DataCSVWriter.INTRA_RUN_DATA;
+import static it.uniroma2.utils.DataCSVWriter.INTRA_RUN_BM_DATA;
 import static it.uniroma2.utils.DataField.*;
 
 public class StationaryStats {
@@ -44,11 +42,11 @@ public class StationaryStats {
 
         /* System stationary stats */
         if (this.serverIndex == null){
-            INTRA_RUN_DATA.addField(endTs, BM_SYSTEM_RESPONSE_TIME, currBatchResponseTime);
+            INTRA_RUN_BM_DATA.addField(endTs, BM_SYSTEM_RESPONSE_TIME, currBatchResponseTime);
         }
         /* Server stationary stats */
         else {
-            INTRA_RUN_DATA.addFieldWithSuffix(
+            INTRA_RUN_BM_DATA.addFieldWithSuffix(
                     endTs, BM_SERVER_RESPONSE_TIME, String.valueOf(serverIndex), currBatchResponseTime);
         }
 

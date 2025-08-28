@@ -73,8 +73,11 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
             completedJob = minServer.getMinRemainingLifeJob();
             completedJobResponseTime = endTs - completedJob.getArrivalTime();
 
+            INTRA_RUN_BM_DATA.addField(endTs, EVENT_TYPE, "COMPLETION");
             INTRA_RUN_DATA.addField(endTs, COMPLETING_SERVER_INDEX, completionServerIndex + 1); // +1 because there is no spike server
+            INTRA_RUN_BM_DATA.addField(endTs, COMPLETING_SERVER_INDEX, completionServerIndex + 1); // +1 because there is no spike server
             INTRA_RUN_DATA.addField(endTs, PER_JOB_RESPONSE_TIME, completedJobResponseTime);
+            INTRA_RUN_BM_DATA.addField(endTs, PER_JOB_RESPONSE_TIME, completedJobResponseTime);
 
             boolean isServerRemoved = minServer.removeJob(completedJob);
             if (isServerRemoved)
