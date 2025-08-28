@@ -30,6 +30,14 @@ public enum DataField {
     /* Intra run Batch means data fields */
     BM_SYSTEM_RESPONSE_TIME,
     BM_SERVER_RESPONSE_TIME,
+    BM_SYSTEM_JOB_NUMBER,
+    BM_SERVER_JOB_NUMBER,
+    BM_SYSTEM_UTILIZATION,
+    BM_SERVER_UTILIZATION,
+    BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC,
+    BM_SERVER_ALLOCATED_CAPACITY_PER_SEC,
+    BM_SYSTEM_SLO_VIOLATIONS_PERC,
+    BM_SERVER_SLO_VIOLATIONS_PERC,
 
     /*----------------------------------*/
     /* Inter run data fields */

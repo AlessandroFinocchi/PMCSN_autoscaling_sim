@@ -64,6 +64,17 @@ public class ServerStats {
     }
 
     private void updateStationaryStats(double endTs) {
-        stationaryStats.updateStats(endTs, this.currMeanResponseTime);
+        double currMeanJobNumber = this.nodeSum / endTs;
+        double currMeanUtilization = this.getServiceSum() / endTs;
+        double currMeanCapacityPerSec = this.getAllocatedCapacity() / endTs;
+        double currMeanViolationPercentage = 1.0f - this.getCompletedJobsInTime() / (double) this.getCompletedJobs();
+        stationaryStats.updateStats(
+                endTs,
+                this.currMeanResponseTime,
+                currMeanJobNumber,
+                currMeanUtilization,
+                currMeanCapacityPerSec,
+                currMeanViolationPercentage
+        );
     }
 }

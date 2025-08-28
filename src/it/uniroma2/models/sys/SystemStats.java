@@ -26,16 +26,27 @@ public class SystemStats {
         if (!stationaryStats.advanceCounterReady()) return;
 
         double meanSystemResponseTime = 0.0f;
+        double meanJobNumber = 0.0f;
+        double systemUtilization = 0.0f;
+        double totalAllocatedCapacityPerSec = 0.0f;
+        double SLOViolationsPercentage = 0.0f;
         int completedJobs = 0;
 
         for (ServerStats stat : stats) {
             meanSystemResponseTime += stat.getCurrMeanResponseTime() * stat.getCompletedJobs();
+            meanJobNumber += stat.getNodeSum() / currentTs;
+            systemUtilization += stat.getServiceSum() / currentTs;
+            totalAllocatedCapacityPerSec += stat.getAllocatedCapacity();
+            SLOViolationsPercentage += stat.getCompletedJobs() - stat.getCompletedJobsInTime();
             completedJobs += stat.getCompletedJobs();
         }
 
         meanSystemResponseTime /= completedJobs;
+        totalAllocatedCapacityPerSec /= currentTs;
+        SLOViolationsPercentage /= completedJobs;
 
-        stationaryStats.updateStats(currentTs, meanSystemResponseTime);
+        stationaryStats.updateStats(currentTs, meanSystemResponseTime, meanJobNumber, systemUtilization,
+                totalAllocatedCapacityPerSec, SLOViolationsPercentage);
     }
 
     public void processStats(double currentTs) {

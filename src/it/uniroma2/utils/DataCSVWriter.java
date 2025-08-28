@@ -143,9 +143,21 @@ public class DataCSVWriter {
         /* Log data about jobs in each server */
         DataHeaders bmHeaders = new DataHeaders();
         bmHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
-        bmHeaders.add(BM_SYSTEM_RESPONSE_TIME);
+        bmHeaders.add(
+                BM_SYSTEM_RESPONSE_TIME,
+                BM_SYSTEM_JOB_NUMBER,
+                BM_SYSTEM_UTILIZATION,
+                BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC,
+                BM_SYSTEM_SLO_VIOLATIONS_PERC
+        );
         for (int i = 1; i <= MAX_NUM_SERVERS; i++) {
-            bmHeaders.add(BM_SERVER_RESPONSE_TIME + "_" + i);
+            bmHeaders.add(
+                    BM_SERVER_RESPONSE_TIME + "_" + i,
+                    BM_SERVER_JOB_NUMBER + "_" + i,
+                    BM_SERVER_UTILIZATION + "_" + i,
+                    BM_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + i,
+                    BM_SERVER_SLO_VIOLATIONS_PERC + "_" + i
+            );
         }
         DataTimeTable fitleredBmData = INTRA_RUN_BM_DATA;
         flushList(fitleredBmData,
