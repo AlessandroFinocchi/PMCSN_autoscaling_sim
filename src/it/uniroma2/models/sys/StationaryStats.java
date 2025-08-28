@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import static it.uniroma2.models.Config.STATS_BATCH_NUM;
 import static it.uniroma2.models.Config.STATS_BATCH_SIZE;
-import static it.uniroma2.utils.DataCSVWriter.INTER_RUN_DATA;
 import static it.uniroma2.utils.DataCSVWriter.INTRA_RUN_DATA;
 import static it.uniroma2.utils.DataField.*;
 

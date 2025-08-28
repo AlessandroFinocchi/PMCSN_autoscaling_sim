@@ -14,6 +14,7 @@ public class ServerStats {
     @Getter private int    completedJobs;              /* number of completed jobs                          */
     @Getter private double allocatedCapacity;          /* total allocated capacity per time                 */
     @Getter private int    completedJobsInTime;        /* number of jobs that completed withing the SLO     */
+    @Getter private double meanResponseTime;
 
     @Getter private StationaryStats stationaryStats;
 
@@ -44,13 +45,18 @@ public class ServerStats {
         }
     }
 
-    public void updateSLO(double responseTime) {
-        if(responseTime <= RESPONSE_TIME_SLO)
+    public void updateOnCompletion(double responseTime) {
+        /* Update SLO indicator */
+        if (responseTime <= RESPONSE_TIME_SLO)
             completedJobsInTime++;
+
+        /* Update mean response time */
+        meanResponseTime += (responseTime - meanResponseTime) / (completedJobs + 1);
     }
 
     private void updateStationaryStats(double endTs) {
         double currResponseTime = this.getNodeSum() / this.getCompletedJobs();
         stationaryStats.updateStats(endTs, currResponseTime);
+        // stationaryStats.updateStats(endTs, this.meanResponseTime);
     }
 }

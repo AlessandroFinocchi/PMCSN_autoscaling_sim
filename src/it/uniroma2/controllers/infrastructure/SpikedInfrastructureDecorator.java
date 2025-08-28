@@ -49,7 +49,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
             removedJob = minServer.getMinRemainingLifeJob();
 
             double jobResponseTime = endTs - removedJob.getArrivalTime();
-            minServer.getStats().updateSLO(jobResponseTime);
+            minServer.getStats().updateOnCompletion(jobResponseTime);
 
             INTRA_RUN_DATA.addField(endTs, COMPLETING_SERVER_INDEX, completionServerIndex);
             INTRA_RUN_DATA.addField(endTs, PER_JOB_RESPONSE_TIME, jobResponseTime);

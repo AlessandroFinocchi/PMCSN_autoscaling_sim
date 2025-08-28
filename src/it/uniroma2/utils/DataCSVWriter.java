@@ -21,6 +21,7 @@ public class DataCSVWriter {
 
     // Data table for completion and scaling events
     public static final DataTimeTable INTRA_RUN_DATA = new DataTimeTable();
+    public static final DataTimeTable INTRA_RUN_BM_DATA = new DataTimeTable();
 
     public static final DataHeaders INTER_RUN_DATA_HEADERS = new DataHeaders();
     public static final DataTimeTable INTER_RUN_DATA = new DataTimeTable();

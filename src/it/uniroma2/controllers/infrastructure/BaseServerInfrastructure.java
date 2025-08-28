@@ -10,9 +10,7 @@ import it.uniroma2.models.sys.StationaryStats;
 import it.uniroma2.models.sys.SystemStats;
 import it.uniroma2.models.sys.TransientStats;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -72,7 +70,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
             removedJob = minServer.getMinRemainingLifeJob();
 
             double jobResponseTime = endTs - removedJob.getArrivalTime();
-            minServer.getStats().updateSLO(jobResponseTime);
+            minServer.getStats().updateOnCompletion(jobResponseTime);
 
             INTRA_RUN_DATA.addField(endTs, COMPLETING_SERVER_INDEX, completionServerIndex + 1); // +1 because there is no spike server
             INTRA_RUN_DATA.addField(endTs, PER_JOB_RESPONSE_TIME, jobResponseTime);
