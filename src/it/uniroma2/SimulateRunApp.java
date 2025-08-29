@@ -4,9 +4,9 @@ import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.libs.Rngs;
 import it.uniroma2.models.Config;
 import it.uniroma2.models.configurations.RunConfiguration;
-import it.uniroma2.models.distr.CHyperExponential;
-import it.uniroma2.models.distr.Distribution;
-import it.uniroma2.models.distr.Normal;
+import it.uniroma2.models.distributions.CHyperExponential;
+import it.uniroma2.models.distributions.Distribution;
+import it.uniroma2.models.distributions.Normal;
 import it.uniroma2.models.events.*;
 import it.uniroma2.models.sys.SystemState;
 import it.uniroma2.utils.DataCSVWriter;
@@ -94,7 +94,7 @@ public class SimulateRunApp {
         s.printStats();
     }
 
-    // TODO: nelle run che non studiano lo stazionario basta mettere nella configurazione
+    //TODO: nelle run che non studiano lo stazionario basta mettere nella configurazione
     // STATS_BATCH_NUM a infinity così non si triggera mai il calcolo delle stationary stats
     // e il controllo in quest'if è sempre vero quindi è come non ci fosse
     private static boolean continueSimulating(SystemState s) {

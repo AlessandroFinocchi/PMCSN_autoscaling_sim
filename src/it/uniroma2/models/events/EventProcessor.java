@@ -4,7 +4,7 @@ import it.uniroma2.controllers.infrastructure.IServerInfrastructure;
 import it.uniroma2.controllers.servers.ServerState;
 import it.uniroma2.controllers.servers.WebServer;
 import it.uniroma2.exceptions.IllegalLifeException;
-import it.uniroma2.models.Job;
+import it.uniroma2.models.jobs.Job;
 import it.uniroma2.models.sys.SystemState;
 
 import static it.uniroma2.models.Config.*;

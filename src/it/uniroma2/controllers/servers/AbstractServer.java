@@ -1,8 +1,8 @@
 package it.uniroma2.controllers.servers;
 
 import it.uniroma2.exceptions.IllegalLifeException;
-import it.uniroma2.models.Job;
-import it.uniroma2.models.JobList;
+import it.uniroma2.models.jobs.Job;
+import it.uniroma2.models.jobs.JobList;
 import it.uniroma2.models.sys.ServerStats;
 import lombok.Getter;
 import lombok.Setter;
@@ -91,6 +91,7 @@ public abstract class AbstractServer implements IServer {
         System.out.println("   average # in the node ... =   " + f.format(stats.getNodeSum() / currentTs));
         System.out.println("   utilization ............. =   " + f.format(stats.getServiceSum() / currentTs));
         System.out.println("   jobs withing SLO ........ =   " + f.format(stats.getCompletedJobsInTime()));
+        stats.getStationaryStats().printIntervalEstimation();
     }
 
     public double getResponseTime() {

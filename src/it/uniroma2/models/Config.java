@@ -50,6 +50,7 @@ public class Config {
     public static double ALPHA;
     public static int STATS_BATCH_SIZE;
     public static int STATS_BATCH_NUM;
+    public static double STATS_CONFIDENCE_ALPHA;
 
     static {
         loadHeaders();
@@ -125,6 +126,7 @@ public class Config {
             STATS_BATCH_SIZE = (Objects.equals(props.getProperty("stats.batch.size"), "INFINITY")) ?
                     Integer.MAX_VALUE : Integer.parseInt(props.getProperty("stats.batch.size"));
             STATS_BATCH_NUM = Integer.parseInt(props.getProperty("stats.batch.num"));
+            STATS_CONFIDENCE_ALPHA = Double.parseDouble(props.getProperty("stats.confidence.alpha"));
 
             /* Add property values for CSV logging */
             INTER_RUN_DATA.clear();

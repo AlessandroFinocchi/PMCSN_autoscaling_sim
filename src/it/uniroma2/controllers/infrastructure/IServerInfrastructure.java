@@ -2,7 +2,7 @@ package it.uniroma2.controllers.infrastructure;
 
 import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
-import it.uniroma2.models.Job;
+import it.uniroma2.models.jobs.Job;
 
 public interface IServerInfrastructure {
     /**

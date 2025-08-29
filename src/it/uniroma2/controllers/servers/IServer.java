@@ -1,9 +1,7 @@
 package it.uniroma2.controllers.servers;
 
 import it.uniroma2.exceptions.IllegalLifeException;
-import it.uniroma2.models.Job;
-
-import java.text.DecimalFormat;
+import it.uniroma2.models.jobs.Job;
 
 public interface IServer {
     void computeJobsAdvancement(double startTs, double endTs, Double completedJobResponseTime) throws IllegalLifeException;

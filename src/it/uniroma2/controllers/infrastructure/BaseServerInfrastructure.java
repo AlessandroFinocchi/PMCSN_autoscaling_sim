@@ -4,7 +4,7 @@ import it.uniroma2.controllers.scheduler.IScheduler;
 import it.uniroma2.controllers.scheduler.SchedulerFactory;
 import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
-import it.uniroma2.models.Job;
+import it.uniroma2.models.jobs.Job;
 import it.uniroma2.models.sys.ServerStats;
 import it.uniroma2.models.sys.StationaryStats;
 import it.uniroma2.models.sys.SystemStats;
@@ -179,6 +179,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
     public void printSystemStats(double currentTs) {
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SPIKE_JOBS_COMPLETED, "");
         systemStats.processStats(currentTs);
+        systemStats.getStationaryStats().printIntervalEstimation();
     }
 
     WebServer findScaleOutTarget() {

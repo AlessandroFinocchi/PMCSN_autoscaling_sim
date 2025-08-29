@@ -1,19 +1,39 @@
 package it.uniroma2.models.sys;
 
-import static it.uniroma2.models.Config.STATS_BATCH_NUM;
-import static it.uniroma2.models.Config.STATS_BATCH_SIZE;
+import it.uniroma2.libs.Rvms;
+import it.uniroma2.models.Pair;
+
+import java.text.DecimalFormat;
+import java.util.*;
+
+import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.INTRA_RUN_BM_DATA;
 import static it.uniroma2.utils.DataField.*;
 
 public class StationaryStats {
+    private final DecimalFormat f;
     private int counter;
     private int currBatch;
+    private Integer serverIndex;
+
+    /* Metrics sums */
     private double sumBatchesResponseTime;
     private double sumBatchesJobNumber;
     private double sumBatchesUtilization;
     private double sumBatchesCapacityPerSec;
     private double sumBatchesViolationPercentage;
-    private Integer serverIndex;
+
+    /* Welford algorithm variables*/
+    private double responseTimeX;
+    private double responseTimeV;
+    private double jobNumberX;
+    private double jobNumberV;
+    private double utilizationX;
+    private double utilizationV;
+    private double capacityPerSecX;
+    private double capacityPerSecV;
+    private double violationPercentageX;
+    private double violationPercentageV;
 
     /**
      * @param serverIndex null if system stats, not null if server stats
@@ -21,8 +41,27 @@ public class StationaryStats {
     public StationaryStats(Integer serverIndex) {
         this.counter = 1;
         this.currBatch = 0;
-        this.sumBatchesResponseTime = 0.0f;
+
         this.serverIndex = serverIndex;
+        this.sumBatchesResponseTime = 0.0f;
+        this.sumBatchesJobNumber = 0.0f;
+        this.sumBatchesUtilization = 0.0f;
+        this.sumBatchesCapacityPerSec = 0.0f;
+        this.sumBatchesViolationPercentage = 0.0f;
+
+        this.responseTimeX = 0.0f;
+        this.responseTimeV = 0.0f;
+        this.jobNumberX = 0.0f;
+        this.jobNumberV = 0.0f;
+        this.utilizationX = 0.0f;
+        this.utilizationV = 0.0f;
+        this.capacityPerSecX = 0.0f;
+        this.capacityPerSecV = 0.0f;
+        this.violationPercentageX = 0.0f;
+        this.violationPercentageV = 0.0f;
+
+        this.f = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
+        this.f.applyPattern("###0.00000000");
     }
 
     private boolean isBatchEnd(){
@@ -71,9 +110,67 @@ public class StationaryStats {
         }
 
         this.currBatch++;
+
+        /* Welford pass */
+        double responseTimeD = currBatchResponseTime - this.responseTimeX;
+        this.responseTimeV += Math.pow(responseTimeD, 2) * (this.currBatch - 1) / this.currBatch;
+        this.responseTimeX += responseTimeD / this.currBatch;
+
+        double jobNumberD = currBatchJobNumber - this.jobNumberX;
+        this.jobNumberV += Math.pow(jobNumberD, 2) * (this.currBatch - 1) / this.currBatch;
+        this.jobNumberX += jobNumberD / this.currBatch;
+
+        double utilizationD = currBatchUtilization - this.utilizationX;
+        this.utilizationV += Math.pow(utilizationD, 2) * (this.currBatch - 1) / this.currBatch;
+        this.utilizationX += utilizationD / this.currBatch;
+
+        double capacityPerSecD = currBatchCapacityPerSec - this.capacityPerSecX;
+        this.capacityPerSecV += Math.pow(capacityPerSecD, 2) * (this.currBatch - 1) / this.currBatch;
+        this.capacityPerSecX += capacityPerSecD / this.currBatch;
+
+        double violationPercentageD = currBatchViolationPercentage - this.violationPercentageX;
+        this.violationPercentageV += Math.pow(violationPercentageD, 2) * (this.currBatch - 1) / this.currBatch;
+        this.violationPercentageX += violationPercentageD / this.currBatch;
+
     }
 
     public boolean isCompleted(){
         return this.currBatch >= STATS_BATCH_NUM;
+    }
+
+    public void printIntervalEstimation() {
+        double x,s, u, t, w;
+        double responseTimeS    = Math.sqrt(this.responseTimeV / this.currBatch);
+        double jobNumberS       = Math.sqrt(this.jobNumberV / this.currBatch);
+        double utilizationS     = Math.sqrt(this.utilizationV / this.currBatch);
+        double capacityPerSecS  = Math.sqrt(this.capacityPerSecV / this.currBatch);
+        double violationS       = Math.sqrt(this.violationPercentageV / this.currBatch);
+
+        double confidence = 1 - STATS_CONFIDENCE_ALPHA;
+        Rvms rvms = new Rvms();
+        u = 1.0 - 0.5 * STATS_CONFIDENCE_ALPHA;                 /* interval parameter  */
+        t = rvms.idfStudent(this.currBatch - 1, u);             /* critical value of t */
+
+        Map<String, Pair<Double, Double>> metrics = new LinkedHashMap<>();
+        metrics.put("Response Time ..........", new Pair<>(this.responseTimeX, responseTimeS));
+        metrics.put("Job Number .............", new Pair<>(this.jobNumberX, jobNumberS));
+        metrics.put("Utilization ............", new Pair<>(this.utilizationX, utilizationS));
+        metrics.put("Capacity per sec .......", new Pair<>(this.capacityPerSecX, capacityPerSecS));
+        metrics.put("Violation Percentage ...", new Pair<>(this.violationPercentageX, violationS));
+
+        System.out.println("Interval estimations based upon "+ this.currBatch + " data points " +
+                "and with " + (int) (100.0 * confidence + 0.5) + "% confidence");
+        for (Map.Entry<String, Pair<Double, Double>> entry : metrics.entrySet()) {
+            String metric = entry.getKey();
+            x = entry.getValue().getFirst();
+            s = entry.getValue().getSecond();
+
+            w = t * s / Math.sqrt(this.currBatch - 1);  /* interval half width */
+
+            System.out.print(metric + " the expected value is in the interval " + f.format(x) + " +/- " + f.format(w) + "\n");
+
+        }
+
+
     }
 }

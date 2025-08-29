@@ -1,4 +1,4 @@
-package it.uniroma2.models;
+package it.uniroma2.models.jobs;
 
 import lombok.Getter;
 

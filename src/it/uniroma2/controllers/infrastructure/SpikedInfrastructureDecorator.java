@@ -2,7 +2,7 @@ package it.uniroma2.controllers.infrastructure;
 
 import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
-import it.uniroma2.models.Job;
+import it.uniroma2.models.jobs.Job;
 import it.uniroma2.models.sys.ServerStats;
 import it.uniroma2.models.sys.StationaryStats;
 import it.uniroma2.models.sys.SystemStats;
@@ -142,6 +142,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
     public void printSystemStats(double currentTs) {
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SPIKE_JOBS_COMPLETED, spikeServer.getStats().getCompletedJobs());
         systemStats.processStats(currentTs);
+        systemStats.getStationaryStats().printIntervalEstimation();
     }
 
     public WebServer requestScaleOut(double endTs, double turnOnTime) {

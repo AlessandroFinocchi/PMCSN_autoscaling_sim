@@ -1,4 +1,4 @@
-package it.uniroma2.models;
+package it.uniroma2.models.jobs;
 
 import it.uniroma2.exceptions.IllegalLifeException;
 import lombok.Getter;

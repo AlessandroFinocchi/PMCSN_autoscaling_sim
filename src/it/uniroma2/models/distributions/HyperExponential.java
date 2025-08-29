@@ -1,4 +1,4 @@
-package it.uniroma2.models.distr;
+package it.uniroma2.models.distributions;
 
 import it.uniroma2.libs.Rngs;
 

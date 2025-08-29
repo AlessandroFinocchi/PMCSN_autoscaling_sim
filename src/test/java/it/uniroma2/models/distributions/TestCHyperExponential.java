@@ -1,4 +1,4 @@
-package it.uniroma2.models.distr;
+package it.uniroma2.models.distributions;
 import static org.junit.Assert.assertTrue;
 
 import it.uniroma2.libs.Rngs;

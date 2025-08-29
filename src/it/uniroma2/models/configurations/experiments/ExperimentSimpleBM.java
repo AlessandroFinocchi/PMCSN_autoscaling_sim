@@ -10,10 +10,10 @@ public class ExperimentSimpleBM implements Experiment {
     @Override
     public List<RunConfiguration> getRunConfigurations() {
         /* Common */
-        // Parameter parBatchNum = new Parameter("stats.batch.num").addValues("64");
-        // Parameter parBatchSize = new Parameter("stats.batch.size").addValues("512");
-        Parameter parBatchNum = new Parameter("stats.batch.num").addValues("10");
-        Parameter parBatchSize = new Parameter("stats.batch.size").addValues("10");
+         Parameter parBatchNum = new Parameter("stats.batch.num").addValues("64");
+         Parameter parBatchSize = new Parameter("stats.batch.size").addValues("512");
+//        Parameter parBatchNum = new Parameter("stats.batch.num").addValues("10");
+//        Parameter parBatchSize = new Parameter("stats.batch.size").addValues("10");
         Parameter parStopTime = new Parameter("system.stop").addValues("INFINITY");
         // Parameter parArrivalMu = new Parameter("distribution.arrivals.mu").addValues("0.025");
         // Parameter parServicesZ = new Parameter("distribution.services.z").addValues("0.1");
