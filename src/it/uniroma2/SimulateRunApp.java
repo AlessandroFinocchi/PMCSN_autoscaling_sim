@@ -29,6 +29,11 @@ public class SimulateRunApp {
         for (RunConfiguration c : configurations) {
             setup(c);
             for (int i = 0; i < REPEAT_CONFIGURATION; i++) {
+                System.out.println();
+                System.out.println(c.toString());
+                System.out.println(i + 1 + " / " + REPEAT_CONFIGURATION + " repetition");
+                System.out.println(configurations.indexOf(c) + 1 + " / " + configurations.size() + " configuration");
+                System.out.println("---------------------------------------");
                 run(c, i);
                 log(c, i);
             }
@@ -51,11 +56,6 @@ public class SimulateRunApp {
     }
 
     private static void run(RunConfiguration c, int repetition) throws IllegalLifeException {
-        System.out.println();
-        System.out.println(c.toString());
-        System.out.println(repetition + 1 + " / " + REPEAT_CONFIGURATION + " repetition");
-        System.out.println("---------------------------------------");
-
         INTER_RUN_DATA.addField(INTER_RUN_KEY, REPETITION_ID, repetition);
         INTER_RUN_DATA.addField(INTER_RUN_KEY, RUN_DATETIME, String.valueOf(LocalDateTime.now()));
 
@@ -68,8 +68,8 @@ public class SimulateRunApp {
 
         // Distribution arrivalVA = new Exponential(R, 0, ARRIVALS_MU);
         // Distribution servicesVA = new Exponential(R, 1, SERVICES_Z);
-        Distribution arrivalVA = new CHyperExponential(R, 4, ARRIVALS_MU, 0, 1, 2);
-        Distribution servicesVA = new CHyperExponential(R, 4, SERVICES_Z, 3, 4, 5);
+        Distribution arrivalVA = new CHyperExponential(R, SERVICES_CV, ARRIVALS_MU, 0, 1, 2);
+        Distribution servicesVA = new CHyperExponential(R, SERVICES_CV, SERVICES_Z, 3, 4, 5);
 
         Distribution turnOnVA = new Normal(R, 6, 7, TURN_ON_MU, TURN_ON_STD);
 

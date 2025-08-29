@@ -9,7 +9,6 @@ import static it.uniroma2.models.Config.SCHEDULER_TYPE;
 public class SchedulerFactory {
 
     public static IScheduler create() {
-        System.out.println("Using scheduler: " +  SCHEDULER_TYPE);
         return switch (SCHEDULER_TYPE) {
             case "leastUsed", "round_robin", "rr" -> new LeastUsedScheduler();
             case "roundRobin", "least_used", "lu", "" -> new RoundRobinScheduler();

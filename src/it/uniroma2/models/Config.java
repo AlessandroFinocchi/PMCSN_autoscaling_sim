@@ -38,7 +38,7 @@ public class Config {
     public static double RESPONSE_TIME_SLO;
     public static int MAX_NUM_SERVERS;
     public static int START_NUM_SERVERS;
-    public static int SI_MAX;
+    public static double SI_MAX;
     public static double SPIKE_CAPACITY;
     public static boolean SPIKESERVER_ACTIVE;
     public static String SCHEDULER_TYPE;
@@ -117,7 +117,7 @@ public class Config {
             RESPONSE_TIME_SLO = Double.parseDouble(props.getProperty("infrastructure.response_time_slo"));
             MAX_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.max_num_server"));
             START_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.start_num_server"));
-            SI_MAX = Integer.parseInt(props.getProperty("infrastructure.si_max"));
+            SI_MAX = Double.parseDouble(props.getProperty("infrastructure.si_max"));
             SPIKE_CAPACITY = Double.parseDouble(props.getProperty("spikeserver.capacity"));
             SPIKESERVER_ACTIVE = Boolean.parseBoolean(props.getProperty("infrastructure.spikeserver.active"));
             SCHEDULER_TYPE = props.getProperty("infrastructure.scheduler");
@@ -145,7 +145,7 @@ public class Config {
     public static List<RunConfiguration> createConfigurations() {
         List<RunConfiguration> configurations = new ArrayList<>();
 
-        Experiment experiment = new ExperimentSimpleBM();
+        Experiment experiment = new ExperimentBaseTransient();
         configurations.addAll(experiment.getRunConfigurations());
 
         // Set variables used to CSV log

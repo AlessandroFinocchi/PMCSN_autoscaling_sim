@@ -1,59 +1,55 @@
 package it.uniroma2.models.configurations.experiments;
 
-import it.uniroma2.controllers.configurations.ConfigurationFactory;
-import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.configurations.RunConfiguration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExperimentBaseTransient implements Experiment {
-    private static final Double Z_OVER_MU = 4.0;
+    List<RunConfiguration> result = new ArrayList<>();
 
     @Override
     public List<RunConfiguration> getRunConfigurations() {
         /* Common */
-        Parameter parRepeatConfig = new Parameter("random.repeat_config").addValues("4");
-        Parameter parLogIntraRun = new Parameter("log.intra_run").addValues("true");
-        Parameter parBatchSize = new Parameter("stats.batch.size").addValues("INFINITY");
-        Parameter parStopTime = new Parameter("system.stop").addValues("10000");
-        Parameter parEmptyJobs = new Parameter("system.empty_jobs").addValues("false");
-        // Parameter parArrivalMu = new Parameter("distribution.arrivals.mu").addValues("0.1", "0.25", "0.5");
-        Parameter parArrivalMu = new Parameter("distribution.arrivals.mu").addValues("0.1");
+        for (int i = 1; i <= 15; i++){
+            RunConfiguration c = new RunConfiguration("trans_b_" + String.format("%02d", i));
+            c.put("random.repeat_config", "5");
+            c.put("log.intra_run", "true");
+            c.put("stats.batch.size", "INFINITY");
+            c.put("system.stop", "10000");
+            c.put("system.empty_jobs", "false");
+            result.add(c);
+        }
 
-        /* W/o spike */
-        Parameter parSpikeInactive = new Parameter("infrastructure.spikeserver.active").addValues("false");
-        Parameter parStartNumServersWithoutSpike = new Parameter("infrastructure.start_num_server")
-                .addValues("1");
-        Parameter parWebServerCapacity = new Parameter("webserver.capacity")
-                .addValues("5");
-
-
-        /* With spike */
-        Parameter parSpikeActive = new Parameter("infrastructure.spikeserver.active").addValues("true");
-        Parameter parStartNumServersWithSpike = new Parameter("infrastructure.start_num_server")
-                .addValues("1", "2", "3");
-        Parameter parSiMax = new Parameter("infrastructure.si_max").addValues("2", "4", "10", "100", "1000");
-
-        List<RunConfiguration> result;
-
-        result = ConfigurationFactory.createConfigurationsList(
-                parLogIntraRun, parRepeatConfig,
-                parBatchSize, parEmptyJobs, parStopTime,
-                parArrivalMu,
-                parSpikeInactive, parStartNumServersWithoutSpike, parWebServerCapacity
-        );
-
-        // result = ConfigurationFactory.createConfigurationsList(
-        //         parLogIntraRun, parStopTime, parEmptyJobs,
-        //         parArrivalMu, parServicesZ,
-        //         parSpikeActive, parStartNumServersWithSpike, parSiMax
-        // );
+        setConfiguration(1, 4.0, 1, 3, false, null);
+        setConfiguration(2, 4.0, 1, 5, false, null);
+        setConfiguration(3, 4.0, 1, 8, false, null);
+        setConfiguration(4, 4.8, 1, 5, false, null);
+        setConfiguration(5, 10, 0.4, 5, false, null);
+        setConfiguration(6, 2, 2, 5, false, null);
+        setConfiguration(7, 10, 0.4, 8, false, null);
+        setConfiguration(8, 4, 1, 5, true, 0.1);
+        setConfiguration(9, 4, 1, 5, true, 0.3);
+        setConfiguration(10, 4, 1, 5, true, 1.0);
+        setConfiguration(11, 4, 1, 5, true, 100.0);
+        setConfiguration(12, 4, 1.5, 5, true, 2.0);
+        setConfiguration(13, 4, 1.5, 5, true, 4.0);
+        setConfiguration(14, 4, 1.5, 5, true, 10.0);
+        setConfiguration(15, 4, 1.5, 5, true, 20.0);
 
         for (RunConfiguration c : result) {
             c.put("infrastructure.max_num_server", c.get("infrastructure.start_num_server"));
-            c.put("distribution.services.z", String.valueOf(Z_OVER_MU * Double.parseDouble(c.get("distribution.arrivals.mu"))));
         }
 
         return result;
+    }
+
+    void setConfiguration(int index, double lambda, double z, int wsNumber, boolean ssActive, Double siMax) {
+        RunConfiguration c = result.get(index - 1);
+        c.put("distribution.arrivals.mu", String.valueOf(1.0 / lambda));
+        c.put("distribution.services.z", String.valueOf(z));
+        c.put("infrastructure.start_num_server", String.valueOf(wsNumber));
+        c.put("infrastructure.spikeserver.active", String.valueOf(ssActive));
+        if (siMax != null) c.put("infrastructure.si_max", String.valueOf(siMax));
     }
 }

@@ -45,9 +45,9 @@ public class RunConfiguration {
         sb.append(name).append(" {");
         if (!params.isEmpty()) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                if (entry.getKey().contains("infrastructure") || entry.getKey().contains("webserver")){
+                if (entry.getKey().contains("infrastructure") || entry.getKey().contains("webserver") || entry.getKey().contains("distribution")){
                     sb
-                            .append(entry.getKey().replace("i.", ""))
+                            .append(entry.getKey().replace("infrastructure.", "i.").replace("distribution.", "d."))
                             .append('=')
                             .append(entry.getValue())
                             .append("; ");
