@@ -9,7 +9,8 @@ import java.util.Map;
 public class RunConfiguration {
     @Getter
     String name;
-    @Getter @Setter
+    @Getter
+    @Setter
     Map<String, String> params;
 
     public RunConfiguration(String name) {
@@ -36,6 +37,25 @@ public class RunConfiguration {
             }
         }
         sb.append("\n}");
+        return sb.toString();
+    }
+
+    public String getDescription() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(name).append(" {");
+        if (!params.isEmpty()) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                if (entry.getKey().contains("infrastructure") || entry.getKey().contains("webserver")){
+                    sb
+                            .append(entry.getKey().replace("i.", ""))
+                            .append('=')
+                            .append(entry.getValue())
+                            .append("; ");
+                }
+            }
+            sb.delete(sb.length() - 2, sb.length());
+        }
+        sb.append("}");
         return sb.toString();
     }
 }

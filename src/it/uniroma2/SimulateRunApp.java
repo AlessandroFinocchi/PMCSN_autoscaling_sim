@@ -13,6 +13,7 @@ import it.uniroma2.utils.DataCSVWriter;
 import it.uniroma2.utils.ProgressBar;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.*;
@@ -21,14 +22,21 @@ import static it.uniroma2.utils.DataField.*;
 public class SimulateRunApp {
 
     private static final Rngs R = new Rngs();
+    private static List<RunConfiguration> configurations;
 
     public static void main(String[] args) throws IllegalLifeException {
-        for (RunConfiguration c : createConfigurations()) {
+        configurations = Config.createConfigurations();
+        for (RunConfiguration c : configurations) {
             setup(c);
             for (int i = 0; i < REPEAT_CONFIGURATION; i++) {
                 run(c, i);
                 log(c, i);
             }
+        }
+
+        System.out.println("\n\nSimulation(s) completed:");
+        for (RunConfiguration c : configurations) {
+            System.out.println("\t" + c.getDescription());
         }
     }
 
@@ -37,7 +45,9 @@ public class SimulateRunApp {
         /* Update experiment specific configuration */
         Config.load(c);
         INTRA_RUN_DATA.setWritable(LOG_INTRA_RUN);
+        INTRA_RUN_BM_DATA.setWritable(LOG_BM);
         INTER_RUN_DATA.addField(INTER_RUN_KEY, CONFIGURATION_ID, c.getName());
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, CONFIGURATION_DESCRIPTION, c.getDescription());
     }
 
     private static void run(RunConfiguration c, int repetition) throws IllegalLifeException {
@@ -104,8 +114,7 @@ public class SimulateRunApp {
 
     private static void log(RunConfiguration c, int repetition) {
         if (LOG_INTRA_RUN) DataCSVWriter.flushAllIntra(c, repetition);
-        // TODO: add configuration
-        DataCSVWriter.flushAllIntraBM(c, repetition);
+        if (LOG_BM) DataCSVWriter.flushAllIntraBM(c, repetition);
         DataCSVWriter.flushAllInter();
     }
 

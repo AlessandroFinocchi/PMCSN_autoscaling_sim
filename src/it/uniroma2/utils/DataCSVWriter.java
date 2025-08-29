@@ -122,17 +122,18 @@ public class DataCSVWriter {
                jobsHeaders.get(), false);
 
         /* Log data about jobs in each server */
-       DataHeaders allJobsHeaders = new DataHeaders();
-       allJobsHeaders.add(TIMESTAMP, AGG_SYSTEM_RESPONSE_TIME, AGG_SYSTEM_JOB_NUMBER);
-       if (SPIKESERVER_ACTIVE) {
-           allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + 0, AGG_SERVER_JOB_NUMBER + "_" + 0);
-       }
-       allJobsHeaders.add(REPETITION_ID);
-       DataTimeTable combinedJobsData = filteredJobsData
-               .setEach(REPETITION_ID, repetition);
-       flushList(combinedJobsData,
-               OUT_DIR_PATH_WITH_SUFFIX, "jobs" + "-" + c.getName() + "_all",
-               allJobsHeaders.get(), true);
+        DataHeaders allJobsHeaders = new DataHeaders();
+        allJobsHeaders.add(TIMESTAMP, AGG_SYSTEM_RESPONSE_TIME, AGG_SYSTEM_JOB_NUMBER);
+        if (SPIKESERVER_ACTIVE) {
+            allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + 0, AGG_SERVER_JOB_NUMBER + "_" + 0);
+        }
+        allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + 1, AGG_SERVER_JOB_NUMBER + "_" + 1);
+        allJobsHeaders.add(REPETITION_ID);
+        DataTimeTable combinedJobsData = filteredJobsData
+                .setEach(REPETITION_ID, repetition);
+        flushList(combinedJobsData,
+                OUT_DIR_PATH_WITH_SUFFIX, "jobs" + "-" + c.getName() + "_all",
+                allJobsHeaders.get(), true);
 
         INTRA_RUN_DATA.clear();
     }
@@ -170,7 +171,12 @@ public class DataCSVWriter {
         for (int stream = 0; stream < TOTAL_STREAMS; stream++) {
             INTER_RUN_DATA_HEADERS.add(STREAM_SEED + "_" + stream);
         }
-        INTER_RUN_DATA_HEADERS.add(RUN_DATETIME, CONFIGURATION_ID, REPETITION_ID, FINAL_TS, TOTAL_ALLOCATED_CAPACITY, ALLOCATED_CAPACITY_PER_SEC, SYSTEM_UTILIZATION, MEAN_SYSTEM_RESPONSE_TIME, TOTAL_JOBS_COMPLETED, TOTAL_SPIKE_JOBS_COMPLETED, TOTAL_SLO_VIOLATIONS, SLO_VIOLATIONS_PERCENTAGE);
+        INTER_RUN_DATA_HEADERS.add(
+                RUN_DATETIME, CONFIGURATION_DESCRIPTION, CONFIGURATION_ID, REPETITION_ID,
+                FINAL_TS, TOTAL_ALLOCATED_CAPACITY, ALLOCATED_CAPACITY_PER_SEC, SYSTEM_UTILIZATION,
+                MEAN_SYSTEM_RESPONSE_TIME, TOTAL_JOBS_COMPLETED, TOTAL_SPIKE_JOBS_COMPLETED,
+                TOTAL_SLO_VIOLATIONS, SLO_VIOLATIONS_PERCENTAGE
+        );
         flushList(INTER_RUN_DATA,
                 OUT_DIR_PATH, "final_all",
                 INTER_RUN_DATA_HEADERS.get(), true);

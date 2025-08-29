@@ -17,6 +17,7 @@ public class Config {
     private static final String CONFIG_FILE = "config.properties";
 
     public static boolean LOG_INTRA_RUN;
+    public static boolean LOG_BM;
 
     public static int SEED;
     public static int TOTAL_STREAMS;
@@ -95,6 +96,7 @@ public class Config {
             }
 
             LOG_INTRA_RUN = Boolean.parseBoolean(props.getProperty("log.intra_run"));
+            LOG_BM = Boolean.parseBoolean(props.getProperty("log.bm"));
             SEED = Integer.parseInt(props.getProperty("random.seed"));
             TOTAL_STREAMS = Integer.parseInt(props.getProperty("random.total_streams"));
             REPEAT_CONFIGURATION = Integer.parseInt(props.getProperty("random.repeat_config"));
