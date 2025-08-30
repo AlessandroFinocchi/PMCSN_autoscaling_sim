@@ -7,11 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RunConfiguration {
-    @Getter
-    String name;
-    @Getter
-    @Setter
-    Map<String, String> params;
+    @Getter@Setter String name;
+    @Getter@Setter Map<String, String> params;
 
     public RunConfiguration(String name) {
         this.name = name;

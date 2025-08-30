@@ -18,6 +18,7 @@ public class ExperimentBaseTransient implements Experiment {
             c.put("stats.batch.size", "INFINITY");
             c.put("system.stop", "10000");
             c.put("system.empty_jobs", "false");
+            c.put("infrastructure.max_num_server", c.get("infrastructure.start_num_server"));
             result.add(c);
         }
 
@@ -36,10 +37,6 @@ public class ExperimentBaseTransient implements Experiment {
         setConfiguration(13, 4, 1.5, 4,5, true, 4.0);
         setConfiguration(14, 4, 1.5, 4,5, true, 10.0);
         setConfiguration(15, 4, 1.5, 4,5, true, 20.0);
-
-        for (RunConfiguration c : result) {
-            c.put("infrastructure.max_num_server", c.get("infrastructure.start_num_server"));
-        }
 
         return result;
     }

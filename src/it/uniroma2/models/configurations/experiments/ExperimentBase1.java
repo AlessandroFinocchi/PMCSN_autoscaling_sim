@@ -1,5 +1,6 @@
 package it.uniroma2.models.configurations.experiments;
 
+import it.uniroma2.controllers.configurations.ConfigurationFactory;
 import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.configurations.RunConfiguration;
 
@@ -13,51 +14,35 @@ public class ExperimentBase1 implements Experiment {
     @Override
     public List<RunConfiguration> getRunConfigurations() {
         /* Common */
-        addParameter("log.intra_run", "false");
-        addParameter("log.bm", "true");
-        addParameter("distribution.arrivals.mu", String.valueOf(1.0 / 4.0));
-        addParameter("distribution.services.z", String.valueOf(1.0));
-        addParameter("infrastructure.start_num_server", String.valueOf(4));
-        addParameter("system.empty_jobs", "false");
+        Parameter parLog1 = new Parameter("log.intra_run").addValues("false");
+        Parameter parLog2 = new Parameter("log.bm").addValues("true");
+        Parameter parArrivalsMu = new Parameter("distribution.arrivals.mu").addValues(String.valueOf(1.0 / 4.0));
+        Parameter parServicesZ = new Parameter("distribution.services.z").addValues("1");
+        Parameter parStartNumWS = new Parameter("infrastructure.start_num_server").addValues("5");
+        Parameter parMaxNumWS = new Parameter("infrastructure.max_num_server").addValues("5");
+        Parameter parEmptyJob = new Parameter("system.empty_jobs").addValues("false");
+        Parameter parRepeat = new Parameter("random.repeat_config").addValues("1");
+        Parameter parBatchSize = new Parameter("stats.batch.size").addValues("INFINITY");
+        Parameter parSystemStop = new Parameter("system.stop").addValues("10000");
 
-        Parameter numWS = new Parameter("infrastructure.start_num_server");
-        numWS.addValues("5", "6", "7", "8");
-        commonParameters.add(numWS);
-
-        Parameter siMax = new Parameter("infrastructure.si_max");
-        siMax.addValues("");
-        for (int i = 1; i <= 10; i+= 2) {
-            siMax.addValues(String.valueOf(i));
+        Parameter parSiMax = new Parameter("infrastructure.si_max");
+        Parameter parSLO = new Parameter("infrastructure.response_time_slo");
+        for (int si=2; si<=10; si+=2) {
+//            for (int si = 2; si <= 2; si+= 2) {
+            parSiMax.addValues(String.valueOf(si));
+        }
+            for (double slo = 2; slo <= 6; slo += 1) {
+//                for (double slo=2.0; slo <= 2.0; slo+= 0.5) {
+            parSLO.addValues(String.valueOf(slo));
         }
 
-        for (int i = 1; i <= 15; i++) {
-            RunConfiguration c = new RunConfiguration("trans_b_" + String.format("%02d", i));
-            c.put("random.repeat_config", "5");
-            c.put("log.intra_run", "true");
-            c.put("stats.batch.size", "INFINITY");
-            c.put("system.stop", "10000");
-            c.put("system.empty_jobs", "false");
-            result.add(c);
-        }
+        List<RunConfiguration> result = ConfigurationFactory.createConfigurationsList(
+                parLog1, parLog2, parArrivalsMu, parServicesZ, parStartNumWS, parMaxNumWS,
+                parEmptyJob, parRepeat, parBatchSize, parSystemStop, parSiMax, parSLO
+        );
 
-        setConfiguration(1, 4.0, 1, 3, false, null);
-        setConfiguration(2, 4.0, 1, 5, false, null);
-        setConfiguration(3, 4.0, 1, 8, false, null);
-        setConfiguration(4, 4.8, 1, 5, false, null);
-        setConfiguration(5, 10, 0.4, 5, false, null);
-        setConfiguration(6, 2, 2, 5, false, null);
-        setConfiguration(7, 10, 0.4, 8, false, null);
-        setConfiguration(8, 4, 1, 5, true, 0.1);
-        setConfiguration(9, 4, 1, 5, true, 0.3);
-        setConfiguration(10, 4, 1, 5, true, 1.0);
-        setConfiguration(11, 4, 1, 5, true, 100.0);
-        setConfiguration(12, 4, 1.5, 5, true, 2.0);
-        setConfiguration(13, 4, 1.5, 5, true, 4.0);
-        setConfiguration(14, 4, 1.5, 5, true, 10.0);
-        setConfiguration(15, 4, 1.5, 5, true, 20.0);
-
-        for (RunConfiguration c : result) {
-            c.put("infrastructure.max_num_server", c.get("infrastructure.start_num_server"));
+        for(RunConfiguration run : result){
+            run.setName("base_" + (result.indexOf(run) + 1));
         }
 
         return result;
@@ -67,12 +52,17 @@ public class ExperimentBase1 implements Experiment {
         commonParameters.add(new Parameter(parName).addValues(parValues));
     }
 
-    void setConfiguration(int index, double lambda, double z, int wsNumber, boolean ssActive, Double siMax) {
+    void setConfiguration(int index, double lambda, double z, int wsNumber, boolean ssActive,
+                          double siMax, double responseTimeSLO) {
         RunConfiguration c = result.get(index - 1);
         c.put("distribution.arrivals.mu", String.valueOf(1.0 / lambda));
         c.put("distribution.services.z", String.valueOf(z));
         c.put("infrastructure.start_num_server", String.valueOf(wsNumber));
         c.put("infrastructure.spikeserver.active", String.valueOf(ssActive));
-        if (siMax != null) c.put("infrastructure.si_max", String.valueOf(siMax));
+        c.put("infrastructure.si_max", String.valueOf(siMax));
+        c.put("infrastructure.response_time_slo", String.valueOf(responseTimeSLO));
+
+        // extra
+        c.put("infrastructure.max_num_server", c.get("infrastructure.start_num_server"));
     }
 }
