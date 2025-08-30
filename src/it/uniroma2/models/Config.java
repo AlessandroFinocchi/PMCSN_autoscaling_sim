@@ -111,6 +111,8 @@ public class Config {
             ARRIVALS_CV = Double.parseDouble(props.getProperty("distribution.arrivals.cv"));
             SERVICES_Z = Double.parseDouble(props.getProperty("distribution.services.z"));
             SERVICES_CV = Double.parseDouble(props.getProperty("distribution.services.cv"));
+            TURN_ON_MU = Double.parseDouble(props.getProperty("distribution.turn_on.mu"));
+            TURN_ON_STD = Double.parseDouble(props.getProperty("distribution.turn_on.std"));
             WEBSERVER_CAPACITY = Double.parseDouble(props.getProperty("webserver.capacity"));
             START = Double.parseDouble(props.getProperty("system.start"));
             STOP = (Objects.equals(props.getProperty("system.stop"), "INFINITY")) ?
@@ -127,8 +129,6 @@ public class Config {
             SPIKE_CAPACITY = Double.parseDouble(props.getProperty("spikeserver.capacity"));
             SPIKESERVER_ACTIVE = Boolean.parseBoolean(props.getProperty("infrastructure.spikeserver.active"));
             SCHEDULER_TYPE = props.getProperty("infrastructure.scheduler");
-            TURN_ON_MU = Double.parseDouble(props.getProperty("turn.on.mu"));
-            TURN_ON_STD = Double.parseDouble(props.getProperty("turn.on.std"));
 
             ALPHA = Double.parseDouble(props.getProperty("stats.alpha"));
             STATS_BATCH_SIZE = (Objects.equals(props.getProperty("stats.batch.size"), "INFINITY")) ?
