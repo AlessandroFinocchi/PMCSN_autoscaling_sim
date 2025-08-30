@@ -6,6 +6,7 @@ import it.uniroma2.models.Config;
 import it.uniroma2.models.configurations.RunConfiguration;
 import it.uniroma2.models.distributions.CHyperExponential;
 import it.uniroma2.models.distributions.Distribution;
+import it.uniroma2.models.distributions.DistributionFactory;
 import it.uniroma2.models.distributions.Normal;
 import it.uniroma2.models.events.*;
 import it.uniroma2.models.sys.SystemState;
@@ -66,10 +67,8 @@ public class SimulateRunApp {
 
         EventVisitor visitor = new EventProcessor();
 
-        // Distribution arrivalVA = new Exponential(R, 0, ARRIVALS_MU);
-        // Distribution servicesVA = new Exponential(R, 1, SERVICES_Z);
-        Distribution arrivalVA = new CHyperExponential(R, SERVICES_CV, ARRIVALS_MU, 0, 1, 2);
-        Distribution servicesVA = new CHyperExponential(R, SERVICES_CV, SERVICES_Z, 3, 4, 5);
+        Distribution arrivalVA = DistributionFactory.createArrivalDistribution(R);
+        Distribution servicesVA = DistributionFactory.createServiceDistribution(R);
 
         Distribution turnOnVA = new Normal(R, 6, 7, TURN_ON_MU, TURN_ON_STD);
 
