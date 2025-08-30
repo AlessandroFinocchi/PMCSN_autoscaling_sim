@@ -46,8 +46,13 @@ public class RunConfiguration {
         if (!params.isEmpty()) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 if (entry.getKey().contains("infrastructure") || entry.getKey().contains("webserver") || entry.getKey().contains("distribution")){
+                    String shortKey = entry.getKey()
+                            .replace("infrastructure.", "i.")
+                            .replace("webserver.", "ws.")
+                            .replace("response_time.", "r_t.")
+                            .replace("distribution.", "d.");
                     sb
-                            .append(entry.getKey().replace("infrastructure.", "i.").replace("distribution.", "d."))
+                            .append(shortKey)
                             .append('=')
                             .append(entry.getValue())
                             .append("; ");

@@ -12,7 +12,8 @@ public class ExperimentFactory {
         return switch (EXPERIMENT) {
             case "val_b" -> new ExperimentBaseValidation();
             case "trans_b" -> new ExperimentBaseTransient();
-            default -> throw new IllegalArgumentException("Invalid experimenti type: " + EXPERIMENT);
+            case "trans_adv" -> new ExperimentAdvancedTransient();
+            default -> throw new IllegalArgumentException("Invalid experiment type: " + EXPERIMENT);
         };
     }
 }

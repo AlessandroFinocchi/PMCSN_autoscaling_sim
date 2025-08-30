@@ -31,9 +31,9 @@ public class SimulateRunApp {
             setup(c);
             for (int i = 0; i < REPEAT_CONFIGURATION; i++) {
                 System.out.println();
-                System.out.println(c.toString());
-                System.out.println(i + 1 + " / " + REPEAT_CONFIGURATION + " repetition");
+                System.out.println(c.getDescription());
                 System.out.println(configurations.indexOf(c) + 1 + " / " + configurations.size() + " configuration");
+                System.out.println(i + 1 + " / " + REPEAT_CONFIGURATION + " repetition");
                 System.out.println("---------------------------------------");
                 run(c, i);
                 log(c, i);

@@ -124,10 +124,12 @@ public class DataCSVWriter {
         /* Log data about jobs in each server */
         DataHeaders allJobsHeaders = new DataHeaders();
         allJobsHeaders.add(TIMESTAMP, AGG_SYSTEM_RESPONSE_TIME, AGG_SYSTEM_JOB_NUMBER);
+        allJobsHeaders.add(AGG_SYSTEM_ALLOCATED_CAPACITY_PER_SEC);
         if (SPIKESERVER_ACTIVE) {
             allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + 0, AGG_SERVER_JOB_NUMBER + "_" + 0);
         }
         allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + 1, AGG_SERVER_JOB_NUMBER + "_" + 1);
+        allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + MAX_NUM_SERVERS, AGG_SERVER_JOB_NUMBER + "_" + MAX_NUM_SERVERS);
         allJobsHeaders.add(REPETITION_ID);
         DataTimeTable combinedJobsData = filteredJobsData
                 .setEach(REPETITION_ID, repetition);
