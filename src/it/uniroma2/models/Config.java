@@ -4,8 +4,7 @@ import it.uniroma2.SimulateRunApp;
 import it.uniroma2.models.configurations.RunConfiguration;
 import it.uniroma2.models.configurations.experiments.Experiment;
 import it.uniroma2.models.configurations.experiments.ExperimentBaseTransient;
-import it.uniroma2.models.configurations.experiments.ExperimentSimpleBM;
-import it.uniroma2.utils.DataCSVWriter;
+import it.uniroma2.models.configurations.experiments.ExperimentFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +21,10 @@ public class Config {
     public static int SEED;
     public static int TOTAL_STREAMS;
     public static int REPEAT_CONFIGURATION;
+    public static String EXPERIMENT;
 
+    public static String ARRIVALS_DISTR;
+    public static String SERVICES_DISTR;
     public static double ARRIVALS_MU;
     public static double ARRIVALS_CV;
     public static double SERVICES_Z;
@@ -101,6 +103,10 @@ public class Config {
             SEED = Integer.parseInt(props.getProperty("random.seed"));
             TOTAL_STREAMS = Integer.parseInt(props.getProperty("random.total_streams"));
             REPEAT_CONFIGURATION = Integer.parseInt(props.getProperty("random.repeat_config"));
+            EXPERIMENT = props.getProperty("experiment");
+
+            ARRIVALS_DISTR = props.getProperty("distribution.arrivals.type");
+            SERVICES_DISTR = props.getProperty("distribution.services.type");
             ARRIVALS_MU = Double.parseDouble(props.getProperty("distribution.arrivals.mu"));
             ARRIVALS_CV = Double.parseDouble(props.getProperty("distribution.arrivals.cv"));
             SERVICES_Z = Double.parseDouble(props.getProperty("distribution.services.z"));
@@ -143,10 +149,8 @@ public class Config {
     }
 
     public static List<RunConfiguration> createConfigurations() {
-        List<RunConfiguration> configurations = new ArrayList<>();
-
-        Experiment experiment = new ExperimentBaseTransient();
-        configurations.addAll(experiment.getRunConfigurations());
+        Experiment experiment = ExperimentFactory.create();
+        List<RunConfiguration> configurations = new ArrayList<>(experiment.getRunConfigurations());
 
         // Set variables used to CSV log
         ALL_MAX_NUM_SERVERS = MAX_NUM_SERVERS;
