@@ -14,9 +14,9 @@ public class DataHeaders {
         this.headers = new ArrayList<>();
     }
 
-    public DataHeaders(List<String> headers) {
+    public DataHeaders(String... headers) {
         this.headers = new ArrayList<>();
-        this.headers.addAll(headers);
+        this.headers.addAll(List.of(headers));
     }
 
     public DataHeaders(DataField... headers) {

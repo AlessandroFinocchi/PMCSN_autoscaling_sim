@@ -27,7 +27,7 @@ public class EventProcessor implements EventVisitor {
         Job newJob = new Job(endTs, nextServiceLife);
         servers.assignJob(newJob);
 
-        servers.addJobsData(endTs, "ARRIVAL");
+        servers.addJobsData(endTs, "ARRIVAL", nextServiceLife);
 
         /* Generate next completion 0.08246927943190602*/
         double nextCompletionTs = servers.computeNextCompletionTs(endTs);
@@ -56,7 +56,7 @@ public class EventProcessor implements EventVisitor {
         /* Advance job execution */
         double movingMeanResponseTime = servers.computeJobsAdvancement(startTs, endTs, true);
 
-        servers.addJobsData(endTs, "COMPLETION");
+        servers.addJobsData(endTs, "COMPLETION", null);
 
         /* Check scaling */
         if (movingMeanResponseTime > RESPONSE_TIME_OUT_THRESHOLD &&

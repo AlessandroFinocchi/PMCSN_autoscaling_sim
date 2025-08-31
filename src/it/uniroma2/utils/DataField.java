@@ -16,6 +16,7 @@ public enum DataField {
     JOBS_IN_SYSTEM,
     STATUS_OF_SERVER,
     SPIKE_CURRENT_CAPACITY,
+    JOB_SIZE,
 
     /* Intra run transient data fields */
     AGG_SYSTEM_RESPONSE_TIME,
