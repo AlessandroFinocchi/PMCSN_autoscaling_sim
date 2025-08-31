@@ -50,7 +50,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         INTRA_RUN_DATA.addField(endTs, REMOVED, getNumWebServersByState(ServerState.REMOVED));
     }
 
-    public void addJobsData(double endTs, String eventType) {
+    public void addJobsData(double endTs, String eventType, Double jobSize) {
         INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, eventType);
         int i = 1;
         for (WebServer server : webServers) {
@@ -59,6 +59,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
             i++;
         }
         INTRA_RUN_DATA.addField(endTs, JOBS_IN_SYSTEM, webServers.stream().mapToInt(AbstractServer::size).sum());
+        if (jobSize != null) INTRA_RUN_DATA.addField(endTs, JOB_SIZE, jobSize);
     }
 
     public double computeJobsAdvancement(double startTs, double endTs, boolean isCompletion) throws IllegalLifeException {

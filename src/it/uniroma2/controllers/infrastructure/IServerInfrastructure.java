@@ -55,5 +55,5 @@ public interface IServerInfrastructure {
 
     void scaleOut(double endTs, WebServer targetWebServer);
 
-    void addJobsData(double endTs, String eventType);
+    void addJobsData(double endTs, String eventType, Double jobSize);
 }
