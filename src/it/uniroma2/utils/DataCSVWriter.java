@@ -90,21 +90,25 @@ public class DataCSVWriter {
         String fileNameSuffix = "-" + c.getName() + "_" + repetition;
 
         /* Log data about scaling events */
-        if (repetition == 0){
+        if (repetition == 0) {
             DataHeaders scalingHeaders = new DataHeaders(
-                    TIMESTAMP, R_0, MOVING_R_O, EVENT_TYPE,
+                    TIMESTAMP,
+                    R_0, MOVING_R_O, COMPLETING_SERVER_INDEX,
+                    EVENT_TYPE,
                     TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED
             );
+            scalingHeaders.add(
+                    JOBS_IN_SERVER + "_1", JOBS_IN_SERVER + "_2", JOBS_IN_SERVER + "_3"
+            );
             DataTimeTable filteredScalingData = INTRA_RUN_DATA
-                    .filter(EVENT_TYPE, false, "ARRIVAL")
-                    .filter(EVENT_TYPE, false, "COMPLETION");
+                    .filter(EVENT_TYPE, false, "ARRIVAL");
             flushList(filteredScalingData,
                     OUT_DIR_PATH_WITH_SUFFIX, "scaling" + fileNameSuffix,
                     scalingHeaders.get(), false);
         }
 
         /* Log data about jobs in each server */
-        if (repetition == 0){
+        if (repetition == 0) {
             DataHeaders jobsHeaders = new DataHeaders();
             jobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME, JOBS_IN_SYSTEM, JOB_SIZE);
             if (SPIKESERVER_ACTIVE) {
