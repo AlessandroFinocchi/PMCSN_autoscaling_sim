@@ -93,7 +93,7 @@ public class DataCSVWriter {
         if (repetition == 0) {
             DataHeaders scalingHeaders = new DataHeaders(
                     TIMESTAMP,
-                    R_0, MOVING_R_O, COMPLETING_SERVER_INDEX,
+                    R_0, WINDOWED_R_0, COMPLETING_SERVER_INDEX,
                     EVENT_TYPE,
                     TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED
             );

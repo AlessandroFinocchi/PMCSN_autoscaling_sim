@@ -54,15 +54,15 @@ public class EventProcessor implements EventVisitor {
         double endTs = event.getTimestamp();
 
         /* Advance job execution */
-        double movingMeanResponseTime = servers.computeJobsAdvancement(startTs, endTs, true);
+        double windowedResponseTime = servers.computeJobsAdvancement(startTs, endTs, true);
 
         servers.addJobsData(endTs, "COMPLETION", null);
 
         /* Check scaling */
-        if (movingMeanResponseTime > RESPONSE_TIME_OUT_THRESHOLD &&
+        if (windowedResponseTime > RESPONSE_TIME_OUT_THRESHOLD &&
                 servers.getNumWebServersByState(ServerState.ACTIVE) + servers.getNumWebServersByState(ServerState.TO_BE_ACTIVE) < MAX_NUM_SERVERS)
             s.addEvent(new ScalingOutReqEvent(endTs));
-        else if (movingMeanResponseTime < RESPONSE_TIME_IN_THRESHOLD &&
+        else if (windowedResponseTime < RESPONSE_TIME_IN_THRESHOLD &&
                 servers.getNumWebServersByState(ServerState.ACTIVE) > 1)
             s.addEvent(new ScalingInEvent(endTs));
 

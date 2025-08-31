@@ -51,7 +51,6 @@ public class Config {
     public static boolean ALL_SPIKESERVER_ACTIVE;
     public static int SLIDING_WINDOW_SIZE;
 
-    public static double ALPHA;
     public static int STATS_BATCH_SIZE;
     public static int STATS_BATCH_NUM;
     public static double STATS_CONFIDENCE_ALPHA;
@@ -132,7 +131,6 @@ public class Config {
             SCHEDULER_TYPE = props.getProperty("infrastructure.scheduler");
             SLIDING_WINDOW_SIZE = Integer.parseInt(props.getProperty("infrastructure.window_size"));
 
-            ALPHA = Double.parseDouble(props.getProperty("stats.alpha"));
             STATS_BATCH_SIZE = (Objects.equals(props.getProperty("stats.batch.size"), "INFINITY")) ?
                     Integer.MAX_VALUE : Integer.parseInt(props.getProperty("stats.batch.size"));
             STATS_BATCH_NUM = Integer.parseInt(props.getProperty("stats.batch.num"));

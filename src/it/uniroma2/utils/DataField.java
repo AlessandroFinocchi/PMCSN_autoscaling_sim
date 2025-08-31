@@ -4,7 +4,7 @@ public enum DataField {
     /* Intra run data fields */
     TIMESTAMP,
     R_0,
-    MOVING_R_O,
+    WINDOWED_R_0,
     TO_BE_ACTIVE,
     ACTIVE,
     TO_BE_REMOVED,
