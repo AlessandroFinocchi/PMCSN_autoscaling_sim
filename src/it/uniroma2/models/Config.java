@@ -49,6 +49,7 @@ public class Config {
 
     public static int ALL_MAX_NUM_SERVERS;
     public static boolean ALL_SPIKESERVER_ACTIVE;
+    public static int SLIDING_WINDOW_SIZE;
 
     public static double ALPHA;
     public static int STATS_BATCH_SIZE;
@@ -129,6 +130,7 @@ public class Config {
             SPIKE_CAPACITY = Double.parseDouble(props.getProperty("spikeserver.capacity"));
             SPIKESERVER_ACTIVE = Boolean.parseBoolean(props.getProperty("infrastructure.spikeserver.active"));
             SCHEDULER_TYPE = props.getProperty("infrastructure.scheduler");
+            SLIDING_WINDOW_SIZE = Integer.parseInt(props.getProperty("infrastructure.window_size"));
 
             ALPHA = Double.parseDouble(props.getProperty("stats.alpha"));
             STATS_BATCH_SIZE = (Objects.equals(props.getProperty("stats.batch.size"), "INFINITY")) ?

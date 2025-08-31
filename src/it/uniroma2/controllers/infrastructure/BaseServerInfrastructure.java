@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.*;
@@ -22,7 +23,7 @@ import static it.uniroma2.utils.DataField.*;
 public class BaseServerInfrastructure implements IServerInfrastructure {
     final IScheduler scheduler;
     final List<WebServer> webServers;
-    double movingExpMeanResponseTime;
+    double windowedResponseTime;
     SystemStats systemStats;
     TransientStats transientStats;
 
@@ -95,17 +96,17 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
 
         /* Compute the moving exponential average of the response time */
         if (isCompletion) {
-            this.updateMovingExpResponseTime(completedJobResponseTime);
+            this.updateMovingExpResponseTime();
 
             addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, completedJobResponseTime);
-            INTRA_RUN_DATA.addField(endTs, MOVING_R_O, this.movingExpMeanResponseTime);
+            INTRA_RUN_DATA.addField(endTs, WINDOWED_R_0, this.windowedResponseTime);
             this.systemStats.updateStationaryStats(endTs);
         }
 
         this.transientStats.updateStats(startTs, endTs, completionServerIndex, completedJobResponseTime);
 
-        return this.movingExpMeanResponseTime;
+        return this.windowedResponseTime;
     }
 
     int getCompletingServerIndex() {
@@ -257,9 +258,11 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         if (minServer != null) {
             if (minServer.size() == 0){
                 minServer.setServerState(ServerState.REMOVED);
+                minServer.resetMovingExpMeanResponseTime();
                 INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
             } else {
                 minServer.setServerState(ServerState.TO_BE_REMOVED);
+                minServer.resetMovingExpMeanResponseTime();
                 INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_REMOVED);
             }
 
@@ -276,8 +279,17 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         addStateToScalingData(endTs);
     }
 
-    void updateMovingExpResponseTime(double lastResponseTime) {
-        this.movingExpMeanResponseTime = this.movingExpMeanResponseTime * ALPHA +
-                lastResponseTime * (1 - ALPHA);
+    void updateMovingExpResponseTime() {
+        this.windowedResponseTime = 0.0;
+        double denominator = 0;
+        List<AbstractServer> activeServers = webServers.stream()
+                .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
+                .collect(Collectors.toList());
+
+        for(AbstractServer server : activeServers){
+            denominator += Math.pow(server.size(), 2);
+            this.windowedResponseTime += server.getWindowedMeanResponseTime() * Math.pow(server.size(), 2);
+        }
+        this.windowedResponseTime /= denominator;
     }
 }

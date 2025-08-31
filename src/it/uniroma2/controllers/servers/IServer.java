@@ -18,7 +18,5 @@ public interface IServer {
 
     double getMinRemainingLife();
 
-    double getResponseTime();
-
     void printServerStats(double currentTs);
 }

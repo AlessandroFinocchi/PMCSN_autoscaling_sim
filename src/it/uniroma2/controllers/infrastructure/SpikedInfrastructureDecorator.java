@@ -71,17 +71,17 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
 
         /* Compute the moving exponential average of the response time */
         if (isCompletion) {
-            base.updateMovingExpResponseTime(completedJobResponseTime);
+            base.updateMovingExpResponseTime();
 
             base.addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, completedJobResponseTime);
-            INTRA_RUN_DATA.addField(endTs, MOVING_R_O, base.movingExpMeanResponseTime);
+            INTRA_RUN_DATA.addField(endTs, WINDOWED_R_0, base.windowedResponseTime);
             this.systemStats.updateStationaryStats(endTs);
         }
 
         this.transientStats.updateStats(startTs, endTs, completionServerIndex, completedJobResponseTime);
 
-        return base.movingExpMeanResponseTime;
+        return base.windowedResponseTime;
     }
 
     int getCompletingServerIndex() {

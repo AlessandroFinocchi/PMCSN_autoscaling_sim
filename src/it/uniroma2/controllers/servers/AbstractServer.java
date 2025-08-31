@@ -8,8 +8,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.text.DecimalFormat;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Locale;
 
+import static it.uniroma2.models.Config.SLIDING_WINDOW_SIZE;
 import static it.uniroma2.models.Config.STOP;
 
 public abstract class AbstractServer implements IServer {
@@ -18,12 +21,14 @@ public abstract class AbstractServer implements IServer {
     @Getter protected double capacity;
     protected JobList jobs;
     @Getter protected ServerStats stats;
+    @Getter private Deque<Double> movingWindowResponseTime;
 
     public AbstractServer(double capacity, ServerState serverState, int index) {
         this.serverState = serverState;
         this.capacity = capacity;
         this.jobs = new JobList();
-        stats = new ServerStats(index);
+        this.stats = new ServerStats(index);
+        this.movingWindowResponseTime = new ArrayDeque<>();
 
         this.f = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
         this.f.applyPattern("###0.00000000");
@@ -44,13 +49,20 @@ public abstract class AbstractServer implements IServer {
 
         stats.updateServerStats(startTs, endTs, jobAdvanced, completedJobResponseTime, this.serverState, this.capacity);
 
+        if(completedJob == 1) {
+            if(this.movingWindowResponseTime.size() == SLIDING_WINDOW_SIZE) {
+                this.movingWindowResponseTime.removeFirst();
+            }
+            this.movingWindowResponseTime.addLast(completedJobResponseTime);
+        }
+
         /* Compute the advancement of each job */
         double quantum = (this.capacity / jobAdvanced) * (endTs - startTs);
         try{
             for (Job job : this.jobs.getJobs()) {
                 job.decreaseRemainingLife(quantum);
             }
-        } catch (IllegalLifeException e) { // #TODO: remove
+        } catch (IllegalLifeException e) {
             System.out.printf("endTs: %f", endTs);
             throw e;
         }
@@ -94,8 +106,16 @@ public abstract class AbstractServer implements IServer {
         stats.getStationaryStats().printIntervalEstimation();
     }
 
-    public double getResponseTime() {
-        return stats.getNodeSum() / stats.getCompletedJobs();
+    public void resetMovingExpMeanResponseTime() {
+        this.movingWindowResponseTime = new ArrayDeque<>();
+    }
+
+    public double getWindowedMeanResponseTime() {
+        double sum = 0.0;
+        for(Double d : movingWindowResponseTime) {
+            sum += d;
+        }
+        sum /= movingWindowResponseTime.size();
+        return sum;
     }
 }
-
