@@ -113,9 +113,8 @@ public abstract class AbstractServer implements IServer {
     public double getWindowedMeanResponseTime() {
         double sum = 0.0;
         for(Double d : movingWindowResponseTime) {
-            sum += d;
+            sum += d / movingWindowResponseTime.size();
         }
-        sum /= movingWindowResponseTime.size();
         return sum;
     }
 }
