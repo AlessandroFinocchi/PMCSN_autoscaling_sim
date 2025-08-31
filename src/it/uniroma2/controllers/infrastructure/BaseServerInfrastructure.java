@@ -254,9 +254,14 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
 
         /* If found server, make it to be removed */
         if (minServer != null) {
-            minServer.setServerState(ServerState.TO_BE_REMOVED);
+            if (minServer.size() == 0){
+                minServer.setServerState(ServerState.REMOVED);
+                INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
+            } else {
+                minServer.setServerState(ServerState.TO_BE_REMOVED);
+                INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_REMOVED);
+            }
 
-            INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_REMOVED);
             addStateToScalingData(endTs);
         }
 
