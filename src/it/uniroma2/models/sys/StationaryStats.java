@@ -14,7 +14,7 @@ public class StationaryStats {
     private final DecimalFormat f;
     private int counter;
     private int currBatch;
-    private Integer serverIndex;
+    private final Integer serverIndex;
 
     /* Metrics sums */
     private double sumBatchesResponseTime;
@@ -131,7 +131,6 @@ public class StationaryStats {
         double violationPercentageD = currBatchViolationPercentage - this.violationPercentageX;
         this.violationPercentageV += Math.pow(violationPercentageD, 2) * (this.currBatch - 1) / this.currBatch;
         this.violationPercentageX += violationPercentageD / this.currBatch;
-
     }
 
     public boolean isCompleted(){
@@ -170,9 +169,6 @@ public class StationaryStats {
             w = t * s / Math.sqrt(this.currBatch - 1);  /* interval half width */
 
             System.out.print(metric + " the expected value is in the interval " + f.format(x) + " +/- " + f.format(w) + "\n");
-
         }
-
-
     }
 }

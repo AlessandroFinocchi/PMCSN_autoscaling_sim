@@ -14,25 +14,25 @@ public class ConfigurationFactory {
     /**
      * Return a list created as the cartesian product of all the possible parameters values.
      */
-    public static List<RunConfiguration> createConfigurationsList(Parameter... parameters) {
+    public static List<RunConfiguration> createConfigurationsList(List<Parameter> parameters) {
         List<RunConfiguration> result = new ArrayList<>();
 
         // MultiCounter allows the translation from a single index to multiple subindexes
-        MultiCounter mc = new MultiCounter(parameters.length);
+        MultiCounter mc = new MultiCounter(parameters.size());
         int totalNumber = 1;
-        for (int i = 0; i < parameters.length; i++) {
-            mc.getMaxCounter()[i] = parameters[i].getValues().size();
-            totalNumber *= parameters[i].getValues().size();
+        for (int i = 0; i < parameters.size(); i++) {
+            mc.getMaxCounter()[i] = parameters.get(i).getValues().size();
+            totalNumber *= parameters.get(i).getValues().size();
         }
 
         // For each possible configuration
         for (int i = 0; i < totalNumber; i++) {
             RunConfiguration c = new RunConfiguration("exp_" + EXP_COUNTER++);
             // For each parameter
-            for (int j = 0; j < parameters.length; j++) {
-                String parameterName = parameters[j].getName();
+            for (int j = 0; j < parameters.size(); j++) {
+                String parameterName = parameters.get(j).getName();
                 // Take the parameter values using its subindex
-                String parameterValue = parameters[j].getValues().get(mc.getCounter()[j]);
+                String parameterValue = parameters.get(j).getValues().get(mc.getCounter()[j]);
                 c.put(parameterName, parameterValue);
             }
             result.add(c);

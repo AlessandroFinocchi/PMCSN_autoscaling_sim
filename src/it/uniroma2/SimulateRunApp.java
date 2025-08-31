@@ -69,7 +69,6 @@ public class SimulateRunApp {
 
         Distribution arrivalVA = DistributionFactory.createArrivalDistribution(R);
         Distribution servicesVA = DistributionFactory.createServiceDistribution(R);
-
         Distribution turnOnVA = new Normal(R, 6, 7, TURN_ON_MU, TURN_ON_STD);
 
         /* Log to CSV the initial seed for each stream for replayability */
@@ -103,9 +102,6 @@ public class SimulateRunApp {
         s.printStats();
     }
 
-    //TODO: nelle run che non studiano lo stazionario basta mettere nella configurazione
-    // STATS_BATCH_NUM a infinity così non si triggera mai il calcolo delle stationary stats
-    // e il controllo in quest'if è sempre vero quindi è come non ci fosse
     private static boolean continueSimulating(SystemState s) {
         return (s.getCurrent() < STOP || (EMPTY_JOBS && s.activeJobExists()))
                 && !s.getServers().isCompletedStationaryStats();

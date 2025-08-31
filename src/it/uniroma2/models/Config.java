@@ -99,6 +99,7 @@ public class Config {
             }
 
             LOG_INTRA_RUN = Boolean.parseBoolean(props.getProperty("log.intra_run"));
+            LOG_BM = Boolean.parseBoolean(props.getProperty("log.bm"));
             SEED = Integer.parseInt(props.getProperty("random.seed"));
             TOTAL_STREAMS = Integer.parseInt(props.getProperty("random.total_streams"));
             REPEAT_CONFIGURATION = Integer.parseInt(props.getProperty("random.repeat_config"));
@@ -134,7 +135,6 @@ public class Config {
                     Integer.MAX_VALUE : Integer.parseInt(props.getProperty("stats.batch.size"));
             STATS_BATCH_NUM = Integer.parseInt(props.getProperty("stats.batch.num"));
             STATS_CONFIDENCE_ALPHA = Double.parseDouble(props.getProperty("stats.confidence.alpha"));
-            LOG_BM = STATS_BATCH_SIZE != INFINITY;
 
             /* Add property values for CSV logging */
             INTER_RUN_DATA.clear();

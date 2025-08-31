@@ -23,19 +23,19 @@ public class ExperimentBaseTransient implements Experiment {
 
         setConfiguration(1, 4.0, 1, 4, 3, false, null);
         setConfiguration(2, 4.0, 1, 4,5, false, null);
-        setConfiguration(3, 4.0, 1, 4,8, false, null);
-        setConfiguration(4, 4.8, 1, 4,5, false, null);
-        setConfiguration(5, 10, 0.4, 4,5, false, null);
-        setConfiguration(6, 2, 2, 4,5, false, null);
-        setConfiguration(7, 10, 0.4, 16,5, false, null);
-        setConfiguration(8, 4, 1, 4,5, true, 0.1);
-        setConfiguration(9, 4, 1, 4,5, true, 0.3);
-        setConfiguration(10, 4, 1, 4,5, true, 1.0);
-        setConfiguration(11, 4, 1, 4,5, true, 100.0);
-        setConfiguration(12, 4, 1.5, 4,5, true, 2.0);
-        setConfiguration(13, 4, 1.5, 4,5, true, 4.0);
-        setConfiguration(14, 4, 1.5, 4,5, true, 10.0);
-        setConfiguration(15, 4, 1.5, 4,5, true, 20.0);
+//        setConfiguration(3, 4.0, 1, 4,8, false, null);
+//        setConfiguration(4, 4.8, 1, 4,5, false, null);
+//        setConfiguration(5, 10, 0.4, 4,5, false, null);
+//        setConfiguration(6, 2, 2, 4,5, false, null);
+//        setConfiguration(7, 10, 0.4, 16,5, false, null);
+//        setConfiguration(8, 4, 1, 4,5, true, 0.1);
+//        setConfiguration(9, 4, 1, 4,5, true, 0.3);
+//        setConfiguration(10, 4, 1, 4,5, true, 1.0);
+//        setConfiguration(11, 4, 1, 4,5, true, 100.0);
+//        setConfiguration(12, 4, 1.5, 4,5, true, 2.0);
+//        setConfiguration(13, 4, 1.5, 4,5, true, 4.0);
+//        setConfiguration(14, 4, 1.5, 4,5, true, 10.0);
+//        setConfiguration(15, 4, 1.5, 4,5, true, 20.0);
 
         return result;
     }
