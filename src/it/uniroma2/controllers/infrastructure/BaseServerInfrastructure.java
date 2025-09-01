@@ -51,8 +51,8 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         INTRA_RUN_DATA.addField(endTs, REMOVED, getNumWebServersByState(ServerState.REMOVED));
     }
 
-    public void addJobsData(double endTs, String eventType, Double jobSize) {
-        INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, eventType);
+    public void addJobsData(double endTs, String eventTypeJob, Double jobSize) {
+        INTRA_RUN_DATA.addField(endTs, EVENT_TYPE_JOB, eventTypeJob);
         int i = 1;
         for (WebServer server : webServers) {
             INTRA_RUN_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(i), server.size());
@@ -75,7 +75,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
             completedJob = minServer.getMinRemainingLifeJob();
             completedJobResponseTime = endTs - completedJob.getArrivalTime();
 
-            INTRA_RUN_BM_DATA.addField(endTs, EVENT_TYPE, "COMPLETION");
+            INTRA_RUN_BM_DATA.addField(endTs, EVENT_TYPE_JOB, "COMPLETION");
             INTRA_RUN_DATA.addField(endTs, COMPLETING_SERVER_INDEX, completionServerIndex + 1); // +1 because there is no spike server
             INTRA_RUN_BM_DATA.addField(endTs, COMPLETING_SERVER_INDEX, completionServerIndex + 1); // +1 because there is no spike server
             INTRA_RUN_DATA.addField(endTs, PER_JOB_RESPONSE_TIME, completedJobResponseTime);
@@ -83,7 +83,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
 
             boolean isServerRemoved = minServer.removeJob(completedJob);
             if (isServerRemoved)
-                INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
+                INTRA_RUN_DATA.addField(endTs, EVENT_TYPE_SCALING, ServerState.REMOVED);
         }
 
         /* Compute the advancement of each job in each web Server */
@@ -232,7 +232,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
             targetWebServer.setServerState(ServerState.TO_BE_ACTIVE);
             targetWebServer.setActivationTimestamp(endTs + turnOnTime);
 
-            INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_ACTIVE);
+            INTRA_RUN_DATA.addField(endTs, EVENT_TYPE_SCALING, ServerState.TO_BE_ACTIVE);
             addStateToScalingData(endTs);
 
             return targetWebServer;
@@ -259,11 +259,11 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
             if (minServer.size() == 0){
                 minServer.setServerState(ServerState.REMOVED);
                 minServer.resetMovingExpMeanResponseTime();
-                INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
+                INTRA_RUN_DATA.addField(endTs, EVENT_TYPE_SCALING, ServerState.REMOVED);
             } else {
                 minServer.setServerState(ServerState.TO_BE_REMOVED);
                 minServer.resetMovingExpMeanResponseTime();
-                INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.TO_BE_REMOVED);
+                INTRA_RUN_DATA.addField(endTs, EVENT_TYPE_SCALING, ServerState.TO_BE_REMOVED);
             }
 
             addStateToScalingData(endTs);
@@ -275,7 +275,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
 
     public void scaleOut(double endTs, WebServer targetWebServer) {
         targetWebServer.setServerState(ServerState.ACTIVE);
-        INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.ACTIVE);
+        INTRA_RUN_DATA.addField(endTs, EVENT_TYPE_SCALING, ServerState.ACTIVE);
         addStateToScalingData(endTs);
     }
 

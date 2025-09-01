@@ -46,7 +46,6 @@ public class RunConfiguration {
                     String shortKey = entry.getKey()
                             .replace("infrastructure.", "i.")
                             .replace("webserver.", "ws.")
-                            .replace("response_time.", "r_t.")
                             .replace("distribution.", "d.");
                     sb
                             .append(shortKey)

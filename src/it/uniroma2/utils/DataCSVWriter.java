@@ -93,15 +93,15 @@ public class DataCSVWriter {
         if (repetition == 0) {
             DataHeaders scalingHeaders = new DataHeaders(
                     TIMESTAMP,
-                    R_0, WINDOWED_R_0, COMPLETING_SERVER_INDEX,
-                    EVENT_TYPE,
+                    R_0, SCALING_INDICATOR, COMPLETING_SERVER_INDEX,
+                    EVENT_TYPE_SCALING,
                     TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED
             );
             scalingHeaders.add(
                     JOBS_IN_SERVER + "_1", JOBS_IN_SERVER + "_2", JOBS_IN_SERVER + "_3"
             );
             DataTimeTable filteredScalingData = INTRA_RUN_DATA
-                    .filter(EVENT_TYPE, false, "ARRIVAL");
+                    .filter(EVENT_TYPE_SCALING, false, "ARRIVAL");
             flushList(filteredScalingData,
                     OUT_DIR_PATH_WITH_SUFFIX, "scaling" + fileNameSuffix,
                     scalingHeaders.get(), false);
@@ -110,7 +110,14 @@ public class DataCSVWriter {
         /* Log data about jobs in each server */
         if (repetition == 0) {
             DataHeaders jobsHeaders = new DataHeaders();
-            jobsHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME, JOBS_IN_SYSTEM, JOB_SIZE);
+            jobsHeaders.add(
+                    TIMESTAMP,
+                    EVENT_TYPE_JOB,
+                    PER_JOB_RESPONSE_TIME,
+                    COMPLETING_SERVER_INDEX, JOBS_IN_SYSTEM, JOB_SIZE,
+                    EVENT_TYPE_SCALING, SCALING_INDICATOR
+            );
+            jobsHeaders.add(TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
             if (SPIKESERVER_ACTIVE) {
                 jobsHeaders.add(SPIKE_CURRENT_CAPACITY);
                 jobsHeaders.add("JOBS_IN_SERVER_0");
@@ -128,7 +135,8 @@ public class DataCSVWriter {
                         AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + serverIndex
                 );
             }
-            DataTimeTable filteredJobsData = INTRA_RUN_DATA.filter(EVENT_TYPE, false, "ACTIVE");
+            // DataTimeTable filteredJobsData = INTRA_RUN_DATA.filter(EVENT_TYPE_SCALING, false, "ACTIVE");
+            DataTimeTable filteredJobsData = INTRA_RUN_DATA;
             flushList(filteredJobsData,
                     OUT_DIR_PATH_WITH_SUFFIX, "jobs" + fileNameSuffix,
                     jobsHeaders.get(), false);
@@ -145,7 +153,7 @@ public class DataCSVWriter {
         allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + MAX_NUM_SERVERS, AGG_SERVER_JOB_NUMBER + "_" + MAX_NUM_SERVERS);
         allJobsHeaders.add(REPETITION_ID);
         DataTimeTable combinedJobsData = INTRA_RUN_DATA
-                .filter(EVENT_TYPE, false, "ACTIVE")
+                .filter(EVENT_TYPE_SCALING, false, "ACTIVE")
                 .setEach(REPETITION_ID, repetition);
         flushList(combinedJobsData,
                 OUT_DIR_PATH_WITH_SUFFIX, "jobs" + "-" + c.getName() + "_all",
@@ -159,7 +167,7 @@ public class DataCSVWriter {
 
         /* Log data about jobs in each server */
         DataHeaders bmHeaders = new DataHeaders();
-        bmHeaders.add(TIMESTAMP, EVENT_TYPE, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
+        bmHeaders.add(TIMESTAMP, EVENT_TYPE_JOB, EVENT_TYPE_SCALING, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
         bmHeaders.add(
                 BM_SYSTEM_RESPONSE_TIME,
                 BM_SYSTEM_JOB_NUMBER,

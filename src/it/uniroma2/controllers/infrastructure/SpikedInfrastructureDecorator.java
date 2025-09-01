@@ -40,6 +40,13 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         return base.getNumWebServersByState(state);
     }
 
+    public void addJobsData(double endTs, String eventType, Double jobSize) {
+        base.addJobsData(endTs, eventType, jobSize);
+        INTRA_RUN_DATA.addField(endTs, JOBS_IN_SYSTEM, allServers.stream().mapToInt(AbstractServer::size).sum());
+        INTRA_RUN_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(0), spikeServer.size());
+        INTRA_RUN_DATA.addField(endTs, SPIKE_CURRENT_CAPACITY, spikeServer.getCapacity());
+    }
+
     public double computeJobsAdvancement(double startTs, double endTs, boolean isCompletion) throws IllegalLifeException {
         Integer completionServerIndex = null;
         Double completedJobResponseTime = null;
@@ -58,7 +65,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
 
             boolean isServerRemoved = minServer.removeJob(completedJob);
             if (isServerRemoved && completionServerIndex != 0) // spike server can't be removed
-                INTRA_RUN_DATA.addField(endTs, EVENT_TYPE, ServerState.REMOVED);
+                INTRA_RUN_DATA.addField(endTs, EVENT_TYPE_SCALING, ServerState.REMOVED);
         }
 
         /* Compute the advancement of each job in each web Server */
@@ -163,10 +170,4 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumWebServersByState(ServerState.ACTIVE));
     }
 
-    public void addJobsData(double endTs, String eventType, Double jobSize) {
-        base.addJobsData(endTs, eventType, jobSize);
-        INTRA_RUN_DATA.addField(endTs, JOBS_IN_SYSTEM, allServers.stream().mapToInt(AbstractServer::size).sum());
-        INTRA_RUN_DATA.addFieldWithSuffix(endTs, JOBS_IN_SERVER, String.valueOf(0), spikeServer.size());
-        INTRA_RUN_DATA.addField(endTs, SPIKE_CURRENT_CAPACITY, spikeServer.getCapacity());
-    }
 }
