@@ -20,7 +20,10 @@ public class EventProcessor implements EventVisitor {
         double endTs = event.getTimestamp();
 
         /* Advance job execution */
-        servers.computeJobsAdvancement(startTs, endTs, false);
+        double scalingIndicator = servers.computeJobsAdvancement(startTs, endTs, false);
+
+        /* Plan scaling */
+        planScaling(s, endTs, scalingIndicator);
 
         /* Add the next job to the list */
         double nextServiceLife = s.getServicesVA().gen();
@@ -54,18 +57,12 @@ public class EventProcessor implements EventVisitor {
         double endTs = event.getTimestamp();
 
         /* Advance job execution */
-        double windowedResponseTime = servers.computeJobsAdvancement(startTs, endTs, true);
+        double scalingIndicator = servers.computeJobsAdvancement(startTs, endTs, true);
 
         servers.addJobsData(endTs, "COMPLETION", null);
 
-        /* Check scaling */
-        if (windowedResponseTime > RESPONSE_TIME_OUT_THRESHOLD &&
-                servers.getNumWebServersByState(ServerState.ACTIVE) + servers.getNumWebServersByState(ServerState.TO_BE_ACTIVE) < MAX_NUM_SERVERS)
-            s.addEvent(new ScalingOutReqEvent(endTs));
-        else if (windowedResponseTime < RESPONSE_TIME_IN_THRESHOLD &&
-                servers.getNumWebServersByState(ServerState.ACTIVE) > 1)
-            s.addEvent(new ScalingInEvent(endTs));
-
+        /* Plan scaling */
+        planScaling(s, endTs, scalingIndicator);
 
         /* Generate next completion */
         double nextCompletionTs = servers.activeJobExists() ? servers.computeNextCompletionTs(endTs) : INFINITY;
@@ -142,5 +139,33 @@ public class EventProcessor implements EventVisitor {
         s.addEvent(nextCompletion);
 
         s.setCurrent(endTs);
+    }
+
+    private void planScaling(SystemState s, double endTs, double scalingIndicator){
+        IServerInfrastructure servers = s.getServers();
+
+        // boolean scalingOutCondition = scalingIndicator >= SCALING_OUT_THRESHOLD * servers.getNumWebServersByState(ServerState.ACTIVE);
+        // boolean scalingOutPossible = servers.getNumWebServersByState(ServerState.ACTIVE) + servers.getNumWebServersByState(ServerState.TO_BE_ACTIVE) < MAX_NUM_SERVERS;
+        // boolean scalingInCondition = scalingIndicator < SCALING_IN_THRESHOLD * servers.getNumWebServersByState(ServerState.ACTIVE);
+        // boolean scalingInPossible = servers.getNumWebServersByState(ServerState.ACTIVE) > 1;
+        // if (scalingOutCondition && scalingOutPossible)
+        //     s.addEvent(new ScalingOutReqEvent(endTs));
+        // else if (scalingInCondition && scalingInPossible)
+        //     s.addEvent(new ScalingInEvent(endTs));
+
+        if (SCALING_OUT_THRESHOLD != INFINITY){
+            int expectedServers = (int) (Math.floor(scalingIndicator / SCALING_OUT_THRESHOLD) + 1);
+            int activatedServer = servers.getNumWebServersByState(ServerState.ACTIVE) + servers.getNumWebServersByState(ServerState.TO_BE_ACTIVE);
+
+            boolean scalingOutCondition = activatedServer < expectedServers;
+            boolean scalingOutPossible =  activatedServer < MAX_NUM_SERVERS;
+            boolean scalingInCondition = activatedServer > expectedServers;
+            boolean scalingInPossible = servers.getNumWebServersByState(ServerState.ACTIVE) > 1;
+            if (scalingOutCondition && scalingOutPossible)
+                s.addEvent(new ScalingOutReqEvent(endTs));
+            else if (scalingInCondition && scalingInPossible)
+                s.addEvent(new ScalingInEvent(endTs));
+        }
+
     }
 }

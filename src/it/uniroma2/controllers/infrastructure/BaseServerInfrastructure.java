@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.*;
@@ -23,7 +22,7 @@ import static it.uniroma2.utils.DataField.*;
 public class BaseServerInfrastructure implements IServerInfrastructure {
     final IScheduler scheduler;
     final List<WebServer> webServers;
-    double windowedResponseTime;
+    double scalingIndicator;
     SystemStats systemStats;
     TransientStats transientStats;
 
@@ -96,17 +95,17 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
 
         /* Compute the moving exponential average of the response time */
         if (isCompletion) {
-            this.updateMovingExpResponseTime();
-
             addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, completedJobResponseTime);
-            INTRA_RUN_DATA.addField(endTs, WINDOWED_R_0, this.windowedResponseTime);
+            INTRA_RUN_DATA.addField(endTs, SCALING_INDICATOR, this.scalingIndicator);
             this.systemStats.updateStationaryStats(endTs);
         }
 
+        this.updateScalingIndicator();
+
         this.transientStats.updateStats(startTs, endTs, completionServerIndex, completedJobResponseTime);
 
-        return this.windowedResponseTime;
+        return this.scalingIndicator;
     }
 
     int getCompletingServerIndex() {
@@ -279,17 +278,21 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         addStateToScalingData(endTs);
     }
 
-    void updateMovingExpResponseTime() {
-        this.windowedResponseTime = 0.0;
-        double denominator = 0;
-        List<AbstractServer> activeServers = webServers.stream()
-                .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
-                .collect(Collectors.toList());
-
-        for(AbstractServer server : activeServers){
-            denominator += Math.pow(server.size(), 2);
-            this.windowedResponseTime += server.getWindowedMeanResponseTime() * Math.pow(server.size(), 2);
-        }
-        this.windowedResponseTime /= denominator;
+    void updateScalingIndicator() {
+        // this.windowedResponseTime = 0.0;
+        // double denominator = 0;
+        // List<AbstractServer> activeServers = webServers.stream()
+        //         .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
+        //         .collect(Collectors.toList());
+        //
+        // for(AbstractServer server : activeServers){
+        //     denominator += Math.pow(server.size(), 2);
+        //     this.windowedResponseTime += server.getWindowedMeanResponseTime() * Math.pow(server.size(), 2);
+        // }
+        // this.windowedResponseTime /= denominator;
+        this.scalingIndicator = webServers.stream()
+                .filter(ws -> ws.getServerState() == ServerState.ACTIVE || ws.getServerState() == ServerState.TO_BE_REMOVED)
+                .map(AbstractServer::size)
+                .reduce(0, (a, b) -> a + b);
     }
 }

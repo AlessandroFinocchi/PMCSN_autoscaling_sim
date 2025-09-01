@@ -3,7 +3,6 @@ package it.uniroma2.models;
 import it.uniroma2.SimulateRunApp;
 import it.uniroma2.models.configurations.RunConfiguration;
 import it.uniroma2.models.configurations.experiments.Experiment;
-import it.uniroma2.models.configurations.experiments.ExperimentBaseTransient;
 import it.uniroma2.models.configurations.experiments.ExperimentFactory;
 
 import java.io.IOException;
@@ -35,8 +34,8 @@ public class Config {
     public static double STOP;
     public static boolean EMPTY_JOBS;
     public static double INFINITY;
-    public static double RESPONSE_TIME_OUT_THRESHOLD;
-    public static double RESPONSE_TIME_IN_THRESHOLD;
+    public static double SCALING_OUT_THRESHOLD;
+    // public static double SCALING_IN_THRESHOLD;
     public static double RESPONSE_TIME_SLO;
     public static int MAX_NUM_SERVERS;
     public static int START_NUM_SERVERS;
@@ -119,9 +118,9 @@ public class Config {
                     Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("system.stop"));
             EMPTY_JOBS =  Boolean.parseBoolean(props.getProperty("system.empty_jobs"));
             INFINITY = Double.POSITIVE_INFINITY;
-            RESPONSE_TIME_OUT_THRESHOLD = (Objects.equals(props.getProperty("webserver.response_time.out_thr"), "INFINITY")) ?
-                    Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("webserver.response_time.out_thr"));
-            RESPONSE_TIME_IN_THRESHOLD = Double.parseDouble(props.getProperty("webserver.response_time.in_thr"));
+            SCALING_OUT_THRESHOLD = (Objects.equals(props.getProperty("webserver.scaling.out_thr"), "INFINITY")) ?
+                    Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("webserver.scaling.out_thr"));
+            // SCALING_IN_THRESHOLD = Double.parseDouble(props.getProperty("webserver.scaling.in_thr"));
             RESPONSE_TIME_SLO = Double.parseDouble(props.getProperty("infrastructure.response_time_slo"));
             MAX_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.max_num_server"));
             START_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.start_num_server"));

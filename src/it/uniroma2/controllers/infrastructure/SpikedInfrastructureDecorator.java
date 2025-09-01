@@ -78,17 +78,17 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
 
         /* Compute the moving exponential average of the response time */
         if (isCompletion) {
-            base.updateMovingExpResponseTime();
-
             base.addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, completedJobResponseTime);
-            INTRA_RUN_DATA.addField(endTs, WINDOWED_R_0, base.windowedResponseTime);
+            INTRA_RUN_DATA.addField(endTs, SCALING_INDICATOR, base.scalingIndicator);
             this.systemStats.updateStationaryStats(endTs);
         }
 
+        this.updateScalingIndicator();
+
         this.transientStats.updateStats(startTs, endTs, completionServerIndex, completedJobResponseTime);
 
-        return base.windowedResponseTime;
+        return base.scalingIndicator;
     }
 
     int getCompletingServerIndex() {
@@ -168,6 +168,13 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
     public void scaleOut(double endTs, WebServer targetWebServer) {
         base.scaleOut(endTs, targetWebServer);
         this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumWebServersByState(ServerState.ACTIVE));
+    }
+
+    void updateScalingIndicator() {
+        base.scalingIndicator = allServers.stream()
+                .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
+                .map(AbstractServer::size)
+                .reduce(0, (a, b) -> a + b);
     }
 
 }
