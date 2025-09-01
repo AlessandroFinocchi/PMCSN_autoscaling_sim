@@ -26,6 +26,9 @@ public class Config {
     public static String SERVICES_DISTR;
     public static double ARRIVALS_MU;
     public static double ARRIVALS_CV;
+    public static double ARRIVALS_TOTAL_PERIOD;
+    public static double ARRIVALS_FAST_INTERVAL;
+    public static double ARRIVALS_FAST_MU_MULTIPLIER;
     public static double SERVICES_Z;
     public static double SERVICES_CV;
     public static double WEBSERVER_CAPACITY;
@@ -107,6 +110,9 @@ public class Config {
             SERVICES_DISTR = props.getProperty("distribution.services.type");
             ARRIVALS_MU = Double.parseDouble(props.getProperty("distribution.arrivals.mu"));
             ARRIVALS_CV = Double.parseDouble(props.getProperty("distribution.arrivals.cv"));
+            ARRIVALS_TOTAL_PERIOD = Double.parseDouble(props.getProperty("distribution.arrivals.total_period"));
+            ARRIVALS_FAST_INTERVAL = Double.parseDouble(props.getProperty("distribution.arrivals.fast_interval"));
+            ARRIVALS_FAST_MU_MULTIPLIER = Double.parseDouble(props.getProperty("distribution.arrivals.fast_mu_multiplier"));
             SERVICES_Z = Double.parseDouble(props.getProperty("distribution.services.z"));
             SERVICES_CV = Double.parseDouble(props.getProperty("distribution.services.cv"));
             TURN_ON_MU = Double.parseDouble(props.getProperty("distribution.turn_on.mu"));

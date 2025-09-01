@@ -4,7 +4,6 @@ import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.libs.Rngs;
 import it.uniroma2.models.Config;
 import it.uniroma2.models.configurations.RunConfiguration;
-import it.uniroma2.models.distributions.CHyperExponential;
 import it.uniroma2.models.distributions.Distribution;
 import it.uniroma2.models.distributions.DistributionFactory;
 import it.uniroma2.models.distributions.Normal;
@@ -97,10 +96,12 @@ public class SimulateRunApp {
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());
 
-            if (nextEvent.getTimestamp() % 500 < 400) {
+            if (nextEvent.getTimestamp() % ARRIVALS_TOTAL_PERIOD < ARRIVALS_TOTAL_PERIOD - ARRIVALS_FAST_INTERVAL) {
+                // Slow arrivals
                 arrivalVA.setMean(ARRIVALS_MU); // 4 arrivals each s
             } else {
-                arrivalVA.setMean(ARRIVALS_MU * 0.5); // 8 arrivals each s
+                // Fast arrivals
+                arrivalVA.setMean(ARRIVALS_MU * ARRIVALS_FAST_MU_MULTIPLIER); // 8 arrivals each s
             }
 
             nextEvent.process(s, visitor);
