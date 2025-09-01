@@ -114,8 +114,9 @@ public class DataCSVWriter {
                     TIMESTAMP,
                     EVENT_TYPE_JOB,
                     PER_JOB_RESPONSE_TIME,
-                    COMPLETING_SERVER_INDEX, JOBS_IN_SYSTEM, JOB_SIZE,
-                    EVENT_TYPE_SCALING, SCALING_INDICATOR
+                    COMPLETING_SERVER_INDEX, JOBS_IN_SYSTEM,
+                    EVENT_TYPE_SCALING, SCALING_INDICATOR,
+                    JOB_SIZE, NEXT_INTERARRIVAL_TIME
             );
             jobsHeaders.add(TO_BE_ACTIVE, ACTIVE, TO_BE_REMOVED, REMOVED);
             if (SPIKESERVER_ACTIVE) {

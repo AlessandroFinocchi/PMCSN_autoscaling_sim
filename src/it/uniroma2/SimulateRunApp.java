@@ -91,10 +91,17 @@ public class SimulateRunApp {
         SystemState s = new SystemState(calendar, arrivalVA, servicesVA, turnOnVA);
 
         ProgressBar bar = new ProgressBar(STOP);
+
         while (continueSimulating(s)) {
             /* Compute the next event time */
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());
+
+            if (nextEvent.getTimestamp() % 500 < 400) {
+                arrivalVA.setMean(ARRIVALS_MU); // 4 arrivals each s
+            } else {
+                arrivalVA.setMean(ARRIVALS_MU * 0.5); // 8 arrivals each s
+            }
 
             nextEvent.process(s, visitor);
         }

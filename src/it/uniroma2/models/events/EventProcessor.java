@@ -8,6 +8,8 @@ import it.uniroma2.models.jobs.Job;
 import it.uniroma2.models.sys.SystemState;
 
 import static it.uniroma2.models.Config.*;
+import static it.uniroma2.utils.DataCSVWriter.INTRA_RUN_DATA;
+import static it.uniroma2.utils.DataField.NEXT_INTERARRIVAL_TIME;
 
 public class EventProcessor implements EventVisitor {
 
@@ -40,6 +42,7 @@ public class EventProcessor implements EventVisitor {
         /* Generate next arrival if simulation is not finished*/
         if (endTs < STOP) {
             double nextArrivalTs = endTs + s.getArrivalVA().gen();
+            INTRA_RUN_DATA.addField(endTs, NEXT_INTERARRIVAL_TIME, nextArrivalTs - endTs);
             Event nextArrival = new ArrivalEvent(nextArrivalTs);
             s.addEvent(nextArrival);
         } else s.addEvent(new ArrivalEvent(INFINITY));
