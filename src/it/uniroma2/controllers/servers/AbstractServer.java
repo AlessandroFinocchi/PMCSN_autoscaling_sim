@@ -102,7 +102,8 @@ public abstract class AbstractServer implements IServer {
         System.out.println("   average service time .... =   " + f.format(stats.getServiceSum() / stats.getCompletedJobs()));
         System.out.println("   average # in the node ... =   " + f.format(stats.getNodeSum() / currentTs));
         System.out.println("   utilization ............. =   " + f.format(stats.getServiceSum() / currentTs));
-        System.out.println("   jobs withing SLO ........ =   " + f.format(stats.getCompletedJobsInTime()));
+        System.out.println("   jobs within 95-perc SLO . =   " + f.format(stats.getJobRespecting95percSLO()));
+        System.out.println("   jobs within 99-perc SLO . =   " + f.format(stats.getJobRespecting99percSLO()));
         stats.getStationaryStats().printIntervalEstimation();
     }
 

@@ -3,7 +3,8 @@ package it.uniroma2.models.sys;
 import it.uniroma2.controllers.servers.ServerState;
 import lombok.Getter;
 
-import static it.uniroma2.models.Config.RESPONSE_TIME_SLO;
+import static it.uniroma2.models.Config.RESPONSE_TIME_95PERC_SLO;
+import static it.uniroma2.models.Config.RESPONSE_TIME_99PERC_SLO;
 
 /**
  * Used for computing statistics
@@ -13,18 +14,21 @@ public class ServerStats {
     @Getter private double serviceSum;                 /* mean population in service intg(x(s))             */
     @Getter private int    completedJobs;              /* number of completed jobs                          */
     @Getter private double allocatedCapacity;          /* total allocated capacity per time                 */
-    @Getter private int    completedJobsInTime;        /* number of jobs that completed withing the SLO     */
+    @Getter private int    jobRespecting95percSLO;     /* number of jobs that completed withing the SLO     */
+    @Getter private int    jobRespecting99percSLO;     /* number of jobs that completed withing the SLO     */
     @Getter private double currMeanResponseTime;       /* current mean response time                        */
 
-    @Getter private StationaryStats stationaryStats;
+    @Getter private final StationaryStats stationaryStats;
 
     public ServerStats(int serverIndex){
-        this.nodeSum           = 0.0;
-        this.serviceSum        = 0.0;
-        this.completedJobs     =   0;
-        this.allocatedCapacity = 0.0;
+        this.nodeSum                = 0.0;
+        this.serviceSum             = 0.0;
+        this.completedJobs          =   0;
+        this.allocatedCapacity      = 0.0;
+        this.jobRespecting95percSLO =   0;
+        this.jobRespecting99percSLO =   0;
 
-        this.stationaryStats   = new StationaryStats(serverIndex);
+        this.stationaryStats = new StationaryStats(serverIndex);
     }
 
     /**
@@ -52,8 +56,11 @@ public class ServerStats {
             this.completedJobs++;
 
             /* Update SLO indicator */
-            if (completedJobResponseTime <= RESPONSE_TIME_SLO)
-                completedJobsInTime++;
+            if (completedJobResponseTime <= RESPONSE_TIME_95PERC_SLO)
+                this.jobRespecting95percSLO++;
+
+            if(completedJobResponseTime <= RESPONSE_TIME_99PERC_SLO)
+                this.jobRespecting99percSLO++;
 
             /* Update mean response time */
             currMeanResponseTime += (completedJobResponseTime - currMeanResponseTime) / completedJobs;
@@ -67,14 +74,16 @@ public class ServerStats {
         double currMeanJobNumber = this.nodeSum / endTs;
         double currMeanUtilization = this.getServiceSum() / endTs;
         double currMeanCapacityPerSec = this.getAllocatedCapacity() / endTs;
-        double currMeanViolationPercentage = 1.0f - this.getCompletedJobsInTime() / (double) this.getCompletedJobs();
+        double currMean95percViolationPercentage = 1.0f - this.getJobRespecting95percSLO() / (double) this.getCompletedJobs();
+        double currMean99percViolationPercentage = 1.0f - this.getJobRespecting99percSLO() / (double) this.getCompletedJobs();
         stationaryStats.updateStats(
                 endTs,
                 this.currMeanResponseTime,
                 currMeanJobNumber,
                 currMeanUtilization,
                 currMeanCapacityPerSec,
-                currMeanViolationPercentage
+                currMean95percViolationPercentage,
+                currMean99percViolationPercentage
         );
     }
 }

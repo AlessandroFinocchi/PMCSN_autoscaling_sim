@@ -29,7 +29,8 @@ public class SystemStats {
         double meanJobNumber = 0.0f;
         double systemUtilization = 0.0f;
         double totalAllocatedCapacityPerSec = 0.0f;
-        double SLOViolationsPercentage = 0.0f;
+        double slo95percViolationsPercentage = 0.0f;
+        double slo99percViolationsPercentage = 0.0f;
         int completedJobs = 0;
 
         for (ServerStats stat : stats) {
@@ -37,16 +38,18 @@ public class SystemStats {
             meanJobNumber += stat.getNodeSum() / currentTs;
             systemUtilization += stat.getServiceSum() / currentTs;
             totalAllocatedCapacityPerSec += stat.getAllocatedCapacity();
-            SLOViolationsPercentage += stat.getCompletedJobs() - stat.getCompletedJobsInTime();
+            slo95percViolationsPercentage += stat.getCompletedJobs() - stat.getJobRespecting95percSLO();
+            slo99percViolationsPercentage += stat.getCompletedJobs() - stat.getJobRespecting99percSLO();
             completedJobs += stat.getCompletedJobs();
         }
 
         meanSystemResponseTime /= completedJobs;
         totalAllocatedCapacityPerSec /= currentTs;
-        SLOViolationsPercentage /= completedJobs;
+        slo95percViolationsPercentage /= completedJobs;
+        slo99percViolationsPercentage /= completedJobs;
 
         stationaryStats.updateStats(currentTs, meanSystemResponseTime, meanJobNumber, systemUtilization,
-                totalAllocatedCapacityPerSec, SLOViolationsPercentage);
+                totalAllocatedCapacityPerSec, slo95percViolationsPercentage, slo99percViolationsPercentage);
     }
 
     public void processStats(double currentTs) {
@@ -54,14 +57,16 @@ public class SystemStats {
         double totalAllocatedCapacity = 0.0f;
         double meanSystemResponseTime = 0.0f;
         int completedJobs = 0;
-        int totalSLOViolations = 0;
+        int total95percSLOViolations = 0;
+        int total99percSLOViolations = 0;
 
         for (ServerStats stat : stats) {
             systemUtilization += stat.getServiceSum() / currentTs;
             totalAllocatedCapacity += stat.getAllocatedCapacity();
             meanSystemResponseTime += stat.getNodeSum();
             completedJobs += stat.getCompletedJobs();
-            totalSLOViolations += stat.getCompletedJobs() - stat.getCompletedJobsInTime();
+            total95percSLOViolations += stat.getCompletedJobs() - stat.getJobRespecting95percSLO();
+            total99percSLOViolations += stat.getCompletedJobs() - stat.getJobRespecting99percSLO();
         }
 
         meanSystemResponseTime /= completedJobs;
@@ -72,14 +77,18 @@ public class SystemStats {
         INTER_RUN_DATA.addField(INTER_RUN_KEY, SYSTEM_UTILIZATION, f.format(systemUtilization));
         INTER_RUN_DATA.addField(INTER_RUN_KEY, MEAN_SYSTEM_RESPONSE_TIME, f.format(meanSystemResponseTime));
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_JOBS_COMPLETED, completedJobs);
-        INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SLO_VIOLATIONS, totalSLOViolations);
-        INTER_RUN_DATA.addField(INTER_RUN_KEY, SLO_VIOLATIONS_PERCENTAGE, f.format((totalSLOViolations * 1.0f) / completedJobs));
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SLO_95_VIOLATIONS, total95percSLOViolations);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SLO_99_VIOLATIONS, total99percSLOViolations);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, SLO_95PERC_VIOLATIONS_PERCENTAGE, f.format((total95percSLOViolations * 1.0f) / completedJobs));
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, SLO_99PERC_VIOLATIONS_PERCENTAGE, f.format((total99percSLOViolations * 1.0f) / completedJobs));
 
         System.out.println();
         System.out.println("System utilization .................... = " + f.format(systemUtilization));
         System.out.println("Total Allocated Capacity per second ... = " + f.format(totalAllocatedCapacity / currentTs));
         System.out.println("Mean System Response .................. = " + f.format(meanSystemResponseTime));
-        System.out.println("Total jobs SLO violation .............. = " + f.format(totalSLOViolations));
-        System.out.println("Perc jobs SLO violation ............... = " + f.format((totalSLOViolations * 1.0f) / completedJobs));
+        System.out.println("Total jobs 95-percSLO violation .............. = " + f.format(total95percSLOViolations));
+        System.out.println("Total jobs 99-perc SLO violation .............. = " + f.format(total99percSLOViolations));
+        System.out.println("Perc jobs 95-perc SLO violation ....... = " + f.format((total95percSLOViolations * 1.0f) / completedJobs));
+        System.out.println("Perc jobs 99-perc SLO violation ....... = " + f.format((total99percSLOViolations * 1.0f) / completedJobs));
     }
 }

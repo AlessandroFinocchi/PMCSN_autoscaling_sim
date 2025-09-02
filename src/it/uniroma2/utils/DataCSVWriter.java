@@ -174,7 +174,8 @@ public class DataCSVWriter {
                 BM_SYSTEM_JOB_NUMBER,
                 BM_SYSTEM_UTILIZATION,
                 BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC,
-                BM_SYSTEM_SLO_VIOLATIONS_PERC
+                BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC,
+                BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC
         );
         for (int i = 1; i <= MAX_NUM_SERVERS; i++) {
             bmHeaders.add(
@@ -182,7 +183,8 @@ public class DataCSVWriter {
                     BM_SERVER_JOB_NUMBER + "_" + i,
                     BM_SERVER_UTILIZATION + "_" + i,
                     BM_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + i,
-                    BM_SERVER_SLO_VIOLATIONS_PERC + "_" + i
+                    BM_SERVER_95PERC_SLO_VIOLATIONS_PERC + "_" + i,
+                    BM_SERVER_99PERC_SLO_VIOLATIONS_PERC + "_" + i
             );
         }
         DataTimeTable fitleredBmData = INTRA_RUN_BM_DATA;
@@ -200,7 +202,8 @@ public class DataCSVWriter {
                 RUN_DATETIME, CONFIGURATION_DESCRIPTION, CONFIGURATION_ID, REPETITION_ID,
                 FINAL_TS, TOTAL_ALLOCATED_CAPACITY, ALLOCATED_CAPACITY_PER_SEC, SYSTEM_UTILIZATION,
                 MEAN_SYSTEM_RESPONSE_TIME, TOTAL_JOBS_COMPLETED, TOTAL_SPIKE_JOBS_COMPLETED,
-                TOTAL_SLO_VIOLATIONS, SLO_VIOLATIONS_PERCENTAGE
+                TOTAL_SLO_95_VIOLATIONS, TOTAL_SLO_99_VIOLATIONS,
+                SLO_95PERC_VIOLATIONS_PERCENTAGE, SLO_99PERC_VIOLATIONS_PERCENTAGE
         );
         flushList(INTER_RUN_DATA,
                 OUT_DIR_PATH, "final_all",

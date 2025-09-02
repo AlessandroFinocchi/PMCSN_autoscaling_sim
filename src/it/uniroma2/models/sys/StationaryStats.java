@@ -21,7 +21,8 @@ public class StationaryStats {
     private double sumBatchesJobNumber;
     private double sumBatchesUtilization;
     private double sumBatchesCapacityPerSec;
-    private double sumBatchesViolationPercentage;
+    private double sumBatches95percViolationPercentage;
+    private double sumBatches99percViolationPercentage;
 
     /* Welford algorithm variables*/
     private double responseTimeX;
@@ -32,8 +33,10 @@ public class StationaryStats {
     private double utilizationV;
     private double capacityPerSecX;
     private double capacityPerSecV;
-    private double violationPercentageX;
-    private double violationPercentageV;
+    private double slo95percViolationPercentageX;
+    private double slo95percViolationPercentageV;
+    private double slo99percViolationPercentageX;
+    private double slo99percViolationPercentageV;
 
     /**
      * @param serverIndex null if system stats, not null if server stats
@@ -47,7 +50,8 @@ public class StationaryStats {
         this.sumBatchesJobNumber = 0.0f;
         this.sumBatchesUtilization = 0.0f;
         this.sumBatchesCapacityPerSec = 0.0f;
-        this.sumBatchesViolationPercentage = 0.0f;
+        this.sumBatches95percViolationPercentage = 0.0f;
+        this.sumBatches99percViolationPercentage = 0.0f;
 
         this.responseTimeX = 0.0f;
         this.responseTimeV = 0.0f;
@@ -57,8 +61,10 @@ public class StationaryStats {
         this.utilizationV = 0.0f;
         this.capacityPerSecX = 0.0f;
         this.capacityPerSecV = 0.0f;
-        this.violationPercentageX = 0.0f;
-        this.violationPercentageV = 0.0f;
+        this.slo95percViolationPercentageX = 0.0f;
+        this.slo95percViolationPercentageV = 0.0f;
+        this.slo99percViolationPercentageX = 0.0f;
+        this.slo99percViolationPercentageV = 0.0f;
 
         this.f = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
         this.f.applyPattern("###0.00000000");
@@ -74,7 +80,8 @@ public class StationaryStats {
     }
 
     public void updateStats(double endTs, double currMeanResponseTime, double currMeanJobNumber,
-                            double currMeanUtilization, double currMeanCapacityPerSec, double currMeanViolationPercentage) {
+                            double currMeanUtilization, double currMeanCapacityPerSec,
+                            double currMean95percViolationPercentage, double currMean99percViolationPercentage) {
         /* Return if all batches were computed or the batch is not ready */
 //        if (isCompleted()) return;
 
@@ -83,14 +90,16 @@ public class StationaryStats {
         double currBatchJobNumber = (this.currBatch + 1) * currMeanJobNumber - this.sumBatchesJobNumber;
         double currBatchUtilization = (this.currBatch + 1) * currMeanUtilization - this.sumBatchesUtilization;
         double currBatchCapacityPerSec = (this.currBatch + 1) * currMeanCapacityPerSec - this.sumBatchesCapacityPerSec;
-        double currBatchViolationPercentage = (this.currBatch + 1) * currMeanViolationPercentage - this.sumBatchesViolationPercentage;
+        double currBatch95percViolationPercentage = (this.currBatch + 1) * currMean95percViolationPercentage - this.sumBatches95percViolationPercentage;
+        double currBatch99percViolationPercentage = (this.currBatch + 1) * currMean99percViolationPercentage - this.sumBatches99percViolationPercentage;
 
         /* Update statistic sums */
         this.sumBatchesResponseTime += currBatchResponseTime;
         this.sumBatchesJobNumber += currBatchJobNumber;
         this.sumBatchesUtilization += currBatchUtilization;
         this.sumBatchesCapacityPerSec += currBatchCapacityPerSec;
-        this.sumBatchesViolationPercentage += currBatchViolationPercentage;
+        this.sumBatches95percViolationPercentage += currBatch95percViolationPercentage;
+        this.sumBatches99percViolationPercentage += currBatch99percViolationPercentage;
 
         /* System stationary stats */
         if (this.serverIndex == null){
@@ -98,7 +107,8 @@ public class StationaryStats {
             INTRA_RUN_BM_DATA.addField(endTs, BM_SYSTEM_JOB_NUMBER, currBatchJobNumber);
             INTRA_RUN_BM_DATA.addField(endTs, BM_SYSTEM_UTILIZATION, currBatchUtilization);
             INTRA_RUN_BM_DATA.addField(endTs, BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC, currBatchCapacityPerSec);
-            INTRA_RUN_BM_DATA.addField(endTs, BM_SYSTEM_SLO_VIOLATIONS_PERC, currBatchViolationPercentage);
+            INTRA_RUN_BM_DATA.addField(endTs, BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC, currBatch95percViolationPercentage);
+            INTRA_RUN_BM_DATA.addField(endTs, BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC, currBatch99percViolationPercentage);
         }
         /* Server stationary stats */
         else {
@@ -106,7 +116,8 @@ public class StationaryStats {
             INTRA_RUN_BM_DATA.addFieldWithSuffix(endTs, BM_SERVER_JOB_NUMBER, String.valueOf(serverIndex), currBatchJobNumber);
             INTRA_RUN_BM_DATA.addFieldWithSuffix(endTs, BM_SERVER_UTILIZATION, String.valueOf(serverIndex), currBatchUtilization);
             INTRA_RUN_BM_DATA.addFieldWithSuffix(endTs, BM_SERVER_ALLOCATED_CAPACITY_PER_SEC, String.valueOf(serverIndex), currBatchCapacityPerSec);
-            INTRA_RUN_BM_DATA.addFieldWithSuffix(endTs, BM_SERVER_SLO_VIOLATIONS_PERC, String.valueOf(serverIndex), currBatchViolationPercentage);
+            INTRA_RUN_BM_DATA.addFieldWithSuffix(endTs, BM_SERVER_95PERC_SLO_VIOLATIONS_PERC, String.valueOf(serverIndex), currBatch95percViolationPercentage);
+            INTRA_RUN_BM_DATA.addFieldWithSuffix(endTs, BM_SERVER_99PERC_SLO_VIOLATIONS_PERC, String.valueOf(serverIndex), currBatch99percViolationPercentage);
         }
 
         this.currBatch++;
@@ -128,9 +139,13 @@ public class StationaryStats {
         this.capacityPerSecV += Math.pow(capacityPerSecD, 2) * (this.currBatch - 1) / this.currBatch;
         this.capacityPerSecX += capacityPerSecD / this.currBatch;
 
-        double violationPercentageD = currBatchViolationPercentage - this.violationPercentageX;
-        this.violationPercentageV += Math.pow(violationPercentageD, 2) * (this.currBatch - 1) / this.currBatch;
-        this.violationPercentageX += violationPercentageD / this.currBatch;
+        double slo95percViolationPercentageD = currBatch95percViolationPercentage - this.slo95percViolationPercentageX;
+        this.slo95percViolationPercentageV += Math.pow(slo95percViolationPercentageD, 2) * (this.currBatch - 1) / this.currBatch;
+        this.slo95percViolationPercentageX += slo95percViolationPercentageD / this.currBatch;
+
+        double slo99percViolationPercentageD = currBatch99percViolationPercentage - this.slo99percViolationPercentageX;
+        this.slo99percViolationPercentageV += Math.pow(slo99percViolationPercentageD, 2) * (this.currBatch - 1) / this.currBatch;
+        this.slo99percViolationPercentageX += slo99percViolationPercentageD / this.currBatch;
     }
 
     public boolean isCompleted(){
@@ -141,23 +156,25 @@ public class StationaryStats {
         if (!LOG_BM) return;
 
         double x,s, u, t, w;
-        double responseTimeS    = Math.sqrt(this.responseTimeV / this.currBatch);
-        double jobNumberS       = Math.sqrt(this.jobNumberV / this.currBatch);
-        double utilizationS     = Math.sqrt(this.utilizationV / this.currBatch);
-        double capacityPerSecS  = Math.sqrt(this.capacityPerSecV / this.currBatch);
-        double violationS       = Math.sqrt(this.violationPercentageV / this.currBatch);
+        double responseTimeS       = Math.sqrt(this.responseTimeV / this.currBatch);
+        double jobNumberS          = Math.sqrt(this.jobNumberV / this.currBatch);
+        double utilizationS        = Math.sqrt(this.utilizationV / this.currBatch);
+        double capacityPerSecS     = Math.sqrt(this.capacityPerSecV / this.currBatch);
+        double slo95percViolationS = Math.sqrt(this.slo95percViolationPercentageV / this.currBatch);
+        double slo99percViolationS = Math.sqrt(this.slo99percViolationPercentageV / this.currBatch);
 
         double confidence = 1 - STATS_CONFIDENCE_ALPHA;
         Rvms rvms = new Rvms();
         u = 1.0 - 0.5 * STATS_CONFIDENCE_ALPHA;                 /* interval parameter  */
-        t = rvms.idfStudent(this.currBatch - 1, u);             /* critical value of t */
+        t = rvms.idfStudent(this.currBatch - 1, u);        /* critical value of t */
 
         Map<String, Pair<Double, Double>> metrics = new LinkedHashMap<>();
-        metrics.put("Response Time ..........", new Pair<>(this.responseTimeX, responseTimeS));
-        metrics.put("Job Number .............", new Pair<>(this.jobNumberX, jobNumberS));
-        metrics.put("Utilization ............", new Pair<>(this.utilizationX, utilizationS));
-        metrics.put("Capacity per sec .......", new Pair<>(this.capacityPerSecX, capacityPerSecS));
-        metrics.put("Violation Percentage ...", new Pair<>(this.violationPercentageX, violationS));
+        metrics.put("Response Time .....................", new Pair<>(this.responseTimeX, responseTimeS));
+        metrics.put("Job Number ........................", new Pair<>(this.jobNumberX, jobNumberS));
+        metrics.put("Utilization .......................", new Pair<>(this.utilizationX, utilizationS));
+        metrics.put("Capacity per sec ..................", new Pair<>(this.capacityPerSecX, capacityPerSecS));
+        metrics.put("95-perc SLO Violation Percentage ..", new Pair<>(this.slo95percViolationPercentageX, slo95percViolationS));
+        metrics.put("99-perc SLO Violation Percentage ..", new Pair<>(this.slo99percViolationPercentageX, slo99percViolationS));
 
         System.out.println("Interval estimations based upon "+ this.currBatch + " data points " +
                 "and with " + (int) (100.0 * confidence + 0.5) + "% confidence");

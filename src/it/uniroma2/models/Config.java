@@ -38,7 +38,8 @@ public class Config {
     public static boolean EMPTY_JOBS;
     public static double INFINITY;
     public static double SCALING_OUT_THRESHOLD;
-    public static double RESPONSE_TIME_SLO;
+    public static double RESPONSE_TIME_95PERC_SLO;
+    public static double RESPONSE_TIME_99PERC_SLO;
     public static int MAX_NUM_SERVERS;
     public static int START_NUM_SERVERS;
     public static double SI_MAX;
@@ -125,7 +126,8 @@ public class Config {
             INFINITY = Double.POSITIVE_INFINITY;
             SCALING_OUT_THRESHOLD = (Objects.equals(props.getProperty("webserver.scaling.out_thr"), "INFINITY")) ?
                     Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("webserver.scaling.out_thr"));
-            RESPONSE_TIME_SLO = Double.parseDouble(props.getProperty("infrastructure.response_time_slo"));
+            RESPONSE_TIME_95PERC_SLO = Double.parseDouble(props.getProperty("infrastructure.response_time_slo.95_perc"));
+            RESPONSE_TIME_99PERC_SLO = Double.parseDouble(props.getProperty("infrastructure.response_time_slo.99_perc"));
             MAX_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.max_num_server"));
             START_NUM_SERVERS = Integer.parseInt(props.getProperty("infrastructure.start_num_server"));
             SI_MAX = Double.parseDouble(props.getProperty("infrastructure.si_max"));
