@@ -1,6 +1,6 @@
 package it.uniroma2.models.configurations.experiments;
 
-import it.uniroma2.controllers.configurations.ConfigurationFactory;
+import it.uniroma2.models.configurations.ConfigurationFactory;
 import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.configurations.RunConfiguration;
 
@@ -26,12 +26,12 @@ public class ExperimentBase1 implements Experiment {
         Parameter parSLO = new Parameter("infrastructure.response_time_slo");
         parameters.add(parSiMax);
         parameters.add(parSLO);
-        for (int si=2; si<=10; si+=2) {
-//        for (int si = 2; si <= 2; si+= 2) {
+//        for (int si=2; si<=10; si+=2) {
+        for (int si = 2; si <= 2; si+= 2) {
             parSiMax.addValues(String.valueOf(si));
         }
-        for (double slo = 2; slo <= 6; slo += 1) {
-//        for (double slo=2.0; slo <= 2.0; slo+= 0.5) {
+//        for (double slo = 2; slo <= 6; slo += 1) {
+        for (double slo=2.0; slo <= 2.0; slo+= 0.5) {
             parSLO.addValues(String.valueOf(slo));
         }
 

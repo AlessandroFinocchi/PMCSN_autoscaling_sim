@@ -6,16 +6,11 @@ import lombok.Setter;
 
 public class WebServer extends AbstractServer {
     @Getter @Setter private Double activationTimestamp;
-    private double timeActive;
 
     public WebServer(double capacity, ServerState serverState, int index) {
         super(capacity, serverState, index);
     }
     
-    public double getRemainingServerLife() {
-        return jobs.getSumRemainingLife();
-    }
-
     @Override
     public boolean removeJob(Job job) {
         jobs.removeJob(job);

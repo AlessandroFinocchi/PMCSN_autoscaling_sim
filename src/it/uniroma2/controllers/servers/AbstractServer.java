@@ -43,12 +43,13 @@ public abstract class AbstractServer implements IServer {
     @Override
     public void computeJobsAdvancement(double startTs, double endTs, Double completedJobResponseTime) throws IllegalLifeException {
         /*  At this point the job has already been removed, so if this is the server
-         *   where completion happened, it must be taken into consideration */
+         *  where completion happened, it must be taken into consideration */
         int completedJob = completedJobResponseTime == null ? 0 : 1;
         int jobAdvanced = jobs.size() + completedJob;
 
         stats.updateServerStats(startTs, endTs, jobAdvanced, completedJobResponseTime, this.serverState, this.capacity);
 
+        /* Update moving window response time */
         if(completedJob == 1) {
             if(this.movingWindowResponseTime.size() == SLIDING_WINDOW_SIZE) {
                 this.movingWindowResponseTime.removeFirst();

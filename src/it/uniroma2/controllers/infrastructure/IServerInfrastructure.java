@@ -14,7 +14,6 @@ public interface IServerInfrastructure {
 
     /**
      * Processes the job advancement in their execution
-     *
      * @param startTs      the computation interval start
      * @param endTs        the computation interval end
      * @param isCompletion if the advancement is a completion or not
@@ -41,6 +40,10 @@ public interface IServerInfrastructure {
      */
     double computeNextCompletionTs(double endTs);
 
+    /**
+     * Checks if stationary stats have been fully computed
+     * @return if stationary stats have finished computing
+     */
     boolean isCompletedStationaryStats();
 
     void printServerStats(double currentTs);

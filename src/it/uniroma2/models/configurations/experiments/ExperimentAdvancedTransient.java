@@ -1,6 +1,6 @@
 package it.uniroma2.models.configurations.experiments;
 
-import it.uniroma2.controllers.configurations.ConfigurationFactory;
+import it.uniroma2.models.configurations.ConfigurationFactory;
 import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.configurations.RunConfiguration;
 

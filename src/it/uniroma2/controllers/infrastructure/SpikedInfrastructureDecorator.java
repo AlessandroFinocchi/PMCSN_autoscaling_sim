@@ -174,7 +174,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         base.scalingIndicator = allServers.stream()
                 .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
                 .map(AbstractServer::size)
-                .reduce(0, (a, b) -> a + b);
+                .reduce(0, Integer::sum);
     }
 
 }

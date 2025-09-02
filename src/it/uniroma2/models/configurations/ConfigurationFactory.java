@@ -1,8 +1,4 @@
-package it.uniroma2.controllers.configurations;
-
-import it.uniroma2.models.configurations.RunConfiguration;
-import it.uniroma2.models.configurations.MultiCounter;
-import it.uniroma2.models.configurations.Parameter;
+package it.uniroma2.models.configurations;
 
 import java.util.ArrayList;
 import java.util.List;

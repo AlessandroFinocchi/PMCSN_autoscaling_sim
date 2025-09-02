@@ -22,7 +22,7 @@ import static it.uniroma2.utils.DataField.*;
 public class BaseServerInfrastructure implements IServerInfrastructure {
     final IScheduler scheduler;
     final List<WebServer> webServers;
-    double scalingIndicator;
+    double scalingIndicator;    /* Actually based on the number of jobs in the system */
     SystemStats systemStats;
     TransientStats transientStats;
 
@@ -67,6 +67,8 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         Double completedJobResponseTime = null;
         Job completedJob;
 
+        /* If there is a completion, before updating the jobs life
+           get the completing job to take its stats and remove it*/
         if (isCompletion) {
             completionServerIndex = getCompletingServerIndex();
             WebServer minServer = webServers.get(completionServerIndex);
@@ -293,6 +295,6 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         this.scalingIndicator = webServers.stream()
                 .filter(ws -> ws.getServerState() == ServerState.ACTIVE || ws.getServerState() == ServerState.TO_BE_REMOVED)
                 .map(AbstractServer::size)
-                .reduce(0, (a, b) -> a + b);
+                .reduce(0, Integer::sum);
     }
 }
