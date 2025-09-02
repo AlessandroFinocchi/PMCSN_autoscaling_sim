@@ -13,10 +13,6 @@ public class ExperimentBaseValidation implements Experiment{
         String EXP = "exp";
         String H2 = "h2";
 
-        /* Common */
-        for (int i = 1; i <= 10; i++){
-        }
-
         setConfiguration(1, EXP, EXP, 3, 1, 1);
         setConfiguration(2, EXP, EXP, 4, 1, 1);
         setConfiguration(3, EXP, H2,  3, 1, 1);
