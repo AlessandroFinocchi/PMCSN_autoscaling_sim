@@ -12,9 +12,9 @@ import static it.uniroma2.utils.DataField.*;
 
 public class StationaryStats {
     private final DecimalFormat f;
-    private int counter;
-    private int currBatch;
-    private final Integer serverIndex;
+    private int counter;                /* For tracking when to trigger update*/
+    private int currBatch;              /* For tracking the last processed batch */
+    private final Integer serverIndex;  /* Null if System stats, not null if server stats */
 
     /* Metrics sums */
     private double sumBatchesResponseTime;
@@ -53,6 +53,7 @@ public class StationaryStats {
         this.sumBatches95percViolationPercentage = 0.0f;
         this.sumBatches99percViolationPercentage = 0.0f;
 
+        /* Values to compute Welford's algorithm */
         this.responseTimeX = 0.0f;
         this.responseTimeV = 0.0f;
         this.jobNumberX = 0.0f;
@@ -79,6 +80,10 @@ public class StationaryStats {
         return isBatchEnd();
     }
 
+    /**
+     * This method computes for each metric, give their current means as parameters,
+     * since the class keeps the sum all the previous batch means, the means of the current batch
+     */
     public void updateStats(double endTs, double currMeanResponseTime, double currMeanJobNumber,
                             double currMeanUtilization, double currMeanCapacityPerSec,
                             double currMean95percViolationPercentage, double currMean99percViolationPercentage) {
@@ -155,7 +160,7 @@ public class StationaryStats {
     public void printIntervalEstimation() {
         if (!LOG_BM) return;
 
-        double x,s, u, t, w;
+        double x, s, u, t, w;
         double responseTimeS       = Math.sqrt(this.responseTimeV / this.currBatch);
         double jobNumberS          = Math.sqrt(this.jobNumberV / this.currBatch);
         double utilizationS        = Math.sqrt(this.utilizationV / this.currBatch);
@@ -165,8 +170,8 @@ public class StationaryStats {
 
         double confidence = 1 - STATS_CONFIDENCE_ALPHA;
         Rvms rvms = new Rvms();
-        u = 1.0 - 0.5 * STATS_CONFIDENCE_ALPHA;                 /* interval parameter  */
-        t = rvms.idfStudent(this.currBatch - 1, u);        /* critical value of t */
+        u = 1.0 - 0.5 * STATS_CONFIDENCE_ALPHA;          /* interval parameter  */
+        t = rvms.idfStudent(this.currBatch - 1, u); /* critical value of t */
 
         Map<String, Pair<Double, Double>> metrics = new LinkedHashMap<>();
         metrics.put("Response Time .....................", new Pair<>(this.responseTimeX, responseTimeS));

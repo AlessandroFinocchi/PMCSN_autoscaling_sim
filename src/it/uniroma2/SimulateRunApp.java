@@ -20,12 +20,10 @@ import static it.uniroma2.utils.DataCSVWriter.*;
 import static it.uniroma2.utils.DataField.*;
 
 public class SimulateRunApp {
-
     private static final Rngs R = new Rngs();
-    private static List<RunConfiguration> configurations;
 
     public static void main(String[] args) throws IllegalLifeException {
-        configurations = Config.createConfigurations();
+        List<RunConfiguration> configurations = Config.createConfigurations();
         for (RunConfiguration c : configurations) {
             setup(c);
             for (int i = 0; i < REPEAT_CONFIGURATION; i++) {
@@ -71,6 +69,7 @@ public class SimulateRunApp {
         Distribution turnOnVA = new Normal(R, 6, 7, TURN_ON_MU, TURN_ON_STD);
 
         /* Log to CSV the initial seed for each stream for replayability */
+        //todo: togliere? non credo che serva
         for (int stream = 0; stream < TOTAL_STREAMS; stream++) {
             R.selectStream(stream);
             INTER_RUN_DATA.addFieldWithSuffix(INTER_RUN_KEY, STREAM_SEED, String.valueOf(stream), R.getSeed());
@@ -96,6 +95,7 @@ public class SimulateRunApp {
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());
 
+            //todo: modificare
             if (nextEvent.getTimestamp() % ARRIVALS_TOTAL_PERIOD < ARRIVALS_TOTAL_PERIOD - ARRIVALS_FAST_INTERVAL) {
                 // Slow arrivals
                 arrivalVA.setMean(ARRIVALS_MU); // 4 arrivals each s
@@ -110,6 +110,13 @@ public class SimulateRunApp {
         s.printStats();
     }
 
+    /**
+     * If stationary-stats statistics are completed, stop
+     * If clock time surpassed limit, if jobs don't have to be emptied or jobs are finished, stop
+     * Otherwise, continue simulating (you can see it all negating the condition)
+     * @param s state to compute condition
+     * @return if the simulation has to continue
+     */
     private static boolean continueSimulating(SystemState s) {
         return (s.getCurrent() < STOP || (EMPTY_JOBS && s.activeJobExists()))
                 && !s.getServers().isCompletedStationaryStats();

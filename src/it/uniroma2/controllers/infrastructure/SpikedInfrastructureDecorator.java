@@ -86,7 +86,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
 
         this.updateScalingIndicator();
 
-        this.transientStats.updateStats(startTs, endTs, completionServerIndex, completedJobResponseTime);
+        this.transientStats.updateStats(endTs, completionServerIndex, completedJobResponseTime);
 
         return base.scalingIndicator;
     }

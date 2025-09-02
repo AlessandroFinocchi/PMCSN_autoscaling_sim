@@ -8,7 +8,7 @@ import static it.uniroma2.utils.DataCSVWriter.INTRA_RUN_DATA;
 import static it.uniroma2.utils.DataField.*;
 
 public class TransientStats {
-    private List<ServerStats> stats;
+    private final List<ServerStats> stats;
     private double aggSystemResponseTime;
     private final Double[] aggServerResponseTimes;
     private double aggSystemJobNumber;
@@ -38,7 +38,7 @@ public class TransientStats {
         Arrays.fill(this.aggServerAllocatedCapacityPerSec, 0.0);
     }
 
-    public void updateStats(double startTs, double endTs, Integer completionServerIndex, Double currJobResponseTime) {
+    public void updateStats(double endTs, Integer completionServerIndex, Double currJobResponseTime) {
         assert (completionServerIndex == null && currJobResponseTime == null) ||
                (completionServerIndex != null && currJobResponseTime != null);
 

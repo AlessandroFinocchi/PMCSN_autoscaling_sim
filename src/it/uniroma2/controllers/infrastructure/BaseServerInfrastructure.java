@@ -103,7 +103,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
 
         this.updateScalingIndicator();
 
-        this.transientStats.updateStats(startTs, endTs, completionServerIndex, completedJobResponseTime);
+        this.transientStats.updateStats(endTs, completionServerIndex, completedJobResponseTime);
 
         return this.scalingIndicator;
     }

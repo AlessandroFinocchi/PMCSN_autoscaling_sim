@@ -13,7 +13,6 @@ public class ExperimentBase1 implements Experiment {
         /* Common */
         List<Parameter> parameters = new ArrayList<>();
         parameters.add(new Parameter("log.intra_run").addValues("false"));
-        parameters.add(new Parameter("log.bm").addValues("false"));
         parameters.add(new Parameter("distribution.arrivals.mu").addValues(String.valueOf(1.0 / 4.0)));
         parameters.add(new Parameter("distribution.services.z").addValues("1"));
         parameters.add(new Parameter("infrastructure.start_num_server").addValues("5"));
@@ -27,12 +26,12 @@ public class ExperimentBase1 implements Experiment {
         Parameter parSLO = new Parameter("infrastructure.response_time_slo");
         parameters.add(parSiMax);
         parameters.add(parSLO);
-//        for (int si=2; si<=10; si+=2) {
-            for (int si = 2; si <= 2; si+= 2) {
+        for (int si=2; si<=10; si+=2) {
+//        for (int si = 2; si <= 2; si+= 2) {
             parSiMax.addValues(String.valueOf(si));
         }
-//            for (double slo = 2; slo <= 6; slo += 1) {
-                for (double slo=2.0; slo <= 2.0; slo+= 0.5) {
+        for (double slo = 2; slo <= 6; slo += 1) {
+//        for (double slo=2.0; slo <= 2.0; slo+= 0.5) {
             parSLO.addValues(String.valueOf(slo));
         }
 

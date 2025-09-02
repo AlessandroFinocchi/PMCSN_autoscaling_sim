@@ -37,7 +37,6 @@ public class ServerStats {
      */
     public void updateServerStats(double startTs, double endTs, double jobNum, Double completedJobResponseTime,
                                   ServerState serverState, double currentCapacity) {
-
         assert startTs >= 0 && endTs >= startTs && jobNum >= 0;
 
         /* Check if there has been a completion */
@@ -45,8 +44,8 @@ public class ServerStats {
 
         /* Update statistics */
         if(jobNum > 0) {
-            this.nodeSum       += (endTs - startTs) * jobNum;
-            this.serviceSum    += (endTs - startTs);
+            this.nodeSum    += (endTs - startTs) * jobNum;
+            this.serviceSum += (endTs - startTs);
         }
 
         if(serverState == ServerState.ACTIVE || serverState == ServerState.TO_BE_REMOVED)
@@ -71,9 +70,9 @@ public class ServerStats {
     }
 
     private void updateStationaryStats(double endTs) {
-        double currMeanJobNumber = this.nodeSum / endTs;
-        double currMeanUtilization = this.getServiceSum() / endTs;
-        double currMeanCapacityPerSec = this.getAllocatedCapacity() / endTs;
+        double currMeanJobNumber                 = this.getNodeSum() / endTs;
+        double currMeanUtilization               = this.getServiceSum() / endTs;
+        double currMeanCapacityPerSec            = this.getAllocatedCapacity() / endTs;
         double currMean95percViolationPercentage = 1.0f - this.getJobRespecting95percSLO() / (double) this.getCompletedJobs();
         double currMean99percViolationPercentage = 1.0f - this.getJobRespecting99percSLO() / (double) this.getCompletedJobs();
         stationaryStats.updateStats(

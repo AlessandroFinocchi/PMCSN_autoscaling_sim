@@ -15,13 +15,6 @@ public class ExperimentBaseValidation implements Experiment{
 
         /* Common */
         for (int i = 1; i <= 10; i++){
-            RunConfiguration c = new RunConfiguration("val_b_" + String.format("%02d", i));
-            c.put("random.repeat_config", "1");
-            c.put("log.intra_run", "true");
-            c.put("stats.batch.size", "INFINITY");
-            c.put("system.stop", "10000");
-            c.put("system.empty_jobs", "false");
-            result.add(c);
         }
 
         setConfiguration(1, EXP, EXP, 3, 1, 1);
@@ -40,7 +33,16 @@ public class ExperimentBaseValidation implements Experiment{
 
     void setConfiguration(int index, String arrivalDistr, String completionDistr, double lambda,
                           int wsNumber, double wsCapacity) {
-        RunConfiguration c = result.get(index - 1);
+        RunConfiguration c = new RunConfiguration("val_b_" + String.format("%02d", index));
+
+        /* Common */
+        c.put("random.repeat_config", "1");
+        c.put("log.intra_run", "true");
+        c.put("stats.batch.size", "INFINITY");
+        c.put("system.stop", "10000");
+        c.put("system.empty_jobs", "false");
+
+        /* Specific */
         c.put("distribution.arrivals.type", arrivalDistr);
         c.put("distribution.services.type", completionDistr);
         c.put("distribution.arrivals.mu", String.valueOf(1.0 / lambda));
@@ -49,5 +51,7 @@ public class ExperimentBaseValidation implements Experiment{
 
         // extra
         c.put("infrastructure.max_num_server", c.get("infrastructure.start_num_server"));
+
+        result.add(c);
     }
 }
