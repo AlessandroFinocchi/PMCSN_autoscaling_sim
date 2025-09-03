@@ -174,12 +174,12 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
 
     public void scaleIn(double endTs) {
         base.scaleIn(endTs);
-        this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumWebServersByState(ServerState.ACTIVE));
+        this.spikeServer.setCapacity(SPIKE_CAPACITY);
     }
 
     public void scaleOut(double endTs, WebServer targetWebServer) {
         base.scaleOut(endTs, targetWebServer);
-        this.spikeServer.setCapacity(SPIKE_CAPACITY * this.getNumWebServersByState(ServerState.ACTIVE));
+        this.spikeServer.setCapacity(SPIKE_CAPACITY);
     }
 
     void updateScalingIndicator() {
