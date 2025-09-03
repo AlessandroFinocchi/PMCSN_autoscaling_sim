@@ -120,7 +120,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
             base.assignJob(job);
         } else {
             // Mid congestion
-            if (!spikeServerCongestion) {
+            if (SPIKE_VERSION == 1 || (SPIKE_VERSION == 2 && !spikeServerCongestion) ) {
                 spikeServer.addJob(job);
             // High congestion
             } else {

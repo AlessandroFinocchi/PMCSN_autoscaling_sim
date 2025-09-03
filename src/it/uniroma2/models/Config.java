@@ -45,6 +45,7 @@ public class Config {
     public static double SI_MAX;
     public static double SPIKE_CAPACITY;
     public static boolean SPIKESERVER_ACTIVE;
+    public static int SPIKE_VERSION;
     public static String SCHEDULER_TYPE;
     public static double TURN_ON_MU;
     public static double TURN_ON_STD;
@@ -132,6 +133,7 @@ public class Config {
             SI_MAX = Double.parseDouble(props.getProperty("infrastructure.si_max"));
             SPIKE_CAPACITY = Double.parseDouble(props.getProperty("spikeserver.capacity"));
             SPIKESERVER_ACTIVE = Boolean.parseBoolean(props.getProperty("infrastructure.spikeserver.active"));
+            SPIKE_VERSION = Integer.parseInt(props.getProperty("spikeserver.version"));
             SCHEDULER_TYPE = props.getProperty("infrastructure.scheduler");
             SLIDING_WINDOW_SIZE = Integer.parseInt(props.getProperty("infrastructure.window_size"));
 

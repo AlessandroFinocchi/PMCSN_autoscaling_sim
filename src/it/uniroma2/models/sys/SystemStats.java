@@ -62,6 +62,8 @@ public class SystemStats {
         int completedJobs = 0;
         int total95percSLOViolations = 0;
         int total99percSLOViolations = 0;
+        int spike95percSLOViolations = 0;
+        int spike99percSLOViolations = 0;
 
         for (ServerStats stat : stats) {
             systemUtilization += stat.getServiceSum() / currentTs;
@@ -69,6 +71,8 @@ public class SystemStats {
             if (stat.getServerIndex() == 0){
                 // Spike server
                 spikeVirtualAllocatedCapacity += stat.getServiceSum() * SPIKE_CAPACITY;
+                spike95percSLOViolations += stat.getCompletedJobs() - stat.getJobRespecting95percSLO();
+                spike99percSLOViolations += stat.getCompletedJobs() - stat.getJobRespecting99percSLO();
             } else {
                 // Web servers
                 wsAllocatedCapacity += stat.getAllocatedCapacity();
@@ -91,6 +95,8 @@ public class SystemStats {
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_JOBS_COMPLETED, completedJobs);
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SLO_95_VIOLATIONS, total95percSLOViolations);
         INTER_RUN_DATA.addField(INTER_RUN_KEY, TOTAL_SLO_99_VIOLATIONS, total99percSLOViolations);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, SPIKE_SLO_95_VIOLATIONS, spike95percSLOViolations);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, SPIKE_SLO_99_VIOLATIONS, spike99percSLOViolations);
         INTER_RUN_DATA.addField(INTER_RUN_KEY, SLO_95PERC_VIOLATIONS_PERCENTAGE, f.format((total95percSLOViolations * 1.0f) / completedJobs));
         INTER_RUN_DATA.addField(INTER_RUN_KEY, SLO_99PERC_VIOLATIONS_PERCENTAGE, f.format((total99percSLOViolations * 1.0f) / completedJobs));
 
