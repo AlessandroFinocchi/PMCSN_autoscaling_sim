@@ -111,10 +111,22 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
     }
 
     public void assignJob(Job job) {
-        if (base.webServersSize() >= SI_MAX * getNumWebServersByState(ServerState.ACTIVE) ) {
-            spikeServer.addJob(job);
-        } else {
+        boolean webServerCongestion = base.webServersSize() >= SI_MAX * getNumWebServersByState(ServerState.ACTIVE);
+        double spikeToWebCapacityRatio = spikeServer.getCapacity() / WEBSERVER_CAPACITY;
+        boolean spikeServerCongestion = spikeServer.size() >= SI_MAX * spikeToWebCapacityRatio;
+
+        // Low congestion
+        if (!webServerCongestion) {
             base.assignJob(job);
+        } else {
+            // Mid congestion
+            if (!spikeServerCongestion) {
+                spikeServer.addJob(job);
+            // High congestion
+            } else {
+                AbstractServer target = base.getScheduler().select(this.allServers);
+                target.addJob(job);
+            }
         }
     }
 

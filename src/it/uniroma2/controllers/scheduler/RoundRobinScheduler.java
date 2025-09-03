@@ -1,5 +1,6 @@
 package it.uniroma2.controllers.scheduler;
 
+import it.uniroma2.controllers.servers.AbstractServer;
 import it.uniroma2.controllers.servers.ServerState;
 import it.uniroma2.controllers.servers.WebServer;
 
@@ -13,10 +14,10 @@ public class RoundRobinScheduler implements IScheduler{
     }
 
     @Override
-    public WebServer select(List<WebServer> webServers) {
+    public AbstractServer select(List<AbstractServer> webServers) {
         for(int currIndex, i = 0; i < webServers.size(); i++) {
             currIndex = (nextAssigningServer + i) % webServers.size();
-            WebServer server = webServers.get(currIndex);
+            AbstractServer server = webServers.get(currIndex);
             if (server.getServerState() == ServerState.ACTIVE) {
                 nextAssigningServer = (currIndex + 1) % webServers.size();
                 return server;

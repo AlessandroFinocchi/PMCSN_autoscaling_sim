@@ -9,6 +9,7 @@ import it.uniroma2.models.sys.ServerStats;
 import it.uniroma2.models.sys.StationaryStats;
 import it.uniroma2.models.sys.SystemStats;
 import it.uniroma2.models.sys.TransientStats;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,6 +21,7 @@ import static it.uniroma2.utils.DataCSVWriter.*;
 import static it.uniroma2.utils.DataField.*;
 
 public class BaseServerInfrastructure implements IServerInfrastructure {
+    @Getter
     final IScheduler scheduler;
     final List<WebServer> webServers;
     double scalingIndicator;    /* Actually based on the number of jobs in the system */
@@ -138,7 +140,8 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
     }
 
     public void assignJob(Job job) {
-        AbstractServer target = scheduler.select(this.webServers);
+        List<AbstractServer> baseList = new ArrayList<>(this.webServers);
+        AbstractServer target = scheduler.select(baseList);
         target.addJob(job);
     }
 

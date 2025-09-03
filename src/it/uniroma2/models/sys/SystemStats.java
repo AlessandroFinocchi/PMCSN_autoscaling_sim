@@ -86,9 +86,9 @@ public class SystemStats {
         System.out.println("System utilization .................... = " + f.format(systemUtilization));
         System.out.println("Total Allocated Capacity per second ... = " + f.format(totalAllocatedCapacity / currentTs));
         System.out.println("Mean System Response .................. = " + f.format(meanSystemResponseTime));
-        System.out.println("Total jobs 95-percSLO violation .............. = " + f.format(total95percSLOViolations));
-        System.out.println("Total jobs 99-perc SLO violation .............. = " + f.format(total99percSLOViolations));
-        System.out.println("Perc jobs 95-perc SLO violation ....... = " + f.format((total95percSLOViolations * 1.0f) / completedJobs));
-        System.out.println("Perc jobs 99-perc SLO violation ....... = " + f.format((total99percSLOViolations * 1.0f) / completedJobs));
+        System.out.println("Total jobs 95-percSLO violation ....... = " + f.format(total95percSLOViolations));
+        System.out.println("Total jobs 99-perc SLO violation ...... = " + f.format(total99percSLOViolations));
+        System.out.println("Perc  jobs 95-perc SLO violation ...... = " + f.format((total95percSLOViolations * 1.0f) / completedJobs));
+        System.out.println("Perc  jobs 99-perc SLO violation ...... = " + f.format((total99percSLOViolations * 1.0f) / completedJobs));
     }
 }
