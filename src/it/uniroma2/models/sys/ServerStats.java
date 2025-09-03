@@ -10,6 +10,7 @@ import static it.uniroma2.models.Config.RESPONSE_TIME_99PERC_SLO;
  * Used for computing statistics
  */
 public class ServerStats {
+    @Getter private final int serverIndex;             /* server index                                      */
     @Getter private double nodeSum;                    /* mean population in system  intg(l(s))             */
     @Getter private double serviceSum;                 /* mean population in service intg(x(s))             */
     @Getter private int    completedJobs;              /* number of completed jobs                          */
@@ -21,6 +22,7 @@ public class ServerStats {
     @Getter private final StationaryStats stationaryStats;
 
     public ServerStats(int serverIndex){
+        this.serverIndex            = serverIndex;
         this.nodeSum                = 0.0;
         this.serviceSum             = 0.0;
         this.completedJobs          =   0;
