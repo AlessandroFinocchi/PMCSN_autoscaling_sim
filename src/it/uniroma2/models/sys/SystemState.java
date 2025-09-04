@@ -11,7 +11,6 @@ import lombok.Setter;
 import static it.uniroma2.models.Config.*;
 
 public class SystemState {
-    @Getter private final double capacity;
     @Getter @Setter private double current;                 /* current time                        */
     private final EventCalendar calendar;
     @Getter private final IServerInfrastructure servers;
@@ -21,7 +20,6 @@ public class SystemState {
 
     public SystemState(EventCalendar calendar, Distribution arrivalVA, Distribution servicesVA, Distribution turnOnVA) {
         this.turnOnVA = turnOnVA;
-        this.capacity = WEBSERVER_CAPACITY;
         this.current = START;
         this.calendar = calendar;
         this.servers = InfrastructureFactory.create();
