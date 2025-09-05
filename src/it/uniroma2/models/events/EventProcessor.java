@@ -34,7 +34,7 @@ public class EventProcessor implements EventVisitor {
 
         servers.addJobsData(endTs, "ARRIVAL", nextServiceLife);
 
-        /* Generate next completion 0.08246927943190602*/
+        /* Generate next completion */
         double nextCompletionTs = servers.computeNextCompletionTs(endTs);
         Event nextCompletion = new CompletionEvent(nextCompletionTs);
         s.addEvent(nextCompletion);
@@ -45,7 +45,9 @@ public class EventProcessor implements EventVisitor {
             INTRA_RUN_DATA.addField(endTs, NEXT_INTERARRIVAL_TIME, nextArrivalTs - endTs);
             Event nextArrival = new ArrivalEvent(nextArrivalTs);
             s.addEvent(nextArrival);
-        } else s.addEvent(new ArrivalEvent(INFINITY));
+        } else {
+            s.addEvent(new ArrivalEvent(INFINITY));
+        }
 
         /* Update the current system clock */
         s.setCurrent(endTs);
