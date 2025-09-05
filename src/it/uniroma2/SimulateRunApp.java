@@ -69,7 +69,6 @@ public class SimulateRunApp {
         Distribution turnOnVA = new Normal(R, 6, 7, TURN_ON_MU, TURN_ON_STD);
 
         /* Log to CSV the initial seed for each stream for replayability */
-        //todo: togliere? non credo che serva
         for (int stream = 0; stream < TOTAL_STREAMS; stream++) {
             R.selectStream(stream);
             INTER_RUN_DATA.addFieldWithSuffix(INTER_RUN_KEY, STREAM_SEED, String.valueOf(stream), R.getSeed());
