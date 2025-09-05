@@ -8,7 +8,7 @@ public class Normal extends Distribution {
     private final Uniform u2VA;
 
     public Normal(Rngs r, int stream1, int stream2, double mean, double s2) {
-        super(r, 0, mean);
+        super(r, null, mean);
         this.u1VA = new Uniform(r, stream1, 0.5, 0.5);
         this.u2VA = new Uniform(r, stream2, 0.5, 0.5);
         this.s2 = s2;

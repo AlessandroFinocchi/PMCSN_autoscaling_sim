@@ -9,7 +9,7 @@ public class CHyperExponential extends Distribution {
     private final double p;
 
     public CHyperExponential(Rngs r, double variationCoefficient, double mean, int stream1, int stream2, int stream3) {
-        super(r, 0, mean);
+        super(r, null, mean);
         this.p = 1.0 / 2.0 * (1 + Math.sqrt((variationCoefficient - 1.0) / (variationCoefficient + 1.0)));
         double mu1 = mean / (2.0 * p);
         double mu2 = mean / (2.0 * (1.0 - p));

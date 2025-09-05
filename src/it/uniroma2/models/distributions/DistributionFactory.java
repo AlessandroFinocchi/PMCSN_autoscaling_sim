@@ -19,7 +19,7 @@ public class DistributionFactory {
 
     public static Distribution createServiceDistribution(Rngs rngs) {
         return switch (SERVICES_DISTR) {
-            case "exp" -> new Exponential(rngs, 1, SERVICES_Z);
+            case "exp" -> new Exponential(rngs, 3, SERVICES_Z);
             case "h2"  -> new CHyperExponential(rngs, SERVICES_CV, SERVICES_Z, 3, 4, 5);
             default -> throw new IllegalArgumentException("Invalid service distribution type: " + SERVICES_DISTR);
         };
