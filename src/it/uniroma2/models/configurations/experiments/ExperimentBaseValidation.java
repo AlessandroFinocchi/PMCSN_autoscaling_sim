@@ -17,12 +17,8 @@ public class ExperimentBaseValidation implements Experiment{
         setConfiguration(2, EXP, EXP, 4, 1, 1);
         setConfiguration(3, EXP, H2,  3, 1, 1);
         setConfiguration(4, EXP, H2,  4, 1, 1);
-        setConfiguration(5, EXP, EXP, 6, 2, 1);
-        setConfiguration(6, EXP, EXP, 8, 2, 1);
-        setConfiguration(7, EXP, EXP, 3, 2, 1);
-        setConfiguration(8, EXP, EXP, 3, 1, 2);
-        setConfiguration(9, H2,  H2,  3, 1, 1);
-        setConfiguration(10,H2,  H2,  4, 1, 1);
+        setConfiguration(5, EXP, EXP, 3, 2, 1);
+        setConfiguration(6, EXP, EXP, 3, 1, 2);
 
         return result;
     }

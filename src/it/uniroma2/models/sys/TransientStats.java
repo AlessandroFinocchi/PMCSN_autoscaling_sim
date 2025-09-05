@@ -82,7 +82,7 @@ public class TransientStats {
             INTRA_RUN_DATA.addFieldWithSuffix(
                     endTs, AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC, String.valueOf(serverIndex+start),
                     this.aggServerAllocatedCapacityPerSec[serverIndex]
-            );
+            )   ;
         }
     }
 }
