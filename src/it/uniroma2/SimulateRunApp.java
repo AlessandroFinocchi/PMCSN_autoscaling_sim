@@ -94,6 +94,9 @@ public class SimulateRunApp {
             Event nextEvent = calendar.nextEvent();
             bar.update(nextEvent.getTimestamp());
 
+            /* Check that the next timestamp is greater than the previous one */
+            assert s.getCurrent() < nextEvent.getTimestamp();
+
             if (nextEvent.getTimestamp() % ARRIVALS_TOTAL_PERIOD < ARRIVALS_TOTAL_PERIOD - ARRIVALS_FAST_INTERVAL) {
                 // Slow arrivals
                 arrivalVA.setMean(ARRIVALS_MU); // 4 arrivals each s
