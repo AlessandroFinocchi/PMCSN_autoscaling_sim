@@ -57,10 +57,10 @@ public class TestBernoulliVA {
 
         double sampleMean = computeSampleMean(bernoulli, n);
 
-        String message = String.format("After %d samples: %f < %f < %f", n, p - eps, sampleMean, p + eps);
+        String message = String.format("After %d samples: %f < %f < %f", n, sampleMean - eps, p, sampleMean + eps);
 
         // With probability (1 - alpha) this test pass
-        assertTrue(message, sampleMean >= p - eps && sampleMean <= p + eps);
+        assertTrue(message, p >= sampleMean - eps && p <= sampleMean + eps);
 
         System.out.println(message);
 

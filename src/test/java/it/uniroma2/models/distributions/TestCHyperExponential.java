@@ -71,10 +71,10 @@ public class TestCHyperExponential {
         // Sample Mean
         double sampleMean = computeSampleMean(ch2, n);
 
-        String message = String.format("After %d samples: %f < %f < %f", n, mean - eps, sampleMean, mean + eps);
+        String message = String.format("After %d samples: %f < %f < %f", n, sampleMean - eps, mean, sampleMean + eps);
 
         // With probability (1 - alpha) this test pass
-        assertTrue(message, sampleMean >= mean - eps && sampleMean <= mean + eps);
+        assertTrue(message, mean >= sampleMean - eps && mean <= sampleMean + eps);
 
         System.out.println(message);
     }
