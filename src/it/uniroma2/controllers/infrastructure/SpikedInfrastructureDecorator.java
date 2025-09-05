@@ -76,7 +76,6 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
                     Objects.equals(currIndex, completionServerIndex) ? completedJobResponseTime : null);
         }
 
-        /* Compute the moving exponential average of the response time */
         if (isCompletion) {
             base.addStateToScalingData(endTs);
             INTRA_RUN_DATA.addField(endTs, R_0, completedJobResponseTime);
