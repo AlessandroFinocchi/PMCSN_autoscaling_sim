@@ -165,10 +165,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
     }
 
     public boolean isCompletedStationaryStats(){
-        boolean isFirstServerStationaryStatsCompleted =
-                this.webServers.get(0).getStats().getStationaryStats().isCompleted();
-        boolean isSystemStationaryStatsCompleted = this.systemStats.getStationaryStats().isCompleted();
-        return isSystemStationaryStatsCompleted && isFirstServerStationaryStatsCompleted;
+        return this.systemStats.getStationaryStats().isCompleted();
     }
 
     public void printServerStats(double currentTs) {

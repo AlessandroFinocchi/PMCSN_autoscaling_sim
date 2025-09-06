@@ -45,7 +45,7 @@ public class ExperimentBase1 implements Experiment {
         c.put("stats.batch.size", "512");
         c.put("system.stop", "INFINITY");
         c.put("distribution.arrivals.fast_interval", "100");
-        c.put("distribution.arrivals.fast_mu", String.valueOf(1.0 / 6.0));
+        c.put("distribution.arrivals.fast_mu", String.valueOf(1.0 / 8.0));
 
         /* Specific */
         c.put("infrastructure.si_max", String.valueOf(siMax));
