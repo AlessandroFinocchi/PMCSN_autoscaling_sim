@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import static it.uniroma2.models.Config.*;
-import static it.uniroma2.utils.DataCSVWriter.INTRA_RUN_BM_DATA;
+import static it.uniroma2.utils.DataCSVWriter.*;
 import static it.uniroma2.utils.DataField.*;
 
 public class StationaryStats {
@@ -180,6 +180,13 @@ public class StationaryStats {
         metrics.put("Capacity per sec ..................", new Pair<>(this.capacityPerSecX, capacityPerSecS));
         metrics.put("95-perc SLO Violation Percentage ..", new Pair<>(this.slo95percViolationPercentageX, slo95percViolationS));
         metrics.put("99-perc SLO Violation Percentage ..", new Pair<>(this.slo99percViolationPercentageX, slo99percViolationS));
+
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, BM_SYSTEM_RESPONSE_TIME, this.responseTimeX);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, BM_SYSTEM_JOB_NUMBER, this.jobNumberX);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, BM_SYSTEM_UTILIZATION, this.utilizationX);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC, this.capacityPerSecX);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC, this.slo95percViolationPercentageX);
+        INTER_RUN_DATA.addField(INTER_RUN_KEY, BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC, this.slo99percViolationPercentageX);
 
         System.out.println("Interval estimations based upon "+ this.currBatch + " data points " +
                 "and with " + (int) (100.0 * confidence + 0.5) + "% confidence");

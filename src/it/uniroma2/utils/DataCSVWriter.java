@@ -217,6 +217,14 @@ public class DataCSVWriter {
                 SPIKE_SLO_95_VIOLATIONS, SPIKE_SLO_99_VIOLATIONS,
                 SLO_95PERC_VIOLATIONS_PERCENTAGE, SLO_99PERC_VIOLATIONS_PERCENTAGE
         );
+        INTER_RUN_DATA_HEADERS.add(
+                BM_SYSTEM_RESPONSE_TIME,
+                BM_SYSTEM_JOB_NUMBER,
+                BM_SYSTEM_UTILIZATION,
+                BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC,
+                BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC,
+                BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC
+        );
         flushList(INTER_RUN_DATA,
                 OUT_DIR_PATH, "final_all",
                 INTER_RUN_DATA_HEADERS.get(), true);
