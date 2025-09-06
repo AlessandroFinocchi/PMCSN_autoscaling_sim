@@ -1,43 +1,60 @@
 package it.uniroma2.models.configurations.experiments;
 
-import it.uniroma2.models.configurations.ConfigurationFactory;
-import it.uniroma2.models.configurations.Parameter;
 import it.uniroma2.models.configurations.RunConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ExperimentBase1 implements Experiment {
+    List<RunConfiguration> result = new ArrayList<>();
+
     @Override
     public List<RunConfiguration> getRunConfigurations() {
-        /* Common */
-        List<Parameter> parameters = new ArrayList<>();
-        parameters.add(new Parameter("log.intra_run").addValues("false"));
-        parameters.add(new Parameter("distribution.arrivals.mu").addValues(String.valueOf(1.0 / 4.0)));
-        parameters.add(new Parameter("distribution.services.z").addValues("1"));
-        parameters.add(new Parameter("infrastructure.start_num_server").addValues("5"));
-        parameters.add(new Parameter("infrastructure.max_num_server").addValues("5"));
-        parameters.add(new Parameter("system.empty_jobs").addValues("false"));
-        parameters.add(new Parameter("random.repeat_config").addValues("1"));
-        parameters.add(new Parameter("stats.batch.num").addValues("64"));
-        parameters.add(new Parameter("stats.batch.size").addValues("512"));
-        parameters.add(new Parameter("system.stop").addValues("100000"));
+        int index = 1;
+        Double[] siMaxList = {1.0, 2.0, 3.0, 4.0, 6.0,
+                              8.0, 10.0, 20.0, 30.0};
 
-        Parameter parSiMax = new Parameter("infrastructure.si_max");
-        parameters.add(parSiMax);
-        for (int si=1; si<10; si+=1) {
-            parSiMax.addValues(String.valueOf(si));
+        for (Double siMax : siMaxList) {
+            for(int wsNum=5; wsNum<8; wsNum+=1) {
+                for(int ssVersion = 1; ssVersion<=2; ssVersion++) {
+                    setConfiguration(index++, siMax, wsNum, ssVersion);
+                }
+            }
         }
-        parSiMax.addValues(String.valueOf(20));
-        parSiMax.addValues(String.valueOf(40));
-        parSiMax.addValues(String.valueOf(60));
 
-        List<RunConfiguration> result = ConfigurationFactory.createConfigurationsList(parameters);
-
-        for(RunConfiguration run : result){
-            run.setName("base_1_" + (result.indexOf(run) + 1));
-        }
+        //todo: prendi i migliori 3 sistemi, levaci le fluttuazioni e osserva magari
+        // che uno che con le fluttuazioni non funziona, senza funziona, oppure che
+        // più in generale, aggiungere le fluttuazioni peggiora le performance.
 
         return result;
+    }
+
+    void setConfiguration(int index, double siMax, int wsNum, int spikeVersion) {
+        RunConfiguration c = new RunConfiguration("base_1_" + String.format("%02d", index));
+
+        /* Common */
+        c.put("log.intra_run", "false");
+        c.put("distribution.arrivals.type", "h2");
+        c.put("distribution.services.type", "h2");
+        c.put("distribution.arrivals.mu", String.valueOf(1.0 / 4.0));
+        c.put("distribution.services.z", "1");
+        c.put("infrastructure.spikeserver.active", "true");
+        c.put("system.empty_jobs", "false");
+        c.put("random.repeat_config", "1");
+        c.put("stats.batch.num", "64");
+        c.put("stats.batch.size", "512");
+        c.put("system.stop", "INFINITY");
+        c.put("distribution.arrivals.fast_interval", "100");
+        c.put("distribution.arrivals.fast_mu", String.valueOf(1.0 / 6.0));
+
+        /* Specific */
+        c.put("infrastructure.si_max", String.valueOf(siMax));
+        c.put("infrastructure.start_num_server", String.valueOf(wsNum));
+        c.put("spikeserver.version", String.valueOf(spikeVersion));
+
+        // extra
+        c.put("infrastructure.max_num_server", String.valueOf(wsNum));
+
+        result.add(c);
     }
 }

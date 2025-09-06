@@ -28,7 +28,7 @@ public class ExperimentBaseValidation implements Experiment{
         c.put("log.intra_run", "true");
         c.put("stats.batch.num", "64");
         c.put("stats.batch.size", "512");
-        c.put("system.stop", "100000");
+        c.put("system.stop", "INFINITY");
         c.put("system.empty_jobs", "false");
         c.put("infrastructure.si_max", "140");
         c.put("webserver.capacity", "1");

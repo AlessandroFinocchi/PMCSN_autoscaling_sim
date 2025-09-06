@@ -30,7 +30,7 @@ public class ExperimentBaseVerification implements Experiment{
         c.put("infrastructure.spikeserver.active", "false");
         c.put("stats.batch.num", "64");
         c.put("stats.batch.size", "512");
-        c.put("system.stop", "100000");
+        c.put("system.stop", "INFINITY");
         c.put("system.empty_jobs", "false");
         c.put("webserver.capacity", "1");
         c.put("infrastructure.start_num_server", "1");
