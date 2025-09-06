@@ -1,6 +1,7 @@
 package it.uniroma2.models.distributions;
 
 import it.uniroma2.libs.Rngs;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -63,6 +64,5 @@ public class TestBernoulliVA {
         assertTrue(message, p >= sampleMean - eps && p <= sampleMean + eps);
 
         System.out.println(message);
-
     }
 }

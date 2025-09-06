@@ -58,7 +58,7 @@ public class TestCHyperExponential {
     }
 
     @Test
-    public void testH2() {
+    public void testH2Mean() {
         Rngs r = new Rngs();
         r.plantSeeds(SEED);
 
@@ -75,6 +75,30 @@ public class TestCHyperExponential {
 
         // With probability (1 - alpha) this test pass
         assertTrue(message, mean >= sampleMean - eps && mean <= sampleMean + eps);
+
+        System.out.println(message);
+    }
+
+    @Test
+    public void testH2Variance() {
+        Rngs r = new Rngs();
+        r.plantSeeds(SEED);
+
+        // Hyperexponential creation
+        CHyperExponential ch2 = new CHyperExponential(r, cv, mean, stream1, stream2, stream3);
+
+        // Width of CI such that P[|X - E[X] > eps] <= alpha
+        double eps = Math.sqrt((Math.pow(mean, 2) * cv) / (n * alpha));
+
+        double sampleMean = computeSampleMean(ch2, n);
+
+        // Compute theoretical variance from definition of C^2
+        double variance = cv * Math.pow(mean, 2);
+
+        String message = String.format("After %d samples: %f < %f < %f", n, cv * Math.pow(sampleMean - eps, 2), variance, cv * Math.pow(sampleMean + eps, 2));
+
+        // With probability (1 - alpha) this test pass
+        assertTrue(message, variance >= cv * Math.pow(sampleMean - eps, 2) && variance <= cv * Math.pow(sampleMean + eps, 2));
 
         System.out.println(message);
     }

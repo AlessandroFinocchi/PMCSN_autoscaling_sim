@@ -1,6 +1,8 @@
 package it.uniroma2.models.distributions;
 
 import it.uniroma2.libs.Rngs;
+import org.apache.commons.math3.distribution.ChiSquaredDistribution;
+import org.apache.commons.math3.distribution.TDistribution;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -50,8 +52,17 @@ public class TestNormalVA {
         return sum / n;
     }
 
+    private double computeSampleVariance(Normal normal, int n, double sampleMean) {
+        double sum = 0.0;
+        for (int i = 0; i < n; i++) {
+            double sample = normal.gen();
+            sum += (sample - sampleMean) * (sample - sampleMean);
+        }
+        return sum / (n - 1);
+    }
+
     @Test
-    public void testNormalVA() {
+    public void testNormalVAMean() {
         Rngs r = new Rngs();
         r.plantSeeds(SEED);
 
@@ -67,6 +78,32 @@ public class TestNormalVA {
 
         // With probability (1 - alpha) this test pass
         assertTrue(message, mean >= sampleMean - eps && mean <= sampleMean + eps);
+
+        System.out.println(message);
+    }
+
+    @Test
+    public void testNormalVAVariance() {
+        Rngs r = new Rngs();
+        r.plantSeeds(SEED);
+
+        Normal normal = new Normal(r, stream1, stream2, mean, s2);
+
+        double sampleMean = computeSampleMean(normal, n);
+
+        double sampleVariance = computeSampleVariance(normal, n, sampleMean);
+
+        ChiSquaredDistribution x = new ChiSquaredDistribution(n - 1);
+
+        // Lower tail critical value
+        double down = x.inverseCumulativeProbability(alpha/2);
+
+        // Upper tail critical value
+        double up = x.inverseCumulativeProbability(1 - alpha/2);
+
+        String message = String.format("After %d samples: %f < %f < %f", n, (n - 1) * sampleVariance / up, s2, (n - 1) * sampleVariance / down);
+
+        assertTrue(message, s2 >= (n - 1) * sampleVariance / up && s2 <= (n - 1) * sampleVariance / down);
 
         System.out.println(message);
     }
