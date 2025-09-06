@@ -90,7 +90,7 @@ public class DataCSVWriter {
         String fileNameSuffix = "-" + c.getName() + "_" + repetition;
 
         /* Log data about scaling events */
-        if (repetition == 0) {
+        if (repetition == 0 && SCALING_OUT_THRESHOLD != INFINITY) {
             DataHeaders scalingHeaders = new DataHeaders(
                     TIMESTAMP,
                     R_0, SCALING_INDICATOR, COMPLETING_SERVER_INDEX,
@@ -101,7 +101,7 @@ public class DataCSVWriter {
                     JOBS_IN_SERVER + "_1", JOBS_IN_SERVER + "_2", JOBS_IN_SERVER + "_3"
             );
             DataTimeTable filteredScalingData = INTRA_RUN_DATA
-                    .filter(EVENT_TYPE_SCALING, false, "ARRIVAL");
+                    .filter(EVENT_TYPE_SCALING, false, "");
             flushList(filteredScalingData,
                     OUT_DIR_PATH_WITH_SUFFIX, "scaling" + fileNameSuffix,
                     scalingHeaders.get(), false);
@@ -145,13 +145,21 @@ public class DataCSVWriter {
 
         /* Log data about jobs in each server */
         DataHeaders allJobsHeaders = new DataHeaders();
-        allJobsHeaders.add(TIMESTAMP, AGG_SYSTEM_RESPONSE_TIME, AGG_SYSTEM_JOB_NUMBER);
-        allJobsHeaders.add(AGG_SYSTEM_ALLOCATED_CAPACITY_PER_SEC);
-        if (SPIKESERVER_ACTIVE) {
-            allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + 0, AGG_SERVER_JOB_NUMBER + "_" + 0);
+        allJobsHeaders.add(
+                TIMESTAMP,
+                AGG_SYSTEM_RESPONSE_TIME,
+                AGG_SYSTEM_JOB_NUMBER,
+                AGG_SYSTEM_UTILIZATION,
+                AGG_SYSTEM_ALLOCATED_CAPACITY_PER_SEC
+        );
+        for (int i = SPIKESERVER_ACTIVE ? 0 : 1; i <= MAX_NUM_SERVERS; i++) {
+            allJobsHeaders.add(
+                    AGG_SERVER_RESPONSE_TIME + "_" + i,
+                    AGG_SERVER_JOB_NUMBER + "_" + i,
+                    AGG_SERVER_UTILIZATION + "_" + i,
+                    AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + i
+            );
         }
-        allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + 1, AGG_SERVER_JOB_NUMBER + "_" + 1);
-        allJobsHeaders.add(AGG_SERVER_RESPONSE_TIME + "_" + MAX_NUM_SERVERS, AGG_SERVER_JOB_NUMBER + "_" + MAX_NUM_SERVERS);
         allJobsHeaders.add(REPETITION_ID);
         DataTimeTable combinedJobsData = INTRA_RUN_DATA
                 .filter(EVENT_TYPE_SCALING, false, "ACTIVE")
