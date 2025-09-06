@@ -97,13 +97,21 @@ public class SimulateRunApp {
             /* Check that the next timestamp is greater than the previous one */
             assert s.getCurrent() < nextEvent.getTimestamp();
 
-            if (nextEvent.getTimestamp() % ARRIVALS_TOTAL_PERIOD < ARRIVALS_TOTAL_PERIOD - ARRIVALS_FAST_INTERVAL) {
-                // Slow arrivals
-                arrivalVA.setMean(ARRIVALS_MU); // 4 arrivals each s
-            } else {
-                // Fast arrivals
-                arrivalVA.setMean(ARRIVALS_MU * ARRIVALS_FAST_MU_MULTIPLIER); // 8 arrivals each s
+            boolean hasLongTermFluctuations = ARRIVALS_FAST_INTERVAL != 0;
+            if (hasLongTermFluctuations) {
+                double slowPercentage = (ARRIVALS_TOTAL_PERIOD - ARRIVALS_FAST_INTERVAL) / ARRIVALS_TOTAL_PERIOD;
+                double fastPercentage = ARRIVALS_FAST_INTERVAL / ARRIVALS_TOTAL_PERIOD;
+                double slowMu = (ARRIVALS_MU - ARRIVALS_FAST_MU * fastPercentage) / slowPercentage;
+
+                if (nextEvent.getTimestamp() % ARRIVALS_TOTAL_PERIOD < slowPercentage * ARRIVALS_TOTAL_PERIOD) {
+                    // Slow arrivals
+                    arrivalVA.setMean(slowMu);
+                } else {
+                    // Fast arrivals
+                    arrivalVA.setMean(ARRIVALS_FAST_MU);
+                }
             }
+
 
             nextEvent.process(s, visitor);
         }
