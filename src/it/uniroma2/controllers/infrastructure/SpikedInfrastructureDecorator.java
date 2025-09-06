@@ -140,14 +140,10 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
         return Math.min(spikeServerMinRemainingLife, base.computeNextCompletionTs(endTs));
     }
 
+
     public boolean isCompletedStationaryStats(){
-        boolean isServerStationaryStatsCompleted =
-                this.allServers.stream().map(AbstractServer::getStats)
-                        .map(ServerStats::getStationaryStats)
-                        .map(StationaryStats::isCompleted)
-                        .reduce(true, (a, b) -> a && b);
-        boolean isSystemStationaryStatsCompleted = this.systemStats.getStationaryStats().isCompleted();
-        return isSystemStationaryStatsCompleted && isServerStationaryStatsCompleted;
+        boolean isSpikeServerStationaryStatsCompleted = this.spikeServer.getStats().getStationaryStats().isCompleted();
+        return isSpikeServerStationaryStatsCompleted && base.isCompletedStationaryStats();
     }
 
     public void printServerStats(double currentTs) {

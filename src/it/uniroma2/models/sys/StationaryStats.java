@@ -158,7 +158,7 @@ public class StationaryStats {
     }
 
     public void printIntervalEstimation() {
-        if (!LOG_BM) return;
+        if (!LOG_BM || !this.isCompleted()) return;
 
         double x, s, u, t, w;
         double responseTimeS       = Math.sqrt(this.responseTimeV / this.currBatch);

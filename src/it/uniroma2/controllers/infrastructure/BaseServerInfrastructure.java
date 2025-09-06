@@ -165,13 +165,10 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
     }
 
     public boolean isCompletedStationaryStats(){
-        boolean isServerStationaryStatsCompleted =
-                this.webServers.stream().map(AbstractServer::getStats)
-                        .map(ServerStats::getStationaryStats)
-                        .map(StationaryStats::isCompleted)
-                        .reduce(true, (a, b) -> a && b);
+        boolean isFirstServerStationaryStatsCompleted =
+                this.webServers.get(1).getStats().getStationaryStats().isCompleted();
         boolean isSystemStationaryStatsCompleted = this.systemStats.getStationaryStats().isCompleted();
-        return isSystemStationaryStatsCompleted && isServerStationaryStatsCompleted;
+        return isSystemStationaryStatsCompleted && isFirstServerStationaryStatsCompleted;
     }
 
     public void printServerStats(double currentTs) {
