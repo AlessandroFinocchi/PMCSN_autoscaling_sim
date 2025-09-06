@@ -15,6 +15,11 @@ public class RunConfiguration {
         this.params = new HashMap<>();
     }
 
+    public RunConfiguration(String name, Map<String, String> params) {
+        this.name = name;
+        this.params = new HashMap<>(params);
+    }
+
     public void put(String key, String value) {
         this.params.put(key, value);
     }

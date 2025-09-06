@@ -19,21 +19,18 @@ public class ExperimentBase1 implements Experiment {
         parameters.add(new Parameter("infrastructure.max_num_server").addValues("5"));
         parameters.add(new Parameter("system.empty_jobs").addValues("false"));
         parameters.add(new Parameter("random.repeat_config").addValues("1"));
-        parameters.add(new Parameter("stats.batch.size").addValues("INFINITY"));
-        parameters.add(new Parameter("system.stop").addValues("10000"));
+        parameters.add(new Parameter("stats.batch.num").addValues("64"));
+        parameters.add(new Parameter("stats.batch.size").addValues("512"));
+        parameters.add(new Parameter("system.stop").addValues("100000"));
 
         Parameter parSiMax = new Parameter("infrastructure.si_max");
-        Parameter parSLO = new Parameter("infrastructure.response_time_slo");
         parameters.add(parSiMax);
-        parameters.add(parSLO);
-//        for (int si=2; si<=10; si+=2) {
-        for (int si = 2; si <= 2; si+= 2) {
+        for (int si=1; si<10; si+=1) {
             parSiMax.addValues(String.valueOf(si));
         }
-//        for (double slo = 2; slo <= 6; slo += 1) {
-        for (double slo=2.0; slo <= 2.0; slo+= 0.5) {
-            parSLO.addValues(String.valueOf(slo));
-        }
+        parSiMax.addValues(String.valueOf(20));
+        parSiMax.addValues(String.valueOf(40));
+        parSiMax.addValues(String.valueOf(60));
 
         List<RunConfiguration> result = ConfigurationFactory.createConfigurationsList(parameters);
 

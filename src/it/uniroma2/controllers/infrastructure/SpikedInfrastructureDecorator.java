@@ -25,7 +25,7 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
 
     public SpikedInfrastructureDecorator(BaseServerInfrastructure base) {
         this.base = base;
-        this.spikeServer = new SpikeServer(SPIKE_CAPACITY * this.getNumWebServersByState(ServerState.ACTIVE));
+        this.spikeServer = new SpikeServer(SPIKE_CAPACITY);
 
         this.allServers = new ArrayList<>();
         this.allServers.add(this.spikeServer);
