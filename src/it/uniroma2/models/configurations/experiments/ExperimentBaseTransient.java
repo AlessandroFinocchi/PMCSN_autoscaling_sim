@@ -10,34 +10,39 @@ public class ExperimentBaseTransient implements Experiment {
 
     @Override
     public List<RunConfiguration> getRunConfigurations() {
+        int shortRunLength  = 10000;
+        int longRunLength   = 25000;
+
         // Group 1
-        addConfiguration(1, 4.0, 1.0, 4, 3, null, null);
-        addConfiguration(2, 4.0, 1.0, 4, 5, null, null);
+        addConfiguration(1, 4.0, 1.0, 4, 3, null, null, shortRunLength);
+        addConfiguration(2, 4.0, 1.0, 4, 5, null, null, longRunLength);
         // Group 2
-        addConfiguration(3, 10.0, 0.4, 4, 5, null, null);
-        addConfiguration(4, 4.0, 1.0, 40, 5, null, null);
+        addConfiguration(3, 10.0, 0.4, 4, 5, null, null, shortRunLength);
+        addConfiguration(4, 4.0, 1.0, 40, 5, null, null, longRunLength);
         // Group 3
-        addConfiguration(5, 4.0, 1.0, 4, 5, 0.1, null);
-        addConfiguration(6, 4.0, 1.0, 4, 5, 3.0, null);
-        addConfiguration(7, 4.0, 1.0, 4, 5, 100.0, null);
+        addConfiguration(5, 4.0, 1.0, 4, 5, 0.1, null, longRunLength);
+        addConfiguration(6, 4.0, 1.0, 4, 5, 3.0, null, longRunLength);
+        addConfiguration(7, 4.0, 1.0, 4, 5, 100.0, null, longRunLength);
         // Group 4
-        addConfiguration(8, 5.5, 1.0, 4, 5, 2.0, null);
-        addConfiguration(9, 6.5, 1.0, 4, 5, 2.0, null);
+        addConfiguration(8, 5.5, 1.0, 4, 5, 2.0, null, longRunLength);
+        addConfiguration(9, 6.5, 1.0, 4, 5, 2.0, null, shortRunLength);
         // Group 5a
-        addConfiguration(10, 4.0, 1.0, 4, 5, null, 6.0);
-        addConfiguration(11, 4.0, 1.0, 4, 5, null, 8.0);
-        addConfiguration(12, 4.0, 1.0, 4, 5, null, 16.0);
+        addConfiguration(10, 4.0, 1.0, 4, 5, null, 6.0, shortRunLength);
+        addConfiguration(11, 4.0, 1.0, 4, 5, null, 8.0, shortRunLength);
+        addConfiguration(12, 4.0, 1.0, 4, 5, null, 16.0, shortRunLength);
         // Group 5b
-        addConfiguration(13, 4.0, 1.0, 4, 4, 2.0, 6.0);
-        addConfiguration(14, 4.0, 1.0, 4, 4, 2.0, 8.0);
-        addConfiguration(15, 4.0, 1.0, 4, 4, 2.0, 16.0);
+        addConfiguration(13, 4.0, 1.0, 4, 4, 2.0, 6.0, shortRunLength);
+        addConfiguration(14, 4.0, 1.0, 4, 4, 2.0, 8.0, shortRunLength);
+        addConfiguration(15, 4.0, 1.0, 4, 4, 2.0, 16.0, shortRunLength);
 
         return result;
     }
 
     void addConfiguration(
-            int index, double lambda, double z, double cv, int wsNumber, Double siMax,
-            Double fastLambda
+            int index,
+            double lambda, double z, double cv, int wsNumber, Double siMax,
+            Double fastLambda,
+            int runLength
     ) {
         RunConfiguration c = new RunConfiguration("trans_base_" + String.format("%02d", index));
 
@@ -45,8 +50,10 @@ public class ExperimentBaseTransient implements Experiment {
         c.put("random.repeat_config", "4");
         c.put("log.intra_run", "true");
         c.put("stats.batch.size", "INFINITY");
-        c.put("system.stop", "10000");
+        c.put("system.stop", String.valueOf(runLength));
         c.put("system.empty_jobs", "false");
+        c.put("distribution.arrivals.type", "h2");
+        c.put("distribution.services.type", "h2");
 
         /* Specific */
         c.put("distribution.arrivals.mu", String.valueOf(1.0 / lambda));
