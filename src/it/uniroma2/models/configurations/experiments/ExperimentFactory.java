@@ -11,6 +11,7 @@ public class ExperimentFactory {
     public static Experiment create() {
         return switch (EXPERIMENT) {
             case "simple_run" -> new SimpleRun();
+            case "ver_b" -> new ExperimentBaseVerification();
             case "val_b" -> new ExperimentBaseValidation();
             case "trans_b" -> new ExperimentBaseTransient();
             case "base1" -> new ExperimentBase1();
