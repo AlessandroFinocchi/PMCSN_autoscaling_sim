@@ -5,7 +5,7 @@ import it.uniroma2.models.configurations.RunConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExperimentBaseValidation implements Experiment{
+public class ExperimentBaseVV implements Experiment{
     List<RunConfiguration> result = new ArrayList<>();
 
     @Override
@@ -13,31 +13,35 @@ public class ExperimentBaseValidation implements Experiment{
         String EXP = "exp";
         String H2 = "h2";
 
-        setConfiguration(1, EXP, EXP, 3, 1, 1);
-        setConfiguration(2, EXP, EXP, 4, 1, 1);
-        setConfiguration(3, EXP, H2,  3, 1, 1);
-        setConfiguration(4, EXP, H2,  4, 1, 1);
-        setConfiguration(5, EXP, EXP, 3, 2, 1);
-        setConfiguration(6, EXP, EXP, 3, 1, 2);
+        setConfiguration(1, EXP, EXP, 0.6, 1, 1, 1);
+        setConfiguration(2, EXP, EXP, 0.8, 1, 1, 1);
+        setConfiguration(3, EXP, H2,  0.6, 1, 1, 1);
+        setConfiguration(4, EXP, H2,  0.8, 1, 1, 1);
+        setConfiguration(5, EXP, EXP, 0.6, 1, 2, 1);
+        setConfiguration(6, EXP, EXP, 0.6, 1, 1, 2);
 
         return result;
     }
 
-    void setConfiguration(int index, String arrivalDistr, String completionDistr, double lambda,
+    void setConfiguration(int index, String arrivalDistr, String completionDistr, double lambda, double z,
                           int wsNumber, double wsCapacity) {
-        RunConfiguration c = new RunConfiguration("val_b_" + String.format("%02d", index));
+        String name = index < 5 ? "ver_b_" : "val_b_";
+        RunConfiguration c = new RunConfiguration(name + String.format("%02d", index));
 
         /* Common */
         c.put("random.repeat_config", "1");
-        c.put("log.intra_run", "true");
-        c.put("stats.batch.size", "INFINITY");
-        c.put("system.stop", "10000");
+        c.put("log.intra_run", "false");
+        c.put("infrastructure.spikeserver.active", "false");
+        c.put("stats.batch.num", "128");
+        c.put("stats.batch.size", "512");
+        c.put("system.stop", "100000");
         c.put("system.empty_jobs", "false");
 
         /* Specific */
         c.put("distribution.arrivals.type", arrivalDistr);
         c.put("distribution.services.type", completionDistr);
         c.put("distribution.arrivals.mu", String.valueOf(1.0 / lambda));
+        c.put("distribution.services.z",  String.valueOf(z));
         c.put("webserver.capacity", String.valueOf(wsCapacity));
         c.put("infrastructure.start_num_server", String.valueOf(wsNumber));
 
