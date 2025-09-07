@@ -90,7 +90,7 @@ public class DataCSVWriter {
         String fileNameSuffix = "-" + c.getName() + "_" + repetition;
 
         /* Log data about scaling events */
-        if (repetition == 0 && SCALING_OUT_THRESHOLD != INFINITY) {
+        if (LOG_FINE && repetition == 0 && SCALING_OUT_THRESHOLD != INFINITY) {
             DataHeaders scalingHeaders = new DataHeaders(
                     TIMESTAMP,
                     R_0, SCALING_INDICATOR, COMPLETING_SERVER_INDEX,
@@ -108,7 +108,7 @@ public class DataCSVWriter {
         }
 
         /* Log data about jobs in each server */
-        if (repetition == 0) {
+        if (LOG_FINE && repetition == 0) {
             DataHeaders jobsHeaders = new DataHeaders();
             jobsHeaders.add(
                     TIMESTAMP,
@@ -152,7 +152,13 @@ public class DataCSVWriter {
                 AGG_SYSTEM_UTILIZATION,
                 AGG_SYSTEM_ALLOCATED_CAPACITY_PER_SEC
         );
-        for (int i = SPIKESERVER_ACTIVE ? 0 : 1; i <= MAX_NUM_SERVERS; i++) {
+        allJobsHeaders.add(
+                AGG_SERVER_RESPONSE_TIME + "_" + 0,
+                AGG_SERVER_JOB_NUMBER + "_" + 0,
+                AGG_SERVER_UTILIZATION + "_" + 0,
+                AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + 0
+        );
+        for (int i = 1; i <= 1; i++) {
             allJobsHeaders.add(
                     AGG_SERVER_RESPONSE_TIME + "_" + i,
                     AGG_SERVER_JOB_NUMBER + "_" + i,
@@ -162,7 +168,7 @@ public class DataCSVWriter {
         }
         allJobsHeaders.add(REPETITION_ID);
         DataTimeTable combinedJobsData = INTRA_RUN_DATA
-                .filter(EVENT_TYPE_SCALING, false, "ACTIVE")
+                .filterPeriod(1.0)
                 .setEach(REPETITION_ID, repetition);
         flushList(combinedJobsData,
                 OUT_DIR_PATH_WITH_SUFFIX, "jobs" + "-" + c.getName() + "_all",

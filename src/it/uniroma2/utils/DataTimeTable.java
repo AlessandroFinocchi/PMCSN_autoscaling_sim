@@ -106,6 +106,27 @@ public class DataTimeTable {
         return new DataTimeTable(newTable);
     }
 
+    public DataTimeTable filterPeriod(double period) {
+        Map<Double, Map<String, String>> newTable = new TreeMap<>();
+
+        double nextKey = 0.0;
+        for (Map.Entry<Double, Map<String, String>> entry : this.table.entrySet()) {
+            double value = Double.parseDouble(entry.getValue().get(TIMESTAMP.toString()));
+            boolean acceptCondition = false;
+
+            if (value > nextKey) {
+                acceptCondition = true;
+                nextKey = Math.floor(value / period) * period + period;
+            }
+
+            if (acceptCondition) {
+                newTable.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return new DataTimeTable(newTable);
+    }
+
     public DataTimeTable filter(DataField field, boolean equals, String target) {
         return this.filter(field.toString(), equals, target);
     }
