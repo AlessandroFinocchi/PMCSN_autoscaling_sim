@@ -18,10 +18,8 @@ public class ExperimentAdvanced1 implements Experiment {
 
         index = 1;
         for (Double siMax : siMaxList) {
-//            for (int maxWsNum = 6; maxWsNum <= 10; maxWsNum++) {
-            for (int maxWsNum = 10; maxWsNum <= 10; maxWsNum++) {
+            for (int maxWsNum = 6; maxWsNum <= 10; maxWsNum++) {
                 for (Double scalingThr : scalingThrList) {
-//                    if (siMax > scalingThr) continue;
                     setConfiguration(++index, siMax, maxWsNum, scalingThr, false, 100);
                 }
             }
@@ -42,6 +40,7 @@ public class ExperimentAdvanced1 implements Experiment {
         c.put("distribution.services.z", "1");
         c.put("infrastructure.spikeserver.active", "true");
         c.put("spikeserver.version", "2");
+        c.put("webserver.scaling.type", "jobs");
         c.put("system.empty_jobs", "false");
         c.put("random.repeat_config", "1");
         c.put("stats.batch.num", "128");
