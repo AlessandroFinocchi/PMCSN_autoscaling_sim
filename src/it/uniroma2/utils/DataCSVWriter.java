@@ -178,39 +178,41 @@ public class DataCSVWriter {
     }
 
     public static void flushAllIntraBM(RunConfiguration c, int repetition) {
-        String fileNameSuffix = "-" + c.getName() + "_" + repetition;
+        if (LOG_FINE && repetition == 0) {
+            String fileNameSuffix = "-" + c.getName() + "_" + repetition;
 
-        /* Log data about jobs in each server */
-        DataHeaders bmHeaders = new DataHeaders();
-        bmHeaders.add(TIMESTAMP, EVENT_TYPE_JOB, EVENT_TYPE_SCALING, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
-        bmHeaders.add(
-                BM_SYSTEM_RESPONSE_TIME,
-                BM_SYSTEM_RESPONSE_TIME_W,
-                BM_SYSTEM_JOB_NUMBER,
-                BM_SYSTEM_JOB_NUMBER_W,
-                BM_SYSTEM_UTILIZATION,
-                BM_SYSTEM_UTILIZATION_W,
-                BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC,
-                BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC_W,
-                BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC,
-                BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC_W,
-                BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC,
-                BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC_W
-        );
-        for (int i = 1; i <= MAX_NUM_SERVERS; i++) {
+            /* Log data about jobs in each server */
+            DataHeaders bmHeaders = new DataHeaders();
+            bmHeaders.add(TIMESTAMP, EVENT_TYPE_JOB, EVENT_TYPE_SCALING, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
             bmHeaders.add(
-                    BM_SERVER_RESPONSE_TIME + "_" + i,
-                    BM_SERVER_JOB_NUMBER + "_" + i,
-                    BM_SERVER_UTILIZATION + "_" + i,
-                    BM_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + i,
-                    BM_SERVER_95PERC_SLO_VIOLATIONS_PERC + "_" + i,
-                    BM_SERVER_99PERC_SLO_VIOLATIONS_PERC + "_" + i
+                    BM_SYSTEM_RESPONSE_TIME,
+                    BM_SYSTEM_RESPONSE_TIME_W,
+                    BM_SYSTEM_JOB_NUMBER,
+                    BM_SYSTEM_JOB_NUMBER_W,
+                    BM_SYSTEM_UTILIZATION,
+                    BM_SYSTEM_UTILIZATION_W,
+                    BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC,
+                    BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC_W,
+                    BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC,
+                    BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC_W,
+                    BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC,
+                    BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC_W
             );
+            for (int i = 1; i <= MAX_NUM_SERVERS; i++) {
+                bmHeaders.add(
+                        BM_SERVER_RESPONSE_TIME + "_" + i,
+                        BM_SERVER_JOB_NUMBER + "_" + i,
+                        BM_SERVER_UTILIZATION + "_" + i,
+                        BM_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + i,
+                        BM_SERVER_95PERC_SLO_VIOLATIONS_PERC + "_" + i,
+                        BM_SERVER_99PERC_SLO_VIOLATIONS_PERC + "_" + i
+                );
+            }
+            DataTimeTable fitleredBmData = INTRA_RUN_BM_DATA;
+            flushList(fitleredBmData,
+                    OUT_DIR_PATH_WITH_SUFFIX, "bm" + fileNameSuffix,
+                    bmHeaders.get(), false);
         }
-        DataTimeTable fitleredBmData = INTRA_RUN_BM_DATA;
-        flushList(fitleredBmData,
-                OUT_DIR_PATH_WITH_SUFFIX, "bm" + fileNameSuffix,
-                bmHeaders.get(), false);
     }
 
     public static void flushAllInter() {
