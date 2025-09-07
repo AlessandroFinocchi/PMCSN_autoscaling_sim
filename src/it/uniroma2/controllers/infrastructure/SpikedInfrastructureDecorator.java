@@ -11,6 +11,7 @@ import it.uniroma2.models.sys.TransientStats;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.*;
@@ -176,10 +177,23 @@ public class SpikedInfrastructureDecorator implements IServerInfrastructure{
     }
 
     void updateScalingIndicator() {
-        base.scalingIndicator = allServers.stream()
-                .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
-                .map(AbstractServer::size)
-                .reduce(0, Integer::sum);
+        if (SCALING_INDICATOR_TYPE.equals("r0")) {
+            base.scalingIndicator = 0.0;
+            List<AbstractServer> activeServers = allServers.stream()
+                    .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
+                    .toList();
+
+            for (AbstractServer server : activeServers) {
+                base.scalingIndicator += server.getWindowedMeanResponseTime() / activeServers.size();
+            }
+        } else if (SCALING_INDICATOR_TYPE.equals("jobs")) {
+            base.scalingIndicator = allServers.stream()
+                    .filter(ws -> ws.getServerState() == ServerState.ACTIVE || ws.getServerState() == ServerState.TO_BE_REMOVED)
+                    .map(AbstractServer::size)
+                    .reduce(0, Integer::sum);
+        } else {
+            throw new IllegalArgumentException("Invalid type of scaling indicator");
+        }
     }
 
 }
