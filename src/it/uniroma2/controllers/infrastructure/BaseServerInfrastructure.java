@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static it.uniroma2.models.Config.*;
 import static it.uniroma2.utils.DataCSVWriter.*;
@@ -33,7 +34,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         this.webServers = new ArrayList<>();
         for (int i = 0; i < MAX_NUM_SERVERS; i++) {
             var serverState = i < START_NUM_SERVERS ? ServerState.ACTIVE : ServerState.REMOVED;
-            this.webServers.add(new WebServer(WEBSERVER_CAPACITY, serverState, i+1));
+            this.webServers.add(new WebServer(WEBSERVER_CAPACITY, serverState, i + 1));
         }
 
         List<ServerStats> serverStats = this.webServers.stream().map(AbstractServer::getStats).toList();
@@ -164,7 +165,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
         return endTs + minRemainingLife;
     }
 
-    public boolean isCompletedStationaryStats(){
+    public boolean isCompletedStationaryStats() {
         return this.systemStats.getStationaryStats().isCompleted();
     }
 
@@ -253,7 +254,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
 
         /* If found server, make it to be removed */
         if (minServer != null) {
-            if (minServer.size() == 0){
+            if (minServer.size() == 0) {
                 minServer.setServerState(ServerState.REMOVED);
                 minServer.resetMovingExpMeanResponseTime();
                 INTRA_RUN_DATA.addField(endTs, EVENT_TYPE_SCALING, ServerState.REMOVED);
@@ -277,20 +278,25 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
     }
 
     void updateScalingIndicator() {
-        // this.windowedResponseTime = 0.0;
-        // double denominator = 0;
-        // List<AbstractServer> activeServers = webServers.stream()
-        //         .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
-        //         .collect(Collectors.toList());
-        //
-        // for(AbstractServer server : activeServers){
-        //     denominator += Math.pow(server.size(), 2);
-        //     this.windowedResponseTime += server.getWindowedMeanResponseTime() * Math.pow(server.size(), 2);
-        // }
-        // this.windowedResponseTime /= denominator;
-        this.scalingIndicator = webServers.stream()
-                .filter(ws -> ws.getServerState() == ServerState.ACTIVE || ws.getServerState() == ServerState.TO_BE_REMOVED)
-                .map(AbstractServer::size)
-                .reduce(0, Integer::sum);
+        if (SCALING_INDICATOR_TYPE.equals("r0")) {
+            this.scalingIndicator = 0.0;
+            double denominator = 0;
+            List<AbstractServer> activeServers = webServers.stream()
+                    .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
+                    .collect(Collectors.toList());
+
+            for (AbstractServer server : activeServers) {
+                denominator += Math.pow(server.size(), 2);
+                this.scalingIndicator += server.getWindowedMeanResponseTime() * Math.pow(server.size(), 2);
+            }
+            this.scalingIndicator /= denominator;
+        } else if (SCALING_INDICATOR_TYPE.equals("job")) {
+            this.scalingIndicator = webServers.stream()
+                    .filter(ws -> ws.getServerState() == ServerState.ACTIVE || ws.getServerState() == ServerState.TO_BE_REMOVED)
+                    .map(AbstractServer::size)
+                    .reduce(0, Integer::sum);
+        } else {
+            throw new IllegalArgumentException("Invalid type of scaling indicator");
+        }
     }
 }

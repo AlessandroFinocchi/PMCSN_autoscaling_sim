@@ -38,6 +38,7 @@ public class Config {
     public static double STOP;
     public static boolean EMPTY_JOBS;
     public static double INFINITY;
+    public static String SCALING_INDICATOR_TYPE;
     public static double SCALING_OUT_THRESHOLD;
     public static double RESPONSE_TIME_95PERC_SLO;
     public static double RESPONSE_TIME_99PERC_SLO;
@@ -126,6 +127,7 @@ public class Config {
                     Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("system.stop"));
             EMPTY_JOBS =  Boolean.parseBoolean(props.getProperty("system.empty_jobs"));
             INFINITY = Double.POSITIVE_INFINITY;
+            SCALING_INDICATOR_TYPE = props.getProperty("webserver.scaling.type");
             SCALING_OUT_THRESHOLD = (Objects.equals(props.getProperty("webserver.scaling.out_thr"), "INFINITY")) ?
                     Double.POSITIVE_INFINITY : Double.parseDouble(props.getProperty("webserver.scaling.out_thr"));
             RESPONSE_TIME_95PERC_SLO = Double.parseDouble(props.getProperty("infrastructure.response_time_slo.95_perc"));

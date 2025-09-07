@@ -148,24 +148,30 @@ public class EventProcessor implements EventVisitor {
 
     private void planScaling(SystemState s, double endTs, double scalingIndicator){
         IServerInfrastructure servers = s.getServers();
-
-        // boolean scalingOutCondition = scalingIndicator >= SCALING_OUT_THRESHOLD * servers.getNumWebServersByState(ServerState.ACTIVE);
-        // boolean scalingOutPossible = servers.getNumWebServersByState(ServerState.ACTIVE) + servers.getNumWebServersByState(ServerState.TO_BE_ACTIVE) < MAX_NUM_SERVERS;
-        // boolean scalingInCondition = scalingIndicator < SCALING_IN_THRESHOLD * servers.getNumWebServersByState(ServerState.ACTIVE);
-        // boolean scalingInPossible = servers.getNumWebServersByState(ServerState.ACTIVE) > 1;
-        // if (scalingOutCondition && scalingOutPossible)
-        //     s.addEvent(new ScalingOutReqEvent(endTs));
-        // else if (scalingInCondition && scalingInPossible)
-        //     s.addEvent(new ScalingInEvent(endTs));
-
         if (SCALING_OUT_THRESHOLD != INFINITY){
-            int expectedServers = (int) (Math.floor(scalingIndicator / SCALING_OUT_THRESHOLD) + 1);
-            int activatedServer = servers.getNumWebServersByState(ServerState.ACTIVE) + servers.getNumWebServersByState(ServerState.TO_BE_ACTIVE);
+            boolean scalingOutPossible;
+            boolean scalingOutCondition;
+            boolean scalingInPossible;
+            boolean scalingInCondition;
 
-            boolean scalingOutCondition = activatedServer < expectedServers;
-            boolean scalingOutPossible =  activatedServer < MAX_NUM_SERVERS;
-            boolean scalingInCondition = activatedServer > expectedServers;
-            boolean scalingInPossible = servers.getNumWebServersByState(ServerState.ACTIVE) > 1;
+            if (SCALING_INDICATOR_TYPE.equals("r0")) {
+                scalingOutCondition = scalingIndicator >= SCALING_OUT_THRESHOLD * servers.getNumWebServersByState(ServerState.ACTIVE);
+                scalingOutPossible = servers.getNumWebServersByState(ServerState.ACTIVE) + servers.getNumWebServersByState(ServerState.TO_BE_ACTIVE) < MAX_NUM_SERVERS;
+                scalingInCondition = scalingIndicator < SCALING_OUT_THRESHOLD * servers.getNumWebServersByState(ServerState.ACTIVE);
+                scalingInPossible = servers.getNumWebServersByState(ServerState.ACTIVE) > 1;
+
+            } else if (SCALING_INDICATOR_TYPE.equals("jobs")) {
+                int expectedServers = (int) (Math.floor(scalingIndicator / SCALING_OUT_THRESHOLD) + 1);
+                int activatedServer = servers.getNumWebServersByState(ServerState.ACTIVE) + servers.getNumWebServersByState(ServerState.TO_BE_ACTIVE);
+
+                scalingOutCondition = activatedServer < expectedServers;
+                scalingOutPossible = activatedServer < MAX_NUM_SERVERS;
+                scalingInCondition = activatedServer > expectedServers;
+                scalingInPossible = servers.getNumWebServersByState(ServerState.ACTIVE) > 1;
+            } else {
+                throw new IllegalArgumentException("Invalid SCALING_INDICATOR_TYPE");
+            }
+
             if (scalingOutCondition && scalingOutPossible)
                 s.addEvent(new ScalingOutReqEvent(endTs));
             else if (scalingInCondition && scalingInPossible)
