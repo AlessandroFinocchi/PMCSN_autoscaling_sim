@@ -1,7 +1,8 @@
 package it.uniroma2.models.sys;
 
 import it.uniroma2.libs.Rvms;
-import it.uniroma2.models.Pair;
+import it.uniroma2.models.Tuple;
+import it.uniroma2.utils.DataField;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -173,13 +174,13 @@ public class StationaryStats {
         u = 1.0 - 0.5 * STATS_CONFIDENCE_ALPHA;          /* interval parameter  */
         t = rvms.idfStudent(this.currBatch - 1, u); /* critical value of t */
 
-        Map<String, Pair<Double, Double>> metrics = new LinkedHashMap<>();
-        metrics.put("Response Time .....................", new Pair<>(this.responseTimeX, responseTimeS));
-        metrics.put("Job Number ........................", new Pair<>(this.jobNumberX, jobNumberS));
-        metrics.put("Utilization .......................", new Pair<>(this.utilizationX, utilizationS));
-        metrics.put("Capacity per sec ..................", new Pair<>(this.capacityPerSecX, capacityPerSecS));
-        metrics.put("95-perc SLO Violation Percentage ..", new Pair<>(this.slo95percViolationPercentageX, slo95percViolationS));
-        metrics.put("99-perc SLO Violation Percentage ..", new Pair<>(this.slo99percViolationPercentageX, slo99percViolationS));
+        Map<String, Tuple<DataField, Double, Double>> metrics = new LinkedHashMap<>();
+        metrics.put("Response Time .....................", new Tuple<>(BM_SYSTEM_RESPONSE_TIME_W, this.responseTimeX, responseTimeS));
+        metrics.put("Job Number ........................", new Tuple<>(BM_SYSTEM_JOB_NUMBER_W, this.jobNumberX, jobNumberS));
+        metrics.put("Utilization .......................", new Tuple<>(BM_SYSTEM_UTILIZATION_W, this.utilizationX, utilizationS));
+        metrics.put("Capacity per sec ..................", new Tuple<>(BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC_W, this.capacityPerSecX, capacityPerSecS));
+        metrics.put("95-perc SLO Violation Percentage ..", new Tuple<>(BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC_W, this.slo95percViolationPercentageX, slo95percViolationS));
+        metrics.put("99-perc SLO Violation Percentage ..", new Tuple<>(BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC_W, this.slo99percViolationPercentageX, slo99percViolationS));
 
         INTER_RUN_DATA.addField(INTER_RUN_KEY, BM_SYSTEM_RESPONSE_TIME, this.responseTimeX);
         INTER_RUN_DATA.addField(INTER_RUN_KEY, BM_SYSTEM_JOB_NUMBER, this.jobNumberX);
@@ -190,12 +191,15 @@ public class StationaryStats {
 
         System.out.println("Interval estimations based upon "+ this.currBatch + " data points " +
                 "and with " + (int) (100.0 * confidence + 0.5) + "% confidence");
-        for (Map.Entry<String, Pair<Double, Double>> entry : metrics.entrySet()) {
+        for (Map.Entry<String, Tuple<DataField, Double, Double>> entry : metrics.entrySet()) {
             String metric = entry.getKey();
-            x = entry.getValue().getFirst();
-            s = entry.getValue().getSecond();
+            DataField dataField = entry.getValue().getFirst();
+            x = entry.getValue().getSecond();
+            s = entry.getValue().getThird();
 
             w = t * s / Math.sqrt(this.currBatch - 1);  /* interval half width */
+
+            INTER_RUN_DATA.addField(INTER_RUN_KEY, dataField, w);
 
             System.out.print(metric + " the expected value is in the interval " + f.format(x) + " +/- " + f.format(w) + "\n");
         }

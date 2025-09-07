@@ -179,11 +179,17 @@ public class DataCSVWriter {
         bmHeaders.add(TIMESTAMP, EVENT_TYPE_JOB, EVENT_TYPE_SCALING, COMPLETING_SERVER_INDEX, PER_JOB_RESPONSE_TIME);
         bmHeaders.add(
                 BM_SYSTEM_RESPONSE_TIME,
+                BM_SYSTEM_RESPONSE_TIME_W,
                 BM_SYSTEM_JOB_NUMBER,
+                BM_SYSTEM_JOB_NUMBER_W,
                 BM_SYSTEM_UTILIZATION,
+                BM_SYSTEM_UTILIZATION_W,
                 BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC,
+                BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC_W,
                 BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC,
-                BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC
+                BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC_W,
+                BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC,
+                BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC_W
         );
         for (int i = 1; i <= MAX_NUM_SERVERS; i++) {
             bmHeaders.add(
@@ -219,11 +225,17 @@ public class DataCSVWriter {
         );
         INTER_RUN_DATA_HEADERS.add(
                 BM_SYSTEM_RESPONSE_TIME,
+                BM_SYSTEM_RESPONSE_TIME_W,
                 BM_SYSTEM_JOB_NUMBER,
+                BM_SYSTEM_JOB_NUMBER_W,
                 BM_SYSTEM_UTILIZATION,
+                BM_SYSTEM_UTILIZATION_W,
                 BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC,
+                BM_SYSTEM_ALLOCATED_CAPACITY_PER_SEC_W,
                 BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC,
-                BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC
+                BM_SYSTEM_95PERC_SLO_VIOLATIONS_PERC_W,
+                BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC,
+                BM_SYSTEM_99PERC_SLO_VIOLATIONS_PERC_W
         );
         flushList(INTER_RUN_DATA,
                 OUT_DIR_PATH, "final_all",
