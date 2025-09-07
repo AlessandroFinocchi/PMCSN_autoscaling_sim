@@ -279,16 +279,13 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
     void updateScalingIndicator() {
         if (SCALING_INDICATOR_TYPE.equals("r0")) {
             this.scalingIndicator = 0.0;
-            double denominator = 0;
-            List<AbstractServer> activeServers = webServers.stream()
+            List<WebServer> activeServers = webServers.stream()
                     .filter(ws -> ws.getServerState() == ServerState.ACTIVE)
-                    .collect(Collectors.toList());
+                    .toList();
 
             for (AbstractServer server : activeServers) {
-                denominator += Math.pow(server.size(), 2);
-                this.scalingIndicator += server.getWindowedMeanResponseTime() * Math.pow(server.size(), 2);
+                this.scalingIndicator += server.getWindowedMeanResponseTime() / activeServers.size();
             }
-            this.scalingIndicator /= denominator;
         } else if (SCALING_INDICATOR_TYPE.equals("jobs")) {
             this.scalingIndicator = webServers.stream()
                     .filter(ws -> ws.getServerState() == ServerState.ACTIVE || ws.getServerState() == ServerState.TO_BE_REMOVED)

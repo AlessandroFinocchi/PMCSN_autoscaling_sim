@@ -12,8 +12,15 @@ public class ExperimentAdvanced2 implements Experiment {
 
     @Override
     public List<RunConfiguration> getRunConfigurations() {
-        setConfiguration(1, 2.0, 10, 4.0, true, 100, "r0");
-        setConfiguration(2, 2.0, 10, 4.0, true, 100, "jobs");
+        int index;
+        index = 100;
+        for (double scalingThr = 0.2; scalingThr <= 10.0; scalingThr += 0.2) {
+            setConfiguration(++index, 2.0, 10, scalingThr, false, 100, "r0");
+        }
+        index = 200;
+        for (double scalingThr = 0.1; scalingThr <= 5.0; scalingThr += 0.1) {
+            setConfiguration(++index, 2.0, 10, scalingThr, false, 100, "jobs");
+        }
 
         return result;
     }
@@ -27,7 +34,7 @@ public class ExperimentAdvanced2 implements Experiment {
         RunConfiguration c = new RunConfiguration(String.valueOf(index));
 
         /* Common */
-        c.put("log.fine", "true");
+        c.put("log.fine", "false");
         c.put("distribution.arrivals.type", "h2");
         c.put("distribution.services.type", "h2");
         c.put("distribution.arrivals.mu", String.valueOf(1.0 / 4.0));
