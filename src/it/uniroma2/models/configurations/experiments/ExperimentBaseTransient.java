@@ -17,7 +17,7 @@ public class ExperimentBaseTransient implements Experiment {
         addConfiguration(1, 4.0, 1.0, 4, 3, null, null, shortRunLength);
         addConfiguration(2, 4.0, 1.0, 4, 5, null, null, longRunLength);
         // Group 2
-        addConfiguration(3, 10.0, 0.4, 4, 5, null, null, shortRunLength);
+        addConfiguration(3, 10.0, 0.4, 4, 5, null, null, longRunLength);
         addConfiguration(4, 4.0, 1.0, 40, 5, null, null, longRunLength);
         // Group 3
         addConfiguration(5, 4.0, 1.0, 4, 5, 0.1, null, longRunLength);
@@ -27,12 +27,12 @@ public class ExperimentBaseTransient implements Experiment {
         addConfiguration(8, 5.5, 1.0, 4, 5, 2.0, null, longRunLength);
         addConfiguration(9, 6.5, 1.0, 4, 5, 2.0, null, shortRunLength);
         // Group 5a
-        addConfiguration(10, 4.0, 1.0, 4, 5, null, 6.0, shortRunLength);
-        addConfiguration(11, 4.0, 1.0, 4, 5, null, 8.0, shortRunLength);
+        addConfiguration(10, 4.0, 1.0, 4, 5, null, 6.0, longRunLength);
+        addConfiguration(11, 4.0, 1.0, 4, 5, null, 8.0, longRunLength);
         addConfiguration(12, 4.0, 1.0, 4, 5, null, 16.0, shortRunLength);
         // Group 5b
-        addConfiguration(13, 4.0, 1.0, 4, 4, 2.0, 6.0, shortRunLength);
-        addConfiguration(14, 4.0, 1.0, 4, 4, 2.0, 8.0, shortRunLength);
+        addConfiguration(13, 4.0, 1.0, 4, 4, 2.0, 6.0, longRunLength);
+        addConfiguration(14, 4.0, 1.0, 4, 4, 2.0, 8.0, longRunLength);
         addConfiguration(15, 4.0, 1.0, 4, 4, 2.0, 16.0, shortRunLength);
 
         return result;

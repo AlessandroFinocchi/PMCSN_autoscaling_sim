@@ -18,6 +18,7 @@ public class ExperimentFactory {
             case "val_adv" -> new ExperimentAdvancedValidation();
             case "trans_adv" -> new ExperimentAdvancedTransient();
             case "adv1" -> new ExperimentAdvanced1();
+            case "adv2" -> new ExperimentAdvanced2();
             default -> throw new IllegalArgumentException("Invalid experiment type: " + EXPERIMENT);
         };
     }

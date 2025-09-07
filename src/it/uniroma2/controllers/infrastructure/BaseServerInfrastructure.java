@@ -6,7 +6,6 @@ import it.uniroma2.controllers.servers.*;
 import it.uniroma2.exceptions.IllegalLifeException;
 import it.uniroma2.models.jobs.Job;
 import it.uniroma2.models.sys.ServerStats;
-import it.uniroma2.models.sys.StationaryStats;
 import it.uniroma2.models.sys.SystemStats;
 import it.uniroma2.models.sys.TransientStats;
 import lombok.Getter;
@@ -290,7 +289,7 @@ public class BaseServerInfrastructure implements IServerInfrastructure {
                 this.scalingIndicator += server.getWindowedMeanResponseTime() * Math.pow(server.size(), 2);
             }
             this.scalingIndicator /= denominator;
-        } else if (SCALING_INDICATOR_TYPE.equals("job")) {
+        } else if (SCALING_INDICATOR_TYPE.equals("jobs")) {
             this.scalingIndicator = webServers.stream()
                     .filter(ws -> ws.getServerState() == ServerState.ACTIVE || ws.getServerState() == ServerState.TO_BE_REMOVED)
                     .map(AbstractServer::size)
