@@ -13,34 +13,34 @@ public class ExperimentAdvanced1 implements Experiment {
     @Override
     public List<RunConfiguration> getRunConfigurations() {
         int index;
-        List<Double> siMaxList = this.getSiMaxList();
-        List<Double> scalingThrList = this.getSiMaxList();
-
-        index = 1;
-        for (Double siMax : siMaxList) {
-            for (int maxWsNum = 6; maxWsNum <= 10; maxWsNum++) {
-                for (Double scalingThr : scalingThrList) {
-                    setConfiguration(++index, siMax, maxWsNum, scalingThr, false, 100);
-                }
-            }
+        index = 100;
+        for (double scalingThr = 0.2; scalingThr <= 10.0; scalingThr += 0.2) {
+            setConfiguration(++index, 2.0, 10, scalingThr, false, 100, "r0");
+        }
+        index = 200;
+        for (double scalingThr = 0.1; scalingThr <= 5.0; scalingThr += 0.1) {
+            setConfiguration(++index, 2.0, 10, scalingThr, false, 100, "jobs");
         }
 
         return result;
     }
 
-    void setConfiguration(int index, double siMax, int maxWsNum, Double scaling_thr,
-                          boolean logIntraRun, double fast_interval) {
-//        RunConfiguration c = new RunConfiguration("base_1_" + String.format("%02d", index));
+    void setConfiguration(
+            int index,
+            double siMax, int maxWsNum, Double scaling_thr,
+            boolean logIntraRun, double fast_interval,
+            String scalingType
+    ) {
         RunConfiguration c = new RunConfiguration(String.valueOf(index));
 
         /* Common */
+        c.put("log.fine", "false");
         c.put("distribution.arrivals.type", "h2");
         c.put("distribution.services.type", "h2");
         c.put("distribution.arrivals.mu", String.valueOf(1.0 / 4.0));
         c.put("distribution.services.z", "1");
         c.put("infrastructure.spikeserver.active", "true");
         c.put("spikeserver.version", "2");
-        c.put("webserver.scaling.type", "jobs");
         c.put("system.empty_jobs", "false");
         c.put("random.repeat_config", "1");
         c.put("stats.batch.num", "128");
@@ -56,6 +56,7 @@ public class ExperimentAdvanced1 implements Experiment {
         c.put("infrastructure.max_num_server", String.valueOf(maxWsNum));
         c.put("webserver.scaling.out_thr", String.valueOf(scaling_thr));
         c.put("distribution.arrivals.fast_interval", String.valueOf(fast_interval));
+        c.put("webserver.scaling.type", scalingType);
 
         result.add(c);
     }

@@ -34,14 +34,13 @@ public class ExperimentBaseVerification implements Experiment{
         c.put("system.empty_jobs", "false");
         c.put("webserver.capacity", "1");
         c.put("infrastructure.start_num_server", "1");
+        c.put("infrastructure.start_num_server", "1");
 
         /* Specific */
         c.put("distribution.arrivals.type", arrivalDistr);
         c.put("distribution.services.type", completionDistr);
         c.put("distribution.arrivals.mu", String.valueOf(1.0 / lambda));
         c.put("distribution.services.z",  String.valueOf(z));
-
-        // extra
 
         result.add(c);
     }
