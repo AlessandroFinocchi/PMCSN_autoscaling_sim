@@ -63,12 +63,15 @@ public class ExperimentAdvanced2 implements Experiment {
     private List<Double> getSiMaxList() {
         List<Double> siMaxList = new ArrayList<>();
 
+        siMaxList.add(0.1);
+        siMaxList.add(0.5);
+
         for (double si = 1; si < 5; si += 1) {
             siMaxList.add(si);
         }
-        for (double si = 7 ; si <= 10; si += 3) {
-            siMaxList.add(si);
-        }
+//        for (double si = 7 ; si <= 10; si += 3) {
+//            siMaxList.add(si);
+//        }
 
         return siMaxList;
     }
