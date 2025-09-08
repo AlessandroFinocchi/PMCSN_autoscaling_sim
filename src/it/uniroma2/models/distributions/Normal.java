@@ -21,8 +21,8 @@ public class Normal extends Distribution {
 
     @Override
     public double gen() {
-        double u1 = u1VA.newTime();
-        double u2 = u2VA.newTime();
+        double u1 = u1VA.gen();
+        double u2 = u2VA.gen();
         double z0 = Math.sqrt(- 2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
         return this.mean + z0 * Math.sqrt(s2);
     }
