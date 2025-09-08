@@ -15,16 +15,16 @@ public class ExperimentBase1 implements Experiment {
 
         /* group 1 */
         index = 100;
-        for (Double siMax : siMaxList) {
-            for (int ssVersion = 1; ssVersion <= 2; ssVersion++) {
+        for (int ssVersion = 1; ssVersion <= 2; ssVersion++) {
+            for (Double siMax : siMaxList) {
                 setConfiguration(++index, siMax, 6, ssVersion, false, 100);
             }
         }
 
         /* group 2 */
         index = 200;
-        for (Double siMax : siMaxList) {
-            for (int wsNum = 6; wsNum <= 8; wsNum++) {
+        for (int wsNum = 6; wsNum <= 8; wsNum++) {
+            for (Double siMax : siMaxList) {
                 setConfiguration(++index, siMax, wsNum, 2, false, 100);
             }
         }
@@ -70,7 +70,7 @@ public class ExperimentBase1 implements Experiment {
     private List<Double> getSiMaxList() {
         List<Double> siMaxList = new ArrayList<>();
 
-        for (double si = 0.4; si < 4; si += 0.4) {
+        for (double si = 0.4; si < 3.7; si += 0.4) {
             siMaxList.add(si);
         }
         for (double si = 4.0; si < 10; si += 1) {
