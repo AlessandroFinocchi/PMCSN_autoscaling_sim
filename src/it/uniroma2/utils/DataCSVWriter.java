@@ -148,30 +148,31 @@ public class DataCSVWriter {
         allJobsHeaders.add(
                 TIMESTAMP,
                 AGG_SYSTEM_RESPONSE_TIME,
-                AGG_SYSTEM_JOB_NUMBER,
+                // AGG_SYSTEM_JOB_NUMBER,
                 AGG_SYSTEM_UTILIZATION,
                 AGG_SYSTEM_ALLOCATED_CAPACITY_PER_SEC
         );
-        allJobsHeaders.add(
-                AGG_SERVER_RESPONSE_TIME + "_" + 0,
-                AGG_SERVER_JOB_NUMBER + "_" + 0,
-                AGG_SERVER_UTILIZATION + "_" + 0,
-                AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + 0
-        );
-        for (int i = 1; i <= 1; i++) {
-            allJobsHeaders.add(
-                    AGG_SERVER_RESPONSE_TIME + "_" + i,
-                    AGG_SERVER_JOB_NUMBER + "_" + i,
-                    AGG_SERVER_UTILIZATION + "_" + i,
-                    AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + i
-            );
-        }
-        allJobsHeaders.add(REPETITION_ID);
+        // allJobsHeaders.add(
+        //         AGG_SERVER_RESPONSE_TIME + "_" + 0,
+        //         AGG_SERVER_JOB_NUMBER + "_" + 0,
+        //         AGG_SERVER_UTILIZATION + "_" + 0,
+        //         AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + 0
+        // );
+        // for (int i = 1; i <= 1; i++) {
+        //     allJobsHeaders.add(
+        //             AGG_SERVER_RESPONSE_TIME + "_" + i,
+        //             AGG_SERVER_JOB_NUMBER + "_" + i,
+        //             AGG_SERVER_UTILIZATION + "_" + i,
+        //             AGG_SERVER_ALLOCATED_CAPACITY_PER_SEC + "_" + i
+        //     );
+        // }
+        allJobsHeaders.add(CONFIGURATION_ID, REPETITION_ID);
         DataTimeTable combinedJobsData = INTRA_RUN_DATA
                 .filterPeriod(1.0)
+                .setEach(CONFIGURATION_ID, c.getName())
                 .setEach(REPETITION_ID, repetition);
         flushList(combinedJobsData,
-                OUT_DIR_PATH_WITH_SUFFIX, "jobs" + "-" + c.getName() + "_all",
+                OUT_DIR_PATH_WITH_SUFFIX, "trans_all",
                 allJobsHeaders.get(), true);
 
         INTRA_RUN_DATA.clear();
