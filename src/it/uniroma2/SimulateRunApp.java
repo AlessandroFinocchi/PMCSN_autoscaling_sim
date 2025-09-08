@@ -101,7 +101,11 @@ public class SimulateRunApp {
             if (hasLongTermFluctuations) {
                 double slowPercentage = (ARRIVALS_TOTAL_PERIOD - ARRIVALS_FAST_INTERVAL) / ARRIVALS_TOTAL_PERIOD;
                 double fastPercentage = ARRIVALS_FAST_INTERVAL / ARRIVALS_TOTAL_PERIOD;
-                double slowMu = (ARRIVALS_MU - ARRIVALS_FAST_MU * fastPercentage) / slowPercentage;
+
+                double meanLambda = 1 / ARRIVALS_MU;
+                double fastMean = 1 / ARRIVALS_FAST_MU;
+                double slowMean = (meanLambda - fastMean * fastPercentage) / slowPercentage;
+                double slowMu = 1 / slowMean;
 
                 if (nextEvent.getTimestamp() % ARRIVALS_TOTAL_PERIOD < slowPercentage * ARRIVALS_TOTAL_PERIOD) {
                     // Slow arrivals
