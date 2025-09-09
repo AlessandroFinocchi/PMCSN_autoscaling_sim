@@ -15,23 +15,23 @@ public class ExperimentBase1 implements Experiment {
 
         /* group 1 */
         index = 100;
-        for (int ssVersion = 1; ssVersion <= 2; ssVersion++) {
-            for (Double siMax : siMaxList) {
-                setConfiguration(++index, siMax, 6, ssVersion, false, 100);
-            }
-        }
-
-        /* group 2 */
-        index = 200;
-        for (int wsNum = 6; wsNum <= 8; wsNum++) {
-            for (Double siMax : siMaxList) {
-                setConfiguration(++index, siMax, wsNum, 2, false, 100);
-            }
-        }
-
-        /* group 3 */
-        index = 300;
-        setConfiguration(++index, 5, 6, 2, true, 0);
+//        for (int ssVersion = 1; ssVersion <= 2; ssVersion++) {
+//            for (Double siMax : siMaxList) {
+//                setConfiguration(++index, siMax, 6, ssVersion, false, 100);
+//            }
+//        }
+//
+//        /* group 2 */
+//        index = 200;
+//        for (int wsNum = 6; wsNum <= 8; wsNum++) {
+//            for (Double siMax : siMaxList) {
+//                setConfiguration(++index, siMax, wsNum, 2, false, 100);
+//            }
+//        }
+//
+//        /* group 3 */
+//        index = 300;
+//        setConfiguration(++index, 5, 6, 2, true, 0);
         setConfiguration(++index, 5, 6, 2, true, 100);
 
         return result;

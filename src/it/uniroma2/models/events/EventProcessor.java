@@ -25,7 +25,9 @@ public class EventProcessor implements EventVisitor {
         double scalingIndicator = servers.computeJobsAdvancement(startTs, endTs, false);
 
         /* Plan scaling */
-        planScaling(s, endTs, scalingIndicator);
+        if(SCALING_INDICATOR_TYPE.equals("jobs")) {
+            planScaling(s, endTs, scalingIndicator);
+        }
 
         /* Add the next job to the list */
         double nextServiceLife = s.getServicesVA().gen();
@@ -159,8 +161,8 @@ public class EventProcessor implements EventVisitor {
             scalingInPossible = servers.getNumWebServersByState(ServerState.ACTIVE) > 1;
 
             if (SCALING_INDICATOR_TYPE.equals("r0")) {
-                scalingOutCondition = scalingIndicator > SCALING_OUT_THRESHOLD * 1.2;
-                scalingInCondition = scalingIndicator < SCALING_OUT_THRESHOLD * 0.8;
+                scalingOutCondition = scalingIndicator > SCALING_OUT_THRESHOLD * 1.5;
+                scalingInCondition = scalingIndicator < SCALING_OUT_THRESHOLD * 0.5;
             } else if (SCALING_INDICATOR_TYPE.equals("jobs")) {
                 int expectedServers = (int) (Math.floor(scalingIndicator / SCALING_OUT_THRESHOLD) + 1);
                 scalingOutCondition = activatedServer < expectedServers;
